@@ -28,7 +28,7 @@ func (r *repository) FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, err
 		q = q.Where("run_num = ?", input.RunNum)
 	}
 
-	err := q.Find(&boqBody).Error
+	err := q.Order("id asc").Find(&boqBody).Error
 
 	return boqBody, err
 }

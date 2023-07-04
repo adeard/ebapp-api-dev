@@ -16,10 +16,10 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 
 	handler := &boqBodyHandler{boqBodyService}
 
-	ztsTravis := v1.Group("boq_body")
+	boqBody := v1.Group("boq_body")
 
-	ztsTravis.GET("", handler.GetAll)
-	ztsTravis.POST("", handler.Store)
+	boqBody.GET("", handler.GetAll)
+	boqBody.POST("", handler.Store)
 }
 
 func (h *boqBodyHandler) GetAll(c *gin.Context) {
@@ -31,15 +31,142 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	ztsTravis, err := h.boqBodyService.GetAll(input)
+	boqBody, err := h.boqBodyService.GetAll(input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"errors ": err,
 		})
 	}
 
+	res := []domain.BoqBodyResponse{}
+
+	ParentData := domain.BoqBody{}
+
+	HighestLevel := 1
+
+	for _, boqBodyData := range boqBody {
+		if res == nil || boqBodyData.ItemLevel == 1 {
+			ParentData = boqBodyData
+			res = append(res, domain.BoqBodyResponse{
+				Id:                boqBodyData.Id,
+				RunNum:            boqBodyData.RunNum,
+				ItemNo:            boqBodyData.ItemNo,
+				ItemLevel:         boqBodyData.ItemLevel,
+				ItemDescription:   boqBodyData.ItemDescription,
+				ItemSpecification: boqBodyData.ItemSpecification,
+				Qty:               boqBodyData.Qty,
+				Unit:              boqBodyData.Unit,
+				Price:             boqBodyData.Price,
+				Currency:          boqBodyData.Currency,
+				Note:              boqBodyData.Note,
+				Children:          nil,
+				ParentId:          0,
+			})
+
+			continue
+		}
+
+		previousValue := res[len(res)-1]
+
+		if previousValue.ItemLevel < boqBodyData.ItemLevel {
+			if HighestLevel <= boqBodyData.ItemLevel {
+				HighestLevel = boqBodyData.ItemLevel
+			}
+			ParentData = domain.BoqBody{
+				Id: previousValue.Id,
+			}
+
+			res = append(res, domain.BoqBodyResponse{
+				Id:                boqBodyData.Id,
+				RunNum:            boqBodyData.RunNum,
+				ItemNo:            boqBodyData.ItemNo,
+				ItemLevel:         boqBodyData.ItemLevel,
+				ItemDescription:   boqBodyData.ItemDescription,
+				ItemSpecification: boqBodyData.ItemSpecification,
+				Qty:               boqBodyData.Qty,
+				Unit:              boqBodyData.Unit,
+				Price:             boqBodyData.Price,
+				Currency:          boqBodyData.Currency,
+				Note:              boqBodyData.Note,
+				Children:          nil,
+				ParentId:          ParentData.Id,
+			})
+
+			continue
+		}
+
+		if previousValue.ItemLevel == boqBodyData.ItemLevel {
+			res = append(res, domain.BoqBodyResponse{
+				Id:                boqBodyData.Id,
+				RunNum:            boqBodyData.RunNum,
+				ItemNo:            boqBodyData.ItemNo,
+				ItemLevel:         boqBodyData.ItemLevel,
+				ItemDescription:   boqBodyData.ItemDescription,
+				ItemSpecification: boqBodyData.ItemSpecification,
+				Qty:               boqBodyData.Qty,
+				Unit:              boqBodyData.Unit,
+				Price:             boqBodyData.Price,
+				Currency:          boqBodyData.Currency,
+				Note:              boqBodyData.Note,
+				Children:          nil,
+				ParentId:          previousValue.ParentId,
+			})
+
+			continue
+		}
+
+		if previousValue.ItemLevel > boqBodyData.ItemLevel {
+			var ParentBefore int
+			for _, parentData := range res {
+				if parentData.Id == previousValue.ParentId {
+					ParentBefore = parentData.ParentId
+				}
+			}
+			res = append(res, domain.BoqBodyResponse{
+				Id:                boqBodyData.Id,
+				RunNum:            boqBodyData.RunNum,
+				ItemNo:            boqBodyData.ItemNo,
+				ItemLevel:         boqBodyData.ItemLevel,
+				ItemDescription:   boqBodyData.ItemDescription,
+				ItemSpecification: boqBodyData.ItemSpecification,
+				Qty:               boqBodyData.Qty,
+				Unit:              boqBodyData.Unit,
+				Price:             boqBodyData.Price,
+				Currency:          boqBodyData.Currency,
+				Note:              boqBodyData.Note,
+				Children:          nil,
+				ParentId:          ParentBefore,
+			})
+
+			continue
+		}
+
+	}
+
+	for i := HighestLevel; i > 0; i-- {
+		for _, resData := range res {
+			if resData.ParentId != 0 && resData.ItemLevel == i {
+				for index, parentTemp := range res {
+					if parentTemp.Id == resData.ParentId {
+						parentTemp.Children = append(parentTemp.Children, resData)
+						res[index] = parentTemp
+						break
+					}
+				}
+			}
+		}
+	}
+
+	resultFix := []domain.BoqBodyResponse{}
+
+	for _, final := range res {
+		if final.ItemLevel == 1 {
+			resultFix = append(resultFix, final)
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"data": ztsTravis,
+		"data": resultFix,
 	})
 }
 
