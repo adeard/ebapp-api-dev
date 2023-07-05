@@ -40,13 +40,12 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 
 	res := []domain.BoqBodyResponse{}
 
-	ParentData := domain.BoqBody{}
+	ParentId := 0
 
 	HighestLevel := 1
 
 	for _, boqBodyData := range boqBody {
 		if res == nil || boqBodyData.ItemLevel == 1 {
-			ParentData = boqBodyData
 			res = append(res, domain.BoqBodyResponse{
 				Id:                boqBodyData.Id,
 				RunNum:            boqBodyData.RunNum,
@@ -72,47 +71,12 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 			if HighestLevel <= boqBodyData.ItemLevel {
 				HighestLevel = boqBodyData.ItemLevel
 			}
-			ParentData = domain.BoqBody{
-				Id: previousValue.Id,
-			}
 
-			res = append(res, domain.BoqBodyResponse{
-				Id:                boqBodyData.Id,
-				RunNum:            boqBodyData.RunNum,
-				ItemNo:            boqBodyData.ItemNo,
-				ItemLevel:         boqBodyData.ItemLevel,
-				ItemDescription:   boqBodyData.ItemDescription,
-				ItemSpecification: boqBodyData.ItemSpecification,
-				Qty:               boqBodyData.Qty,
-				Unit:              boqBodyData.Unit,
-				Price:             boqBodyData.Price,
-				Currency:          boqBodyData.Currency,
-				Note:              boqBodyData.Note,
-				Children:          nil,
-				ParentId:          ParentData.Id,
-			})
-
-			continue
+			ParentId = previousValue.Id
 		}
 
 		if previousValue.ItemLevel == boqBodyData.ItemLevel {
-			res = append(res, domain.BoqBodyResponse{
-				Id:                boqBodyData.Id,
-				RunNum:            boqBodyData.RunNum,
-				ItemNo:            boqBodyData.ItemNo,
-				ItemLevel:         boqBodyData.ItemLevel,
-				ItemDescription:   boqBodyData.ItemDescription,
-				ItemSpecification: boqBodyData.ItemSpecification,
-				Qty:               boqBodyData.Qty,
-				Unit:              boqBodyData.Unit,
-				Price:             boqBodyData.Price,
-				Currency:          boqBodyData.Currency,
-				Note:              boqBodyData.Note,
-				Children:          nil,
-				ParentId:          previousValue.ParentId,
-			})
-
-			continue
+			ParentId = previousValue.ParentId
 		}
 
 		if previousValue.ItemLevel > boqBodyData.ItemLevel {
@@ -120,26 +84,31 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 			for _, parentData := range res {
 				if parentData.Id == previousValue.ParentId {
 					ParentBefore = parentData.ParentId
+
+					break
 				}
 			}
-			res = append(res, domain.BoqBodyResponse{
-				Id:                boqBodyData.Id,
-				RunNum:            boqBodyData.RunNum,
-				ItemNo:            boqBodyData.ItemNo,
-				ItemLevel:         boqBodyData.ItemLevel,
-				ItemDescription:   boqBodyData.ItemDescription,
-				ItemSpecification: boqBodyData.ItemSpecification,
-				Qty:               boqBodyData.Qty,
-				Unit:              boqBodyData.Unit,
-				Price:             boqBodyData.Price,
-				Currency:          boqBodyData.Currency,
-				Note:              boqBodyData.Note,
-				Children:          nil,
-				ParentId:          ParentBefore,
-			})
 
-			continue
+			ParentId = ParentBefore
 		}
+
+		res = append(res, domain.BoqBodyResponse{
+			Id:                boqBodyData.Id,
+			RunNum:            boqBodyData.RunNum,
+			ItemNo:            boqBodyData.ItemNo,
+			ItemLevel:         boqBodyData.ItemLevel,
+			ItemDescription:   boqBodyData.ItemDescription,
+			ItemSpecification: boqBodyData.ItemSpecification,
+			Qty:               boqBodyData.Qty,
+			Unit:              boqBodyData.Unit,
+			Price:             boqBodyData.Price,
+			Currency:          boqBodyData.Currency,
+			Note:              boqBodyData.Note,
+			Children:          nil,
+			ParentId:          ParentId,
+		})
+
+		continue
 
 	}
 
