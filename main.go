@@ -2,7 +2,6 @@ package main
 
 import (
 	"ebapp-api-dev/config"
-	"ebapp-api-dev/middlewares"
 	"ebapp-api-dev/modules/auth"
 	"ebapp-api-dev/modules/boqbody"
 
@@ -19,7 +18,7 @@ func main() {
 	v1 := router.Group("api/v1")
 	auth.NewAuthHandler(v1, auth.AuthRegistry(db))
 
-	v1.Use(middlewares.AuthService_Sample())
+	//v1.Use(middlewares.AuthService_Sample())
 
 	boqbody.NewBoqBodyHandler(v1, boqbody.BoqBodyRegistry(db))
 

@@ -7,7 +7,7 @@ type BoqBody struct {
 	ItemLevel         int     `json:"item_level"`
 	ItemDescription   string  `json:"item_description"`
 	ItemSpecification string  `json:"item_specification"`
-	Qty               int     `json:"qty"`
+	Qty               float32 `json:"qty"`
 	Unit              string  `json:"unit"`
 	Price             float64 `json:"price"`
 	Currency          string  `json:"currency"`
@@ -20,7 +20,7 @@ type BoqBodyRequest struct {
 	ItemLevel         int     `json:"item_level"`
 	ItemDescription   string  `json:"item_description"`
 	ItemSpecification string  `json:"item_specification"`
-	Qty               int     `json:"qty"`
+	Qty               float32 `json:"qty"`
 	Unit              string  `json:"unit"`
 	Price             float64 `json:"price"`
 	Currency          string  `json:"currency"`
@@ -34,7 +34,7 @@ type BoqBodyResponse struct {
 	ItemLevel         int               `json:"item_level"`
 	ItemDescription   string            `json:"item_description"`
 	ItemSpecification string            `json:"item_specification"`
-	Qty               int               `json:"qty"`
+	Qty               float32           `json:"qty"`
 	Unit              string            `json:"unit"`
 	Price             float64           `json:"price"`
 	Currency          string            `json:"currency"`
