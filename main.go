@@ -4,6 +4,7 @@ import (
 	"ebapp-api-dev/config"
 	"ebapp-api-dev/modules/auth"
 	"ebapp-api-dev/modules/boqbody"
+	"ebapp-api-dev/modules/boqheader"
 	"log"
 	"net/http"
 	"os"
@@ -24,6 +25,7 @@ func main() {
 	//v1.Use(middlewares.AuthService_Sample())
 
 	boqbody.NewBoqBodyHandler(v1, boqbody.BoqBodyRegistry(db))
+	boqheader.NewBoqHeaderHandler(v1, boqheader.BoqHeaderRegistry(db))
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)
