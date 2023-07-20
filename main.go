@@ -28,6 +28,7 @@ func main() {
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)
 
+	//Penyesuaian Port ke IIS
 	port := "88"
 	if os.Getenv("ASPNETCORE_PORT") != "" {
 		port = os.Getenv("ASPNETCORE_PORT")
@@ -35,6 +36,6 @@ func main() {
 
 	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
-		log.Fatal("Gagal mendengarkan port "+port+":", err)
+		log.Fatal("Koneksi gagal -> port "+port+":", err)
 	}
 }
