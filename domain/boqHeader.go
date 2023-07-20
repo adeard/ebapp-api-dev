@@ -8,7 +8,7 @@ type BoqHeader struct {
 	HeaderDescription string    `json:"header_description"`
 	HeaderVersion     string    `json:"header_version"`
 	HeaderStatus      bool      `json:"header_status"`
-	CreatedAt         time.Time `json:"created_at"`
+	Created           time.Time `json:"created"`
 	CreatedBy         string    `json:"created_by"`
 	LastUpdated       time.Time `json:"last_updated"`
 	LastUpdatedBy     string    `json:"last_updated_by"`
