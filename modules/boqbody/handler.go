@@ -33,9 +33,12 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 
 	boqBody, err := h.boqBodyService.GetAll(input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"errors ": err,
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Body",
+			"data":    nil,
 		})
+		return
 	}
 
 	res := []domain.BoqBodyResponse{}
@@ -135,7 +138,9 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": resultFix,
+		"status":  200,
+		"message": "Berhasil mengambil data BoQ Body",
+		"data":    resultFix,
 	})
 }
 
