@@ -26,17 +26,18 @@ func (h *boqHeaderHandler) GetAll(c *gin.Context) {
 	boqHeaders, err := h.boqHeaderService.GetAll(input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Gagal mengambil data BoQ Header",
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Header",
 		})
 		return
 	}
 
 	// Mengubah data BoQ Header menjadi response yang sesuai dengan BoqHeaderResponse.
-	var response domain.BoqHeaderResponse
-
-	response.Data = boqHeaders
-	response.Status = 200
-	response.Message = "Berhasil mengambil data BoQ Header"
+	response := domain.BoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data BoQ Header",
+		Data:    boqHeaders,
+	}
 
 	// Mengirimkan response dengan data BoQ Header yang sudah diubah formatnya.
 	c.JSON(http.StatusOK, response)
