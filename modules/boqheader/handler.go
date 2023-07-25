@@ -3,6 +3,7 @@ package boqheader
 import (
 	"ebapp-api-dev/domain"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,4 +44,45 @@ func (h *boqHeaderHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *boqHeaderHandler) Store(c *gin.Context) {}
+func (h *boqHeaderHandler) Store(c *gin.Context) {
+	var input domain.BoqHeaderRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	createdBoqHeader := domain.BoqHeader{
+		RunNum:            "14",
+		BoqNo:             input.BoqNo,
+		HeaderDescription: input.HeaderDescription,
+		HeaderVersion:     input.HeaderVersion,
+		HeaderStatus:      input.HeaderStatus,
+		Created:           time.Now(),
+		CreatedBy:         input.CreatedBy,
+		LastUpdated:       time.Now(),
+		LastUpdatedBy:     input.LastUpdatedBy,
+		Category:          input.Category,
+		Remarks:           input.Remarks,
+	}
+
+	boqHeaders, err := h.boqHeaderService.Store(createdBoqHeader)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Header",
+		})
+		return
+	}
+
+	response := domain.BoqHeaderResponse{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data BoQ Header",
+		Data:    []domain.BoqHeader{boqHeaders},
+	}
+
+	c.JSON(http.StatusCreated, response)
+}

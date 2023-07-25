@@ -8,7 +8,7 @@ import (
 
 type Repository interface {
 	FindAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error)
-	Store(input domain.BoqHeaderRequest) (domain.BoqHeaderRequest, error)
+	Store(input domain.BoqHeader) (domain.BoqHeader, error)
 }
 
 type repository struct {
@@ -25,7 +25,7 @@ func (r *repository) FindAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader,
 	return boqHeaders, err
 }
 
-func (r *repository) Store(input domain.BoqHeaderRequest) (domain.BoqHeaderRequest, error) {
+func (r *repository) Store(input domain.BoqHeader) (domain.BoqHeader, error) {
 
 	err := r.db.Table("boq_header").Create(&input).Error
 	return input, err

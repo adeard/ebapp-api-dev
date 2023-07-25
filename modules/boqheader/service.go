@@ -4,7 +4,7 @@ import "ebapp-api-dev/domain"
 
 type Service interface {
 	GetAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error)
-	Store(input domain.BoqHeaderRequest) (domain.BoqHeaderRequest, error)
+	Store(input domain.BoqHeader) (domain.BoqHeader, error)
 }
 
 type service struct {
@@ -20,7 +20,7 @@ func (s *service) GetAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader, err
 	return boqHeaders, err
 }
 
-func (s *service) Store(input domain.BoqHeaderRequest) (domain.BoqHeaderRequest, error) {
+func (s *service) Store(input domain.BoqHeader) (domain.BoqHeader, error) {
 	boqHeader, err := s.repository.Store(input)
 	return boqHeader, err
 }
