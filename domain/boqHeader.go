@@ -10,8 +10,8 @@ type BoqHeader struct {
 	HeaderStatus      bool      `json:"header_status" gorm:"column:header_status"`
 	Created           time.Time `json:"created" gorm:"column:created"`
 	CreatedBy         string    `json:"created_by" gorm:"column:created_by"`
-	LastUpdated       time.Time `json:"last_updated" gorm:"column:lastupdated"`
-	LastUpdatedBy     string    `json:"last_updated_by" gorm:"column:lastupdatedby"`
+	LastUpdated       time.Time `json:"last_updated" gorm:"column:lastupdated; default:nil"`
+	LastUpdatedBy     string    `json:"last_updated_by" gorm:"column:lastupdatedby; default:null"`
 	Category          string    `json:"category" gorm:"column:category"`
 	Remarks           string    `json:"remarks" gorm:"column:remarks"`
 }

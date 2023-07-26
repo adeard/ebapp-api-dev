@@ -2,6 +2,7 @@ package boqheader
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/helper"
 	"net/http"
 	"time"
 
@@ -55,16 +56,16 @@ func (h *boqHeaderHandler) Store(c *gin.Context) {
 		return
 	}
 
+	boqHeaderID, _ := helper.GenerateHeaderBoq(3)
+
 	createdBoqHeader := domain.BoqHeader{
-		RunNum:            "14",
+		RunNum:            boqHeaderID,
 		BoqNo:             input.BoqNo,
 		HeaderDescription: input.HeaderDescription,
 		HeaderVersion:     input.HeaderVersion,
 		HeaderStatus:      input.HeaderStatus,
 		Created:           time.Now(),
 		CreatedBy:         input.CreatedBy,
-		LastUpdated:       time.Now(),
-		LastUpdatedBy:     input.LastUpdatedBy,
 		Category:          input.Category,
 		Remarks:           input.Remarks,
 	}
@@ -73,7 +74,7 @@ func (h *boqHeaderHandler) Store(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Gagal mengambil data BoQ Header",
+			"message": "Gagal meneruskan data BoQ Header",
 		})
 		return
 	}
