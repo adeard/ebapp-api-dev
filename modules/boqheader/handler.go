@@ -20,6 +20,7 @@ func NewBoqHeaderHandler(v1 *gin.RouterGroup, boqHeaderService Service) {
 
 	boqHeader.GET("", handler.GetAll)
 	boqHeader.POST("", handler.Store)
+	boqHeader.PUT("/:id", handler.Update)
 }
 
 func (h *boqHeaderHandler) GetAll(c *gin.Context) {
@@ -86,4 +87,49 @@ func (h *boqHeaderHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *boqHeaderHandler) Update(c *gin.Context) {
+	// Mendapatkan nilai ID dari parameter URL.
+	id := c.Param("id")
+
+	var input domain.BoqHeaderRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	// Membuat objek domain.BoqHeader yang akan diupdate.
+	updatedBoqHeader := domain.BoqHeader{
+		RunNum:            id,
+		BoqNo:             input.BoqNo,
+		HeaderDescription: input.HeaderDescription,
+		HeaderVersion:     input.HeaderVersion,
+		HeaderStatus:      input.HeaderStatus,
+		LastUpdated:       time.Now(),
+		LastUpdatedBy:     input.LastUpdatedBy,
+		Category:          input.Category,
+		Remarks:           input.Remarks,
+	}
+
+	// Memanggil service untuk melakukan update data BoQ Header.
+	_, err := h.boqHeaderService.Update(updatedBoqHeader, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengupdate data BoQ Header",
+		})
+		return
+	}
+
+	response := domain.BoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengupdate data BoQ Header",
+	}
+
+	c.JSON(http.StatusOK, response)
 }
