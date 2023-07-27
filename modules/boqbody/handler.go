@@ -19,6 +19,7 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	boqBody := v1.Group("boq_body")
 
 	boqBody.GET("", handler.GetAll)
+	boqBody.GET("/:id", handler.GetByID)
 	boqBody.POST("", handler.Store)
 }
 
@@ -36,6 +37,139 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Gagal mengambil data BoQ Body",
+			"data":    nil,
+		})
+		return
+	}
+
+	res := []domain.BoqBodyResponse{}
+
+	ParentId := 0
+
+	HighestLevel := 1
+
+	for _, boqBodyData := range boqBody {
+		if res == nil || boqBodyData.ItemLevel == 1 {
+			res = append(res, domain.BoqBodyResponse{
+				Id:                boqBodyData.Id,
+				RunNum:            boqBodyData.RunNum,
+				ItemNo:            boqBodyData.ItemNo,
+				ItemLevel:         boqBodyData.ItemLevel,
+				ItemDescription:   boqBodyData.ItemDescription,
+				ItemSpecification: boqBodyData.ItemSpecification,
+				Qty:               boqBodyData.Qty,
+				Unit:              boqBodyData.Unit,
+				Price:             boqBodyData.Price,
+				Currency:          boqBodyData.Currency,
+				Note:              boqBodyData.Note,
+				Children:          nil,
+				ParentId:          0,
+			})
+
+			continue
+		}
+
+		previousValue := res[len(res)-1]
+
+		if previousValue.ItemLevel < boqBodyData.ItemLevel {
+			if HighestLevel <= boqBodyData.ItemLevel {
+				HighestLevel = boqBodyData.ItemLevel
+			}
+
+			ParentId = previousValue.Id
+		}
+
+		if previousValue.ItemLevel == boqBodyData.ItemLevel {
+			ParentId = previousValue.ParentId
+		}
+
+		if previousValue.ItemLevel > boqBodyData.ItemLevel {
+			var ParentBefore int
+			for _, parentData := range res {
+				if parentData.Id == previousValue.ParentId {
+					ParentBefore = parentData.ParentId
+
+					break
+				}
+			}
+
+			ParentId = ParentBefore
+		}
+
+		res = append(res, domain.BoqBodyResponse{
+			Id:                boqBodyData.Id,
+			RunNum:            boqBodyData.RunNum,
+			ItemNo:            boqBodyData.ItemNo,
+			ItemLevel:         boqBodyData.ItemLevel,
+			ItemDescription:   boqBodyData.ItemDescription,
+			ItemSpecification: boqBodyData.ItemSpecification,
+			Qty:               boqBodyData.Qty,
+			Unit:              boqBodyData.Unit,
+			Price:             boqBodyData.Price,
+			Currency:          boqBodyData.Currency,
+			Note:              boqBodyData.Note,
+			Children:          nil,
+			ParentId:          ParentId,
+		})
+
+		continue
+
+	}
+
+	for i := HighestLevel; i > 0; i-- {
+		for _, resData := range res {
+			if resData.ParentId != 0 && resData.ItemLevel == i {
+				for index, parentTemp := range res {
+					if parentTemp.Id == resData.ParentId {
+						parentTemp.Children = append(parentTemp.Children, resData)
+						res[index] = parentTemp
+						break
+					}
+				}
+			}
+		}
+	}
+
+	resultFix := []domain.BoqBodyResponse{}
+
+	for _, final := range res {
+		if final.ItemLevel == 1 {
+			resultFix = append(resultFix, final)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "Berhasil mengambil data BoQ Body",
+		"data":    resultFix,
+	})
+}
+
+func (h *boqBodyHandler) GetByID(c *gin.Context) {
+	runNum := c.Param("id")
+
+	var input domain.BoqBodyRequest
+
+	err := c.Bind(&input)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	boqBody, err := h.boqBodyService.GetByID(runNum)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Body",
+			"data":    nil,
+		})
+		return
+	}
+
+	if len(boqBody) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Data BoQ Body tidak ditemukan",
 			"data":    nil,
 		})
 		return

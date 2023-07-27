@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error)
+	FindByID(runNum string) ([]domain.BoqBody, error)
 	Store(input domain.BoqBodyRequest) (domain.BoqBodyRequest, error)
 }
 
@@ -26,6 +27,20 @@ func (r *repository) FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, err
 
 	if input.RunNum != "" {
 		q = q.Where("run_num = ?", input.RunNum)
+	}
+
+	err := q.Order("id asc").Find(&boqBody).Error
+
+	return boqBody, err
+}
+
+func (r *repository) FindByID(runNum string) ([]domain.BoqBody, error) {
+	var boqBody []domain.BoqBody
+
+	q := r.db.Table("boq_body").Debug()
+
+	if runNum != "" {
+		q = q.Where("run_num = ?", runNum)
 	}
 
 	err := q.Order("id asc").Find(&boqBody).Error

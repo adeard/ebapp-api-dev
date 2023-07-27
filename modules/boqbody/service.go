@@ -4,6 +4,7 @@ import "ebapp-api-dev/domain"
 
 type Service interface {
 	GetAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error)
+	GetByID(runNum string) ([]domain.BoqBody, error)
 	Store(input domain.BoqBodyRequest) (domain.BoqBodyRequest, error)
 }
 
@@ -19,6 +20,11 @@ func (s *service) GetAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error) 
 
 	boqBody, err := s.repository.FindAll(input)
 
+	return boqBody, err
+}
+
+func (s *service) GetByID(runNum string) ([]domain.BoqBody, error) {
+	boqBody, err := s.repository.FindByID(runNum)
 	return boqBody, err
 }
 
