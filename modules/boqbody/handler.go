@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type boqBodyHandler struct {
@@ -281,39 +280,41 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 func (h *boqBodyHandler) Store(c *gin.Context) {
 	var input domain.BoqBodyRequest
 
-	c.ShouldBindJSON(&input)
-
-	validate := validator.New()
-	err := validate.Struct(input)
-	if err != nil {
-		errorMessages := []interface{}{}
-
-		for _, v := range err.(validator.ValidationErrors) {
-			errorArray := map[string]string{
-				"field":   v.Field(),
-				"message": v.ActualTag(),
-			}
-
-			errorMessages = append(errorMessages, errorArray)
-		}
-
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"errors": errorMessages,
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
 		})
-
 		return
 	}
 
-	ztsTravis, err := h.boqBodyService.Store(input)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"errors ": err,
-		})
+	createdBoqBody := domain.BoqBody{
+		RunNum:            input.RunNum,
+		ItemNo:            input.ItemNo,
+		ItemLevel:         input.ItemLevel,
+		ItemDescription:   input.ItemDescription,
+		ItemSpecification: input.ItemSpecification,
+		Qty:               input.Qty,
+		Unit:              input.Unit,
+		Price:             input.Price,
+		Currency:          input.Currency,
+		Note:              input.Note,
+	}
 
+	boqBodies, err := h.boqBodyService.Store(createdBoqBody)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data BoQ Body",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": ztsTravis,
-	})
+	response := domain.BoqBodyResponseFinal{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data BoQ Body",
+		Data:    []domain.BoqBody{boqBodies},
+	}
+
+	c.JSON(http.StatusCreated, response)
 }

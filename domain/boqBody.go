@@ -42,3 +42,9 @@ type BoqBodyResponse struct {
 	Children          []BoqBodyResponse `json:"children"`
 	ParentId          int               `json:"parent_id"`
 }
+
+type BoqBodyResponseFinal struct {
+	Status  int       `json:"status"`
+	Message string    `json:"message"`
+	Data    []BoqBody `json:"data"`
+}
