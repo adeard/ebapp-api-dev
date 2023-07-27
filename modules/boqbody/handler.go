@@ -20,6 +20,7 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	boqBody.GET("", handler.GetAll)
 	boqBody.GET("/:id", handler.GetByID)
 	boqBody.POST("", handler.Store)
+	boqBody.PUT("/:id", handler.Update)
 }
 
 func (h *boqBodyHandler) GetAll(c *gin.Context) {
@@ -317,4 +318,47 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *boqBodyHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	var input domain.BoqBodyRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	// Membuat objek domain.BoqBody yang akan diupdate.
+	updateBoqBody := domain.BoqBody{
+		ItemNo:            input.ItemNo,
+		ItemDescription:   input.ItemDescription,
+		ItemSpecification: input.ItemSpecification,
+		Qty:               input.Qty,
+		Unit:              input.Unit,
+		Price:             input.Price,
+		Currency:          input.Currency,
+		Note:              input.Note,
+	}
+
+	_, err := h.boqBodyService.Update(updateBoqBody, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengupdate data BoQ Body",
+		})
+		return
+	}
+
+	response := domain.BoqBodyResponseFinal{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengupdate data BoQ Body",
+		Data:    nil,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
