@@ -2,8 +2,10 @@ package main
 
 import (
 	"ebapp-api-dev/config"
+	"ebapp-api-dev/middlewares"
 	"ebapp-api-dev/modules/auth"
 	"ebapp-api-dev/modules/boqbody"
+	"ebapp-api-dev/modules/boqheader"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +15,19 @@ import (
 )
 
 func main() {
+	// Buka file log.txt untuk ditulis (create or append)
+	file, err := os.OpenFile("log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("Gagal membuka file log.txt: %s", err)
+	}
+	defer file.Close()
+
+	// Pengaturan log output ke file log.txt
+	log.SetOutput(file)
+
+	// Menampilkan log saat aplikasi dimulai
+	log.Println("Start App Service...")
+
 	db := config.Connect()
 
 	router := gin.Default()
@@ -21,9 +36,11 @@ func main() {
 	v1 := router.Group("api/v1")
 	auth.NewAuthHandler(v1, auth.AuthRegistry(db))
 
-	//v1.Use(middlewares.AuthService_Sample())
+	// Menambahkan middleware untuk mencatat log setiap permintaan
+	v1.Use(middlewares.RequestLoggerMiddleware)
 
 	boqbody.NewBoqBodyHandler(v1, boqbody.BoqBodyRegistry(db))
+	boqheader.NewBoqHeaderHandler(v1, boqheader.BoqHeaderRegistry(db))
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)
@@ -34,8 +51,12 @@ func main() {
 		port = os.Getenv("ASPNETCORE_PORT")
 	}
 
-	err := http.ListenAndServe(":"+port, router)
+	// Menampilkan log koneksi sukses
+	log.Println("App Service run in port:", port)
+
+	err = http.ListenAndServe(":"+port, router)
 	if err != nil {
-		log.Fatal("Koneksi gagal -> port "+port+":", err)
+		// Menampilkan log ketika koneksi gagal
+		log.Fatal("Connection Fail -> port "+port+":", err)
 	}
 }

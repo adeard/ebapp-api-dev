@@ -8,7 +8,8 @@ import (
 
 type Repository interface {
 	FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error)
-	Store(input domain.BoqBodyRequest) (domain.BoqBodyRequest, error)
+	FindByID(runNum string) ([]domain.BoqBody, error)
+	Store(input domain.BoqBody) (domain.BoqBody, error)
 }
 
 type repository struct {
@@ -33,8 +34,21 @@ func (r *repository) FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, err
 	return boqBody, err
 }
 
-func (r *repository) Store(input domain.BoqBodyRequest) (domain.BoqBodyRequest, error) {
-	err := r.db.Table("boq_body").Debug().Create(&input).Error
+func (r *repository) FindByID(runNum string) ([]domain.BoqBody, error) {
+	var boqBody []domain.BoqBody
 
+	q := r.db.Table("boq_body").Debug()
+
+	if runNum != "" {
+		q = q.Where("run_num = ?", runNum)
+	}
+
+	err := q.Order("id asc").Find(&boqBody).Error
+
+	return boqBody, err
+}
+
+func (r *repository) Store(input domain.BoqBody) (domain.BoqBody, error) {
+	err := r.db.Table("boq_body").Create(&input).Error
 	return input, err
 }
