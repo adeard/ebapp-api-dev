@@ -41,6 +41,7 @@ func (s *service) Update(input domain.BoqBody, id string) (domain.BoqBody, error
 	}
 
 	finalUpdateBoqBody := domain.BoqBody{
+		Id:                boqBody.Id,
 		RunNum:            boqBody.RunNum,
 		ItemNo:            input.ItemNo,
 		ItemLevel:         boqBody.ItemLevel,
