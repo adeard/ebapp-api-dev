@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type BoqHeader struct {
 	RunNum            string    `json:"run_num" gorm:"column:run_num"`
@@ -28,6 +31,10 @@ type BoqHeaderRequest struct {
 	Category          string    `json:"category"`
 	Remarks           string    `json:"remarks"`
 }
+
+var (
+	ErrNotFound = errors.New("not found")
+)
 
 type BoqHeaderResponse struct {
 	Data    []BoqHeader `json:"data"`
