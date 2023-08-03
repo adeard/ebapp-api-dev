@@ -289,6 +289,23 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 		return
 	}
 
+	existingBoqBody, err := h.boqBodyService.FindByItemNo(input.ItemNo)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data BoQ Body",
+		})
+		return
+	}
+
+	if existingBoqBody.RunNum != "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "ItemNo sudah ada di database",
+		})
+		return
+	}
+
 	createdBoqBody := domain.BoqBody{
 		RunNum:            input.RunNum,
 		ItemNo:            input.ItemNo,
@@ -333,6 +350,23 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 		return
 	}
 
+	existingBoqBody, err := h.boqBodyService.FindByItemNo(input.ItemNo)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data BoQ Body",
+		})
+		return
+	}
+
+	if existingBoqBody.RunNum != "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "ItemNo sudah ada di database",
+		})
+		return
+	}
+
 	// Membuat objek domain.BoqBody yang akan diupdate.
 	updateBoqBody := domain.BoqBody{
 		ItemNo:            input.ItemNo,
@@ -345,8 +379,8 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 		Note:              input.Note,
 	}
 
-	_, err := h.boqBodyService.Update(updateBoqBody, id)
-	if err != nil {
+	_, updateErr := h.boqBodyService.Update(updateBoqBody, id)
+	if updateErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Gagal mengupdate data BoQ Body",

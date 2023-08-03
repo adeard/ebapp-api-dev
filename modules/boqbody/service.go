@@ -5,6 +5,7 @@ import "ebapp-api-dev/domain"
 type Service interface {
 	GetAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error)
 	GetByID(runNum string) ([]domain.BoqBody, error)
+	FindByItemNo(itemNo string) (domain.BoqBody, error)
 	Store(input domain.BoqBody) (domain.BoqBody, error)
 	Update(input domain.BoqBody, id string) (domain.BoqBody, error)
 }
@@ -56,4 +57,9 @@ func (s *service) Update(input domain.BoqBody, id string) (domain.BoqBody, error
 
 	boqBodies, err := s.repository.Update(finalUpdateBoqBody)
 	return boqBodies, err
+}
+
+func (s *service) FindByItemNo(itemNo string) (domain.BoqBody, error) {
+	boqBody, err := s.repository.FindByItemNo(itemNo)
+	return boqBody, err
 }

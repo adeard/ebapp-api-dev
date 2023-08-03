@@ -10,6 +10,7 @@ type Repository interface {
 	FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error)
 	FindByID(runNum string) ([]domain.BoqBody, error)
 	FindById(id string) (domain.BoqBody, error)
+	FindByItemNo(itemNo string) (domain.BoqBody, error)
 	Store(input domain.BoqBody) (domain.BoqBody, error)
 	Update(input domain.BoqBody) (domain.BoqBody, error)
 }
@@ -53,6 +54,12 @@ func (r *repository) FindByID(runNum string) ([]domain.BoqBody, error) {
 func (r *repository) FindById(id string) (domain.BoqBody, error) {
 	var boqBody domain.BoqBody
 	err := r.db.Table("boq_body").Where("id =?", id).First(&boqBody).Error
+	return boqBody, err
+}
+
+func (r *repository) FindByItemNo(itemNo string) (domain.BoqBody, error) {
+	var boqBody domain.BoqBody
+	err := r.db.Table("boq_body").Where("item_no = ?", itemNo).First(&boqBody).Error
 	return boqBody, err
 }
 
