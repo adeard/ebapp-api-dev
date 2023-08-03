@@ -298,10 +298,10 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 		return
 	}
 
-	if existingBoqBody.RunNum != "" {
+	if existingBoqBody.Id != 0 && existingBoqBody.RunNum == input.RunNum {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  http.StatusBadRequest,
-			"message": "ItemNo sudah ada di database",
+			"message": "ItemNo sudah ada di database untuk RunNum yang sama",
 		})
 		return
 	}
@@ -359,10 +359,10 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if existingBoqBody.RunNum != "" {
+	if existingBoqBody.Id != 0 && existingBoqBody.RunNum == input.RunNum {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  http.StatusBadRequest,
-			"message": "ItemNo sudah ada di database",
+			"message": "ItemNo sudah ada di database untuk RunNum yang sama",
 		})
 		return
 	}
