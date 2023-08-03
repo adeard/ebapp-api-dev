@@ -289,14 +289,7 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 		return
 	}
 
-	existingBoqBody, err := h.boqBodyService.FindByItemNo(input.ItemNo)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Gagal meneruskan data BoQ Body",
-		})
-		return
-	}
+	existingBoqBody, _ := h.boqBodyService.FindByItemNo(input.ItemNo)
 
 	if existingBoqBody.Id != 0 && existingBoqBody.RunNum == input.RunNum {
 		c.JSON(http.StatusBadRequest, gin.H{
