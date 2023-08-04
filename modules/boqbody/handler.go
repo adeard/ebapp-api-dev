@@ -316,7 +316,7 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Gagal meneruskan data BoQ Body" + err.Error(),
+			"message": "Gagal meneruskan data BoQ Body",
 		})
 		return
 	}
@@ -343,8 +343,10 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 		return
 	}
 
+	// Mengecek apakah ItemNo yang baru sudah ada di database untuk RunNum yang sama.
 	existingBoqBody, _ := h.boqBodyService.FindByItemNo(input.ItemNo)
-	if existingBoqBody.Id != 0 && existingBoqBody.RunNum == input.RunNum {
+	// Jika ItemNo yang ditemukan memiliki Id yang tidak sama dengan Id yang sedang diupdate, berarti ItemNo sudah ada di database untuk RunNum yang sama.
+	if existingBoqBody.Id != 0 && existingBoqBody.RunNum == input.RunNum && existingBoqBody.RunNum != "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  http.StatusBadRequest,
 			"message": "ItemNo sudah ada di database untuk RunNum yang sama",
@@ -364,6 +366,7 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 		Note:              input.Note,
 	}
 
+	// Memanggil service untuk melakukan update data BoQ Body.
 	_, updateErr := h.boqBodyService.Update(updateBoqBody, id)
 	if updateErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
