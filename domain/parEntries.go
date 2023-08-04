@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type ParEntries struct {
 	Id            int       `json:"id"`

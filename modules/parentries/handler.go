@@ -17,6 +17,7 @@ func NewParEntriesHandler(v1 *gin.RouterGroup, parEntriesService Service) {
 	parEntries := v1.Group("par_entries")
 
 	parEntries.GET("", handler.GetAll)
+	parEntries.GET("/:id", handler.GetByID)
 }
 
 func (h *parEntriesHandler) GetAll(c *gin.Context) {
@@ -39,5 +40,35 @@ func (h *parEntriesHandler) GetAll(c *gin.Context) {
 	}
 
 	// Mengirimkan response dengan data ParEntries yang sudah diubah formatnya.
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *parEntriesHandler) GetByID(c *gin.Context) {
+	id := c.Param("id")
+
+	parEntries, err := h.parEntriesService.GetByID(id)
+	if err != nil {
+		// Cek apakah error disebabkan oleh data tidak ditemukan.
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Par Entries tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Par Entries",
+		})
+		return
+	}
+
+	response := domain.ParEntriesResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data Par Entries",
+		Data:    parEntries,
+	}
+
 	c.JSON(http.StatusOK, response)
 }
