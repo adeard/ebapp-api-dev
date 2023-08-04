@@ -15,6 +15,7 @@ type BoqBody struct {
 }
 
 type BoqBodyRequest struct {
+	Id                int     `json:"id"`
 	RunNum            string  `json:"run_num"`
 	ItemNo            string  `json:"item_no"`
 	ItemLevel         int     `json:"item_level"`
