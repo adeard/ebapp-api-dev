@@ -19,6 +19,7 @@ func NewBoqHeaderHandler(v1 *gin.RouterGroup, boqHeaderService Service) {
 	boqHeader := v1.Group("boq_header")
 
 	boqHeader.GET("", handler.GetAll)
+	boqHeader.GET("/:id", handler.GetByID)
 	boqHeader.POST("", handler.Store)
 	boqHeader.PUT("/:id", handler.Update)
 }
@@ -40,6 +41,40 @@ func (h *boqHeaderHandler) GetAll(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Berhasil mengambil data BoQ Header",
 		Data:    boqHeaders,
+	}
+
+	// Mengirimkan response dengan data BoQ Header yang sudah diubah formatnya.
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *boqHeaderHandler) GetByID(c *gin.Context) {
+	// Mendapatkan nilai ID dari parameter URL.
+	id := c.Param("id")
+
+	// Menggunakan boqHeaderService untuk mendapatkan data BoQ Header berdasarkan ID dari repository.
+	boqHeader, err := h.boqHeaderService.GetByID(id)
+	if err != nil {
+		// Cek apakah error disebabkan oleh data tidak ditemukan.
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data BoQ Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Header",
+		})
+		return
+	}
+
+	// Mengubah data BoQ Header menjadi response yang sesuai dengan BoqHeaderResponse.
+	response := domain.BoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data BoQ Header",
+		Data:    []domain.BoqHeader{boqHeader}, // Menggunakan slice dari BoqHeader
 	}
 
 	// Mengirimkan response dengan data BoQ Header yang sudah diubah formatnya.

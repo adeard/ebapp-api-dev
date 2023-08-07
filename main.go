@@ -6,6 +6,8 @@ import (
 	"ebapp-api-dev/modules/auth"
 	"ebapp-api-dev/modules/boqbody"
 	"ebapp-api-dev/modules/boqheader"
+	"ebapp-api-dev/modules/listproject"
+	"ebapp-api-dev/modules/parentries"
 	"log"
 	"net/http"
 	"os"
@@ -41,6 +43,8 @@ func main() {
 
 	boqbody.NewBoqBodyHandler(v1, boqbody.BoqBodyRegistry(db))
 	boqheader.NewBoqHeaderHandler(v1, boqheader.BoqHeaderRegistry(db))
+	listproject.NewListProjectHandler(v1, listproject.ListProjectRegistry(db))
+	parentries.NewParEntriesHandler(v1, parentries.ParEntriesRegistry(db))
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)

@@ -20,6 +20,7 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	boqBody.GET("", handler.GetAll)
 	boqBody.GET("/:id", handler.GetByID)
 	boqBody.POST("", handler.Store)
+	boqBody.PUT("/:id", handler.Update)
 }
 
 func (h *boqBodyHandler) GetAll(c *gin.Context) {
@@ -288,6 +289,16 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 		return
 	}
 
+	existingBoqBody, _ := h.boqBodyService.FindByItemNo(input.ItemNo)
+
+	if existingBoqBody.Id != 0 && existingBoqBody.RunNum == input.RunNum {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "ItemNo sudah ada di database untuk RunNum yang sama",
+		})
+		return
+	}
+
 	createdBoqBody := domain.BoqBody{
 		RunNum:            input.RunNum,
 		ItemNo:            input.ItemNo,
@@ -317,4 +328,59 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *boqBodyHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	var input domain.BoqBodyRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid" + err.Error(),
+		})
+		return
+	}
+
+	// Mengecek apakah ItemNo yang baru sudah ada di database untuk RunNum yang sama.
+	existingBoqBody, _ := h.boqBodyService.FindByItemNo(input.ItemNo)
+	// Jika ItemNo yang ditemukan memiliki Id yang tidak sama dengan Id yang sedang diupdate, berarti ItemNo sudah ada di database untuk RunNum yang sama.
+	if existingBoqBody.RunNum == input.RunNum && existingBoqBody.Id != input.Id {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "ItemNo sudah ada di database untuk RunNum yang sama",
+		})
+		return
+	}
+
+	// Membuat objek domain.BoqBody yang akan diupdate.
+	updateBoqBody := domain.BoqBody{
+		ItemNo:            input.ItemNo,
+		ItemDescription:   input.ItemDescription,
+		ItemSpecification: input.ItemSpecification,
+		Qty:               input.Qty,
+		Unit:              input.Unit,
+		Price:             input.Price,
+		Currency:          input.Currency,
+		Note:              input.Note,
+	}
+
+	// Memanggil service untuk melakukan update data BoQ Body.
+	_, updateErr := h.boqBodyService.Update(updateBoqBody, id)
+	if updateErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengupdate data BoQ Body",
+		})
+		return
+	}
+
+	response := domain.BoqBodyResponseFinal{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengupdate data BoQ Body",
+		Data:    nil,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
