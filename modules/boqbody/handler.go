@@ -311,6 +311,7 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 		Price:             input.Price,
 		Currency:          input.Currency,
 		Note:              input.Note,
+		ParentId:          input.ParentId,
 	}
 
 	boqBodies, err := h.boqBodyService.Store(createdBoqBody)
@@ -365,6 +366,7 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 		Price:             input.Price,
 		Currency:          input.Currency,
 		Note:              input.Note,
+		ParentId:          input.ParentId,
 	}
 
 	// Memanggil service untuk melakukan update data BoQ Body.
