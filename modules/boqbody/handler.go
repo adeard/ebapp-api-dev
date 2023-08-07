@@ -2,7 +2,6 @@ package boqbody
 
 import (
 	"ebapp-api-dev/domain"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -346,7 +345,6 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 
 	// Mengecek apakah ItemNo yang baru sudah ada di database untuk RunNum yang sama.
 	existingBoqBody, _ := h.boqBodyService.FindByItemNo(input.ItemNo)
-	fmt.Println("INI DATA ", existingBoqBody.Id)
 	// Jika ItemNo yang ditemukan memiliki Id yang tidak sama dengan Id yang sedang diupdate, berarti ItemNo sudah ada di database untuk RunNum yang sama.
 	if existingBoqBody.RunNum == input.RunNum && existingBoqBody.Id != input.Id {
 		c.JSON(http.StatusBadRequest, gin.H{
