@@ -21,6 +21,7 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	boqBody.GET("/:id", handler.GetByID)
 	boqBody.POST("", handler.Store)
 	boqBody.PUT("/:id", handler.Update)
+	boqBody.DELETE("/:id", handler.Delete)
 }
 
 func (h *boqBodyHandler) GetAll(c *gin.Context) {
@@ -177,7 +178,7 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 
 	res := []domain.BoqBodyResponse{}
 
-	ParentId := 0
+	//ParentId := 0
 
 	HighestLevel := 1
 
@@ -196,7 +197,7 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 				Currency:          boqBodyData.Currency,
 				Note:              boqBodyData.Note,
 				Children:          nil,
-				ParentId:          0,
+				ParentId:          boqBodyData.ParentId,
 			})
 
 			continue
@@ -209,11 +210,11 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 				HighestLevel = boqBodyData.ItemLevel
 			}
 
-			ParentId = previousValue.Id
+			boqBodyData.ParentId = previousValue.Id
 		}
 
 		if previousValue.ItemLevel == boqBodyData.ItemLevel {
-			ParentId = previousValue.ParentId
+			boqBodyData.ParentId = previousValue.ParentId
 		}
 
 		if previousValue.ItemLevel > boqBodyData.ItemLevel {
@@ -226,7 +227,7 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 				}
 			}
 
-			ParentId = ParentBefore
+			boqBodyData.ParentId = ParentBefore
 		}
 
 		res = append(res, domain.BoqBodyResponse{
@@ -242,7 +243,7 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 			Currency:          boqBodyData.Currency,
 			Note:              boqBodyData.Note,
 			Children:          nil,
-			ParentId:          ParentId,
+			ParentId:          boqBodyData.ParentId,
 		})
 
 		continue
@@ -383,4 +384,8 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *boqBodyHandler) Delete(c *gin.Context) {
+
 }

@@ -2,6 +2,7 @@ package domain
 
 type BoqBody struct {
 	Id                int     `json:"id" gorm:"column:id"`
+	ParentId          int     `json:"parent_id" gorm:"parent_id"`
 	RunNum            string  `json:"run_num" gorm:"column:run_num"`
 	ItemNo            string  `json:"item_no" gorm:"column:item_no"`
 	ItemLevel         int     `json:"item_level" gorm:"column:item_level"`
@@ -16,6 +17,7 @@ type BoqBody struct {
 
 type BoqBodyRequest struct {
 	Id                int     `json:"id"`
+	ParentId          int     `json:"parent_id"`
 	RunNum            string  `json:"run_num"`
 	ItemNo            string  `json:"item_no"`
 	ItemLevel         int     `json:"item_level"`
@@ -30,6 +32,7 @@ type BoqBodyRequest struct {
 
 type BoqBodyResponse struct {
 	Id                int               `json:"id"`
+	ParentId          int               `json:"parent_id"`
 	RunNum            string            `json:"run_num"`
 	ItemNo            string            `json:"item_no"`
 	ItemLevel         int               `json:"item_level"`
@@ -41,7 +44,6 @@ type BoqBodyResponse struct {
 	Currency          string            `json:"currency"`
 	Note              string            `json:"note"`
 	Children          []BoqBodyResponse `json:"children"`
-	ParentId          int               `json:"parent_id"`
 }
 
 type BoqBodyResponseFinal struct {
