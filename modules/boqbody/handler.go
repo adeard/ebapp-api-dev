@@ -2,7 +2,9 @@ package boqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,8 +19,9 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 
 	boqBody := v1.Group("boq_body")
 
-	boqBody.GET("", handler.GetAll) // FOR TEST PURPOSE ONLY
-	boqBody.GET("/:id", handler.GetByID)
+	boqBody.GET("", handler.GetAll)                      // FOR TEST PURPOSE ONLY
+	boqBody.GET("/tree/:id", handler.GetChildByParentId) // FOR TEST PURPOSE ONLY
+	boqBody.GET("/:id", handler.GetBoqByRunNum)
 	boqBody.POST("", handler.Store)
 	boqBody.PUT("/:id", handler.Update)
 	boqBody.DELETE("/:id", handler.Delete)
@@ -26,12 +29,6 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 
 func (h *boqBodyHandler) GetAll(c *gin.Context) {
 	var input domain.BoqBodyRequest
-
-	err := c.Bind(&input)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 
 	boqBody, err := h.boqBodyService.GetAll(input)
 	if err != nil {
@@ -142,7 +139,56 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 	})
 }
 
-func (h *boqBodyHandler) GetByID(c *gin.Context) {
+func (h *boqBodyHandler) GetChildByParentId(c *gin.Context) {
+	id := c.Param("id")
+
+	boqBody, err := h.boqBodyService.GetByParentId(id)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Body",
+			"data":    nil,
+		})
+		return
+	}
+
+	if len(boqBody) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Data BoQ Body tidak ditemukan",
+			"data":    nil,
+		})
+		return
+	}
+
+	// Algoritma rekurisnya tabahkan disini
+	var result []int
+	var findData func(parentID int)
+	findData = func(parentID int) {
+		boqBody, err := h.boqBodyService.GetByParentId(strconv.Itoa(parentID))
+		if err != nil {
+			return
+		}
+
+		for _, item := range boqBody {
+			result = append(result, item.Id)
+			findData(item.Id)
+		}
+	}
+
+	for _, item := range boqBody {
+		result = append(result, item.Id)
+		findData(item.Id)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "Berhasil mengambil data BoQ Body",
+		"data":    result,
+	})
+}
+
+func (h *boqBodyHandler) GetBoqByRunNum(c *gin.Context) {
 	runNum := c.Param("id")
 
 	var input domain.BoqBodyRequest
@@ -382,5 +428,74 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 }
 
 func (h *boqBodyHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+	fmt.Println("Ini Id yang didapat : ", id)
 
+	_, err := h.boqBodyService.GetByParentId(id)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Body",
+			"data":    nil,
+		})
+		return
+	}
+
+	// boqBody, err := h.boqBodyService.GetByParentId(id)
+	// if err != nil {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"status":  http.StatusInternalServerError,
+	// 		"message": "Gagal mengambil data BoQ Body",
+	// 		"data":    nil,
+	// 	})
+	// 	return
+	// }
+
+	// if len(boqBody) == 0 {
+	// 	c.JSON(http.StatusNotFound, gin.H{
+	// 		"status":  http.StatusNotFound,
+	// 		"message": "Data BoQ Body tidak ditemukan",
+	// 		"data":    nil,
+	// 	})
+	// 	return
+	// }
+
+	// Algoritma rekurisnya
+	var result []int
+	parentID, _ := strconv.Atoi(id)
+	result = append(result, parentID)
+
+	var findData func(parentID int)
+	findData = func(parentID int) {
+		boqBody, err := h.boqBodyService.GetByParentId(strconv.Itoa(parentID))
+		if err != nil {
+			return
+		}
+
+		for _, item := range boqBody {
+			result = append(result, item.Id)
+			findData(item.Id)
+		}
+	}
+
+	findData(parentID)
+
+	//buatkan funsi delete dibawah ini berdasarkan id yang ada di result -> contoh hasil result [19,20,21,22,23]
+	// Hapus data berdasarkan ID yang ada di result
+	for _, id := range result {
+		err := h.boqBodyService.DeleteByID(id)
+		if err != nil {
+			// Jika ada kesalahan saat menghapus, tangani sesuai kebutuhan (misalnya kembalikan pesan kesalahan)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": "Gagal menghapus data BoQ Body",
+			})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "Berhasil menhapus data BoQ Body",
+	})
 }

@@ -1,13 +1,18 @@
 package boqbody
 
-import "ebapp-api-dev/domain"
+import (
+	"ebapp-api-dev/domain"
+	"strconv"
+)
 
 type Service interface {
 	GetAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error)
 	GetByRunNum(runNum string) ([]domain.BoqBody, error)
+	GetByParentId(parentId string) ([]domain.BoqBody, error)
 	FindByItemNo(itemNo string) (domain.BoqBody, error)
 	Store(input domain.BoqBody) (domain.BoqBody, error)
 	Update(input domain.BoqBody, id string) (domain.BoqBody, error)
+	DeleteByID(id int) error
 }
 
 type service struct {
@@ -24,7 +29,12 @@ func (s *service) GetAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error) 
 }
 
 func (s *service) GetByRunNum(runNum string) ([]domain.BoqBody, error) {
-	boqBody, err := s.repository.FindByID(runNum)
+	boqBody, err := s.repository.FindByRunNum(runNum)
+	return boqBody, err
+}
+
+func (s *service) GetByParentId(parentId string) ([]domain.BoqBody, error) {
+	boqBody, err := s.repository.FindByParentID(parentId)
 	return boqBody, err
 }
 
@@ -61,4 +71,22 @@ func (s *service) Update(input domain.BoqBody, id string) (domain.BoqBody, error
 func (s *service) FindByItemNo(itemNo string) (domain.BoqBody, error) {
 	boqBody, err := s.repository.FindByItemNo(itemNo)
 	return boqBody, err
+}
+
+func (s *service) DeleteByID(id int) error {
+	// Cek terlebih dahulu apakah data dengan ID tersebut ada atau tidak
+	_, err := s.repository.FindById(strconv.Itoa(id))
+	if err != nil {
+		// Jika data tidak ditemukan, kembalikan error
+		return err
+	}
+
+	// Panggil fungsi DeleteByID dari repository untuk menghapus data BoQ Body berdasarkan ID
+	err = s.repository.DeleteByID(strconv.Itoa(id))
+	if err != nil {
+		// Jika ada kesalahan saat menghapus, tangani sesuai kebutuhan (misalnya kembalikan pesan kesalahan)
+		return err
+	}
+
+	return nil
 }

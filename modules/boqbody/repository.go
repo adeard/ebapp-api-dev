@@ -8,11 +8,13 @@ import (
 
 type Repository interface {
 	FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error)
-	FindByID(runNum string) ([]domain.BoqBody, error)
+	FindByRunNum(runNum string) ([]domain.BoqBody, error)
+	FindByParentID(parentID string) ([]domain.BoqBody, error)
 	FindById(id string) (domain.BoqBody, error)
 	FindByItemNo(itemNo string) (domain.BoqBody, error)
 	Store(input domain.BoqBody) (domain.BoqBody, error)
 	Update(input domain.BoqBody) (domain.BoqBody, error)
+	DeleteByID(id string) error
 }
 
 type repository struct {
@@ -37,7 +39,7 @@ func (r *repository) FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, err
 	return boqBody, err
 }
 
-func (r *repository) FindByID(runNum string) ([]domain.BoqBody, error) {
+func (r *repository) FindByRunNum(runNum string) ([]domain.BoqBody, error) {
 	var boqBody []domain.BoqBody
 
 	q := r.db.Table("boq_body").Debug()
@@ -47,6 +49,20 @@ func (r *repository) FindByID(runNum string) ([]domain.BoqBody, error) {
 	}
 
 	err := q.Order("id asc").Find(&boqBody).Error
+
+	return boqBody, err
+}
+
+func (r *repository) FindByParentID(parentID string) ([]domain.BoqBody, error) {
+	var boqBody []domain.BoqBody
+
+	q := r.db.Table("boq_body").Debug()
+
+	if parentID != "" {
+		q = q.Where("parent_id = ?", parentID)
+	}
+
+	err := q.Order("parent_id asc").Find(&boqBody).Error
 
 	return boqBody, err
 }
@@ -71,4 +87,9 @@ func (r *repository) Store(input domain.BoqBody) (domain.BoqBody, error) {
 func (r *repository) Update(input domain.BoqBody) (domain.BoqBody, error) {
 	err := r.db.Table("boq_body").Where("id =?", input.Id).Save(&input).Error
 	return input, err
+}
+
+func (r *repository) DeleteByID(id string) error {
+	err := r.db.Table("boq_body").Where("id =?", id).Delete(&domain.BoqBody{}).Error
+	return err
 }
