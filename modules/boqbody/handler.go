@@ -44,9 +44,6 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 	}
 
 	res := []domain.BoqBodyResponse{}
-
-	// ParentId := 0
-
 	HighestLevel := 1
 
 	for _, boqBodyData := range boqBody {
@@ -76,7 +73,6 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 			if HighestLevel <= boqBodyData.ItemLevel {
 				HighestLevel = boqBodyData.ItemLevel
 			}
-
 			boqBodyData.ParentId = previousValue.Id
 		}
 
@@ -157,7 +153,7 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	boqBody, err := h.boqBodyService.GetByID(runNum)
+	boqBody, err := h.boqBodyService.GetByRunNum(runNum)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
@@ -177,9 +173,6 @@ func (h *boqBodyHandler) GetByID(c *gin.Context) {
 	}
 
 	res := []domain.BoqBodyResponse{}
-
-	// ParentId := 0
-
 	HighestLevel := 1
 
 	for _, boqBodyData := range boqBody {
