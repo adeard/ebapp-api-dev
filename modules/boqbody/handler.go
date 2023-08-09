@@ -27,12 +27,24 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	boqBody.DELETE("/:id", handler.Delete)
 }
 
-func (h *boqBodyHandler) GetAll(c *gin.Context) {
-	var input domain.BoqBodyRequest
+func groupItemsByParent(items []domain.BoqBodyResponse, parentId int) []domain.BoqBodyResponse {
+	var result []domain.BoqBodyResponse
 
-	boqBody, err := h.boqBodyService.GetAll(input)
+	for _, item := range items {
+		if item.ParentId == parentId {
+			children := groupItemsByParent(items, item.Id)
+			item.Children = children
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
+func (h *boqBodyHandler) GetAll(c *gin.Context) {
+	boqBody, err := h.boqBodyService.GetAll(domain.BoqBodyRequest{})
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Gagal mengambil data BoQ Body",
 			"data":    nil,
@@ -40,102 +52,40 @@ func (h *boqBodyHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	res := []domain.BoqBodyResponse{}
-	HighestLevel := 1
-
-	for _, boqBodyData := range boqBody {
-		if res == nil || boqBodyData.ItemLevel == 1 {
-			res = append(res, domain.BoqBodyResponse{
-				Id:                boqBodyData.Id,
-				RunNum:            boqBodyData.RunNum,
-				ItemNo:            boqBodyData.ItemNo,
-				ItemLevel:         boqBodyData.ItemLevel,
-				ItemDescription:   boqBodyData.ItemDescription,
-				ItemSpecification: boqBodyData.ItemSpecification,
-				Qty:               boqBodyData.Qty,
-				Unit:              boqBodyData.Unit,
-				Price:             boqBodyData.Price,
-				Currency:          boqBodyData.Currency,
-				Note:              boqBodyData.Note,
-				Children:          nil,
-				ParentId:          boqBodyData.ParentId,
-			})
-
-			continue
-		}
-
-		previousValue := res[len(res)-1]
-
-		if previousValue.ItemLevel < boqBodyData.ItemLevel {
-			if HighestLevel <= boqBodyData.ItemLevel {
-				HighestLevel = boqBodyData.ItemLevel
-			}
-			boqBodyData.ParentId = previousValue.Id
-		}
-
-		if previousValue.ItemLevel == boqBodyData.ItemLevel {
-			boqBodyData.ParentId = previousValue.ParentId
-		}
-
-		if previousValue.ItemLevel > boqBodyData.ItemLevel {
-			var ParentBefore int
-			for _, parentData := range res {
-				if parentData.Id == previousValue.ParentId {
-					ParentBefore = parentData.ParentId
-
-					break
-				}
-			}
-
-			boqBodyData.ParentId = ParentBefore
-		}
-
-		res = append(res, domain.BoqBodyResponse{
-			Id:                boqBodyData.Id,
-			RunNum:            boqBodyData.RunNum,
-			ItemNo:            boqBodyData.ItemNo,
-			ItemLevel:         boqBodyData.ItemLevel,
-			ItemDescription:   boqBodyData.ItemDescription,
-			ItemSpecification: boqBodyData.ItemSpecification,
-			Qty:               boqBodyData.Qty,
-			Unit:              boqBodyData.Unit,
-			Price:             boqBodyData.Price,
-			Currency:          boqBodyData.Currency,
-			Note:              boqBodyData.Note,
-			Children:          nil,
-			ParentId:          boqBodyData.ParentId,
+	if len(boqBody) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Data BoQ Body tidak ditemukan",
+			"data":    nil,
 		})
-
-		continue
-
+		return
 	}
 
-	for i := HighestLevel; i > 0; i-- {
-		for _, resData := range res {
-			if resData.ParentId != 0 && resData.ItemLevel == i {
-				for index, parentTemp := range res {
-					if parentTemp.Id == resData.ParentId {
-						parentTemp.Children = append(parentTemp.Children, resData)
-						res[index] = parentTemp
-						break
-					}
-				}
-			}
-		}
+	// Konversi tipe data []domain.BoqBody menjadi []domain.BoqBodyResponse
+	var boqBodyResponse []domain.BoqBodyResponse
+	for _, body := range boqBody {
+		boqBodyResponse = append(boqBodyResponse, domain.BoqBodyResponse{
+			Id:                body.Id,
+			ParentId:          body.ParentId,
+			RunNum:            body.RunNum,
+			ItemNo:            body.ItemNo,
+			ItemLevel:         body.ItemLevel,
+			ItemDescription:   body.ItemDescription,
+			ItemSpecification: body.ItemSpecification,
+			Qty:               body.Qty,
+			Unit:              body.Unit,
+			Price:             body.Price,
+			Currency:          body.Currency,
+			Note:              body.Note,
+		})
 	}
 
-	resultFix := []domain.BoqBodyResponse{}
-
-	for _, final := range res {
-		if final.ItemLevel == 1 {
-			resultFix = append(resultFix, final)
-		}
-	}
+	result := groupItemsByParent(boqBodyResponse, 0)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  200,
+		"status":  http.StatusOK,
 		"message": "Berhasil mengambil data BoQ Body",
-		"data":    resultFix,
+		"data":    result,
 	})
 }
 
@@ -191,17 +141,9 @@ func (h *boqBodyHandler) GetChildByParentId(c *gin.Context) {
 func (h *boqBodyHandler) GetBoqByRunNum(c *gin.Context) {
 	runNum := c.Param("id")
 
-	var input domain.BoqBodyRequest
-
-	err := c.Bind(&input)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
 	boqBody, err := h.boqBodyService.GetByRunNum(runNum)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Gagal mengambil data BoQ Body",
 			"data":    nil,
@@ -218,103 +160,31 @@ func (h *boqBodyHandler) GetBoqByRunNum(c *gin.Context) {
 		return
 	}
 
-	res := []domain.BoqBodyResponse{}
-	HighestLevel := 1
-
-	for _, boqBodyData := range boqBody {
-		if res == nil || boqBodyData.ItemLevel == 1 {
-			res = append(res, domain.BoqBodyResponse{
-				Id:                boqBodyData.Id,
-				RunNum:            boqBodyData.RunNum,
-				ItemNo:            boqBodyData.ItemNo,
-				ItemLevel:         boqBodyData.ItemLevel,
-				ItemDescription:   boqBodyData.ItemDescription,
-				ItemSpecification: boqBodyData.ItemSpecification,
-				Qty:               boqBodyData.Qty,
-				Unit:              boqBodyData.Unit,
-				Price:             boqBodyData.Price,
-				Currency:          boqBodyData.Currency,
-				Note:              boqBodyData.Note,
-				Children:          nil,
-				ParentId:          boqBodyData.ParentId,
-			})
-
-			continue
-		}
-
-		previousValue := res[len(res)-1]
-
-		if previousValue.ItemLevel < boqBodyData.ItemLevel {
-			if HighestLevel <= boqBodyData.ItemLevel {
-				HighestLevel = boqBodyData.ItemLevel
-			}
-
-			boqBodyData.ParentId = previousValue.Id
-		}
-
-		if previousValue.ItemLevel == boqBodyData.ItemLevel {
-			boqBodyData.ParentId = previousValue.ParentId
-		}
-
-		if previousValue.ItemLevel > boqBodyData.ItemLevel {
-			var ParentBefore int
-			for _, parentData := range res {
-				if parentData.Id == previousValue.ParentId {
-					ParentBefore = parentData.ParentId
-
-					break
-				}
-			}
-
-			boqBodyData.ParentId = ParentBefore
-		}
-
-		res = append(res, domain.BoqBodyResponse{
-			Id:                boqBodyData.Id,
-			RunNum:            boqBodyData.RunNum,
-			ItemNo:            boqBodyData.ItemNo,
-			ItemLevel:         boqBodyData.ItemLevel,
-			ItemDescription:   boqBodyData.ItemDescription,
-			ItemSpecification: boqBodyData.ItemSpecification,
-			Qty:               boqBodyData.Qty,
-			Unit:              boqBodyData.Unit,
-			Price:             boqBodyData.Price,
-			Currency:          boqBodyData.Currency,
-			Note:              boqBodyData.Note,
-			Children:          nil,
-			ParentId:          boqBodyData.ParentId,
+	// Konversi tipe data []domain.BoqBody menjadi []domain.BoqBodyResponse
+	var boqBodyResponse []domain.BoqBodyResponse
+	for _, body := range boqBody {
+		boqBodyResponse = append(boqBodyResponse, domain.BoqBodyResponse{
+			Id:                body.Id,
+			ParentId:          body.ParentId,
+			RunNum:            body.RunNum,
+			ItemNo:            body.ItemNo,
+			ItemLevel:         body.ItemLevel,
+			ItemDescription:   body.ItemDescription,
+			ItemSpecification: body.ItemSpecification,
+			Qty:               body.Qty,
+			Unit:              body.Unit,
+			Price:             body.Price,
+			Currency:          body.Currency,
+			Note:              body.Note,
 		})
-
-		continue
-
 	}
 
-	for i := HighestLevel; i > 0; i-- {
-		for _, resData := range res {
-			if resData.ParentId != 0 && resData.ItemLevel == i {
-				for index, parentTemp := range res {
-					if parentTemp.Id == resData.ParentId {
-						parentTemp.Children = append(parentTemp.Children, resData)
-						res[index] = parentTemp
-						break
-					}
-				}
-			}
-		}
-	}
-
-	resultFix := []domain.BoqBodyResponse{}
-
-	for _, final := range res {
-		if final.ItemLevel == 1 {
-			resultFix = append(resultFix, final)
-		}
-	}
+	result := groupItemsByParent(boqBodyResponse, 0)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  200,
+		"status":  http.StatusOK,
 		"message": "Berhasil mengambil data BoQ Body",
-		"data":    resultFix,
+		"data":    result,
 	})
 }
 
