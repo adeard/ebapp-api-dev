@@ -17,6 +17,7 @@ type ListProject struct {
 	Vendor          string    `json:"vendor"`
 	Status          string    `json:"status"`
 	Total           float64   `json:"total"`
+	Currency        string    `json:"currency"`
 }
 
 type ListProjectRequest struct {

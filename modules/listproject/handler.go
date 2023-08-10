@@ -15,9 +15,10 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 	handler := &listProjectHandler{listProjectService}
 
 	listProject := v1.Group("list_project")
+	project := v1.Group("project")
 
 	listProject.GET("", handler.GetAll)
-	listProject.GET("/:id", handler.GetByID)
+	project.GET("/:id", handler.GetByID)
 }
 
 func (h *listProjectHandler) GetAll(c *gin.Context) {
