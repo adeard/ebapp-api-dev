@@ -19,6 +19,7 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 
 	listProject.GET("", handler.GetAll)
 	project.GET("/:id", handler.GetByID)
+	project.POST("", handler.Store)
 }
 
 func (h *listProjectHandler) GetAll(c *gin.Context) {
@@ -70,4 +71,17 @@ func (h *listProjectHandler) GetByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *listProjectHandler) Store(c *gin.Context) {
+	var input domain.ListProjectRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
 }
