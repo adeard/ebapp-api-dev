@@ -2,7 +2,7 @@ package domain
 
 type PoProject struct {
 	Id          int     `json:"id"`
-	Po          string  `json:"po"`
+	Po          string  `json:"po" gorm:"column:po"`
 	Item        string  `json:"item"`
 	Description string  `json:"description"`
 	Qty         float32 `json:"qty"`
@@ -13,7 +13,7 @@ type PoProject struct {
 
 type PoProjectRequest struct {
 	Id          int     `json:"id"`
-	Po          string  `json:"po"`
+	Po          string  `json:"po" gorm:"column:po"`
 	Item        string  `json:"item"`
 	Description string  `json:"description"`
 	Qty         float32 `json:"qty"`
