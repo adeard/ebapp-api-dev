@@ -1,6 +1,8 @@
 package listproject
 
-import "ebapp-api-dev/domain"
+import (
+	"ebapp-api-dev/domain"
+)
 
 type Service interface {
 	GetAll(input domain.ListProjectRequest) ([]domain.ListProject, error)
