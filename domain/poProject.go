@@ -7,8 +7,8 @@ type PoProject struct {
 	Description string  `json:"description"`
 	Qty         float32 `json:"qty"`
 	Price       float64 `json:"price"`
-	wbs         string  `json:"wbs"`
-	cera        string  `json:"cera"`
+	Wbs         string  `json:"wbs"`
+	Cera        string  `json:"cera"`
 }
 
 type PoProjectRequest struct {
@@ -18,8 +18,8 @@ type PoProjectRequest struct {
 	Description string  `json:"description"`
 	Qty         float32 `json:"qty"`
 	Price       float64 `json:"price"`
-	wbs         string  `json:"wbs"`
-	cera        string  `json:"cera"`
+	Wbs         string  `json:"wbs"`
+	Cera        string  `json:"cera"`
 }
 
 type PoProjectResponse struct {

@@ -31,8 +31,8 @@ func (s *service) GetByID(id string) (domain.BoqHeader, error) {
 }
 
 func (s *service) Store(input domain.BoqHeader) (domain.BoqHeader, error) {
-	boqHeaders, err := s.repository.Store(input)
-	return boqHeaders, err
+	boqHeader, err := s.repository.Store(input)
+	return boqHeader, err
 }
 
 func (s *service) Update(input domain.BoqHeader, id string) (domain.BoqHeader, error) {

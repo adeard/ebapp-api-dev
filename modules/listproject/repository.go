@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	FindAll(input domain.ListProjectRequest) ([]domain.ListProject, error)
 	FindById(id string) (domain.ListProject, error)
+	Store(input domain.ListProject) (domain.ListProject, error)
 }
 
 type repository struct {
@@ -29,4 +30,9 @@ func (r *repository) FindById(id string) (domain.ListProject, error) {
 	var project domain.ListProject
 	err := r.db.Table("list_project").Where("id =?", id).First(&project).Error
 	return project, err
+}
+
+func (r *repository) Store(input domain.ListProject) (domain.ListProject, error) {
+	err := r.db.Table("list_project").Create(&input).Error
+	return input, err
 }

@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	FindAll(input domain.PoProjectRequest) ([]domain.PoProject, error)
 	FindByPo(po string) ([]domain.PoProject, error)
+	Store(input domain.PoProject) (domain.PoProject, error)
 }
 
 type repository struct {
@@ -37,4 +38,9 @@ func (r *repository) FindByPo(po string) ([]domain.PoProject, error) {
 	err := q.Order("id asc").Find(&poProject).Error
 
 	return poProject, err
+}
+
+func (r *repository) Store(input domain.PoProject) (domain.PoProject, error) {
+	err := r.db.Table("po_project").Create(&input).Error
+	return input, err
 }

@@ -84,4 +84,39 @@ func (h *listProjectHandler) Store(c *gin.Context) {
 		return
 	}
 
+	createProject := domain.ListProject{
+		Po:              input.Po,
+		PoDate:          input.PoDate,
+		PekerjaanNo:     input.PekerjaanNo,
+		PekerjaanName:   input.PekerjaanName,
+		PekerjaanDate:   input.PekerjaanDate,
+		StartDate:       input.StartDate,
+		EndDate:         input.EndDate,
+		StartDateActual: input.StartDateActual,
+		EndDateActual:   input.EndDateActual,
+		UnitUsaha:       input.UnitUsaha,
+		Pt:              input.Pt,
+		Vendor:          input.Vendor,
+		Status:          input.Status,
+		Total:           input.Total,
+		Currency:        input.Currency,
+		Area:            input.Area,
+	}
+
+	project, err := h.listProjectService.Store(createProject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data Project",
+		})
+		return
+	}
+
+	response := domain.ListProjectsResponse{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data Po Project",
+		Data:    []domain.ListProject{project},
+	}
+
+	c.JSON(http.StatusCreated, response)
 }

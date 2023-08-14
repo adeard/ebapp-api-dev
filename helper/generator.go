@@ -8,6 +8,20 @@ import (
 	"time"
 )
 
+func GeneratePoId(numberOfDigits int) (string, error) {
+	prefix := "POID"
+	uniqueNumber, err := GenerateRandomSecureToken(numberOfDigits)
+	if err != nil {
+		return "", err
+	}
+	uniqueYear := getLastTwoDigitsOfYear()
+	day := getDayOfMonth()
+	timeValue := getCurrentTime()
+
+	generate := prefix + strconv.Itoa(uniqueNumber) + uniqueYear + day + timeValue
+	return generate, nil
+}
+
 func GenerateHeaderBoq(numberOfDigits int) (string, error) {
 	prefix := ""
 	uniqueNumber, err := GenerateRandomSecureToken(numberOfDigits)

@@ -7,6 +7,7 @@ import (
 type Service interface {
 	GetAll(input domain.ListProjectRequest) ([]domain.ListProject, error)
 	GetByID(id string) (domain.ListProject, error)
+	Store(input domain.ListProject) (domain.ListProject, error)
 }
 
 type service struct {
@@ -25,4 +26,9 @@ func (s *service) GetAll(input domain.ListProjectRequest) ([]domain.ListProject,
 func (s *service) GetByID(id string) (domain.ListProject, error) {
 	project, err := s.repository.FindById(id)
 	return project, err
+}
+
+func (s *service) Store(input domain.ListProject) (domain.ListProject, error) {
+	listProject, err := s.repository.Store(input)
+	return listProject, err
 }

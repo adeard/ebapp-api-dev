@@ -18,6 +18,7 @@ func NewPoProjectHandler(v1 *gin.RouterGroup, poProjectService Service) {
 
 	poProject.GET("", handler.GetAll)
 	poProject.GET("/:id", handler.GetByPo)
+	poProject.POST("", handler.Store)
 }
 
 func (h *poProjectHandler) GetAll(c *gin.Context) {
@@ -69,4 +70,43 @@ func (h *poProjectHandler) GetByPo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *poProjectHandler) Store(c *gin.Context) {
+	var input domain.PoProjectRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	createPoProject := domain.PoProject{
+		Po:          input.Po,
+		Item:        input.Item,
+		Description: input.Description,
+		Qty:         input.Qty,
+		Price:       input.Price,
+		Wbs:         input.Wbs,
+		Cera:        input.Cera,
+	}
+
+	poProjects, err := h.poProjectService.Store(createPoProject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data Po Project",
+		})
+		return
+	}
+
+	response := domain.PoProjectResponse{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data Po Project",
+		Data:    []domain.PoProject{poProjects},
+	}
+
+	c.JSON(http.StatusCreated, response)
 }
