@@ -44,10 +44,10 @@ func ParseXML(xmlData []byte) (PoDataSapHeader, error) {
 }
 
 type PoDataSapHeader struct {
-	PoDate    time.Time `xml:"entry>content>properties>d:DocDate"`
-	Pt        string    `xml:"entry>content>properties>d:CompCode"`
-	UnitUsaha string    `xml:"entry>content>properties>d:Plant"`
-	Vendor    string    `xml:"entry>content>properties>d:Vendor"`
+	PoDate    time.Time
+	Pt        string
+	UnitUsaha string
+	Vendor    string
 }
 
 type PoDataSapHeaderResponse struct {
