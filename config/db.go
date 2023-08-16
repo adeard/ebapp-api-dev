@@ -57,3 +57,24 @@ func SqlsvrDev(DbUser string, DbPassword string, DbHost string, DbName string, D
 		log.Fatal("Database Connection Error")
 	}
 }
+
+// func FetchXMLData(username, password, url string) ([]byte, error) {
+// 	client := &http.Client{}
+// 	req, err := http.NewRequest("GET", url, nil)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	req.SetBasicAuth(username, password)
+
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer resp.Body.Close()
+
+// 	data, err := ioutil.ReadAll(resp.Body)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return data, nil
+// }

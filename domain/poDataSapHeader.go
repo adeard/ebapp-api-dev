@@ -1,14 +1,53 @@
 package domain
 
 import (
+	"encoding/xml"
+	"fmt"
 	"time"
 )
 
+type entry struct {
+	XMLName xml.Name `xml:"entry"`
+	Content content  `xml:"content"`
+}
+
+type content struct {
+	XMLName    xml.Name   `xml:"content"`
+	Properties properties `xml:"properties"`
+}
+
+type properties struct {
+	XMLName   xml.Name  `xml:"properties"`
+	PoDate    time.Time `xml:"d:DocDate"`
+	Pt        string    `xml:"d:CompCode"`
+	UnitUsaha string    `xml:"d:Plant"`
+	Vendor    string    `xml:"d:Vendor"`
+}
+
+func ParseXML(xmlData []byte) (PoDataSapHeader, error) {
+	var entryData entry
+	err := xml.Unmarshal(xmlData, &entryData)
+	if err != nil {
+		return PoDataSapHeader{}, err
+	}
+
+	poHeader := PoDataSapHeader{
+		PoDate:    entryData.Content.Properties.PoDate,
+		Pt:        entryData.Content.Properties.Pt,
+		UnitUsaha: entryData.Content.Properties.UnitUsaha,
+		Vendor:    entryData.Content.Properties.Vendor,
+	}
+
+	fmt.Println("Data yang di ambil :", poHeader)
+
+	return poHeader, nil
+}
+
 type PoDataSapHeader struct {
-	PoDate    time.Time `json:"date"`       //<d:DocDate>2018-02-06T00:00:00</d:DocDate>
-	Pt        string    `json:"pt"`         //<d:CompCode>3500</d:CompCode>
-	UnitUsaha string    `json:"unit_usaha"` //<d:Plant>3520</d:Plant>
-	Vendor    string    `json:"vendor"`     //<d:Vendor>100016</d:Vendor>
+	PoDate    time.Time `xml:"entry>content>properties>d:DocDate"`
+	Pt        string    `xml:"entry>content>properties>d:CompCode"`
+	UnitUsaha string    `xml:"entry>content>properties>d:Plant"`
+	Vendor    string    `xml:"entry>content>properties>d:Vendor"`
 }
 
 type PoDataSapHeaderResponse struct {

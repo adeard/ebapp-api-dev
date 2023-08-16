@@ -8,6 +8,7 @@ import (
 	"ebapp-api-dev/modules/boqheader"
 	"ebapp-api-dev/modules/listproject"
 	"ebapp-api-dev/modules/parentries"
+	"ebapp-api-dev/modules/podatasapheader"
 	"ebapp-api-dev/modules/poproject"
 	"log"
 	"net/http"
@@ -27,8 +28,6 @@ func main() {
 
 	// Pengaturan log output ke file log.txt
 	log.SetOutput(file)
-
-	// Menampilkan log saat aplikasi dimulai
 	log.Println("Start App Service...")
 
 	db := config.Connect()
@@ -47,6 +46,7 @@ func main() {
 	listproject.NewListProjectHandler(v1, listproject.ListProjectRegistry(db))
 	parentries.NewParEntriesHandler(v1, parentries.ParEntriesRegistry(db))
 	poproject.NewPoProjectHandler(v1, poproject.PoProjectRegistry(db))
+	podatasapheader.NewPoDataSapHeaderHandler(v1, podatasapheader.PoDataSapHeaderRegistry(db))
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)
