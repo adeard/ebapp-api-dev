@@ -10,7 +10,7 @@ import (
 )
 
 type Repository interface {
-	FindByPo(po string) ([]domain.PoDataSapHeader, error)
+	CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error)
 }
 
 type repository struct {
@@ -21,10 +21,10 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
 }
 
-func (r *repository) FindByPo(po string) ([]domain.PoDataSapHeader, error) {
-	var poProject []domain.PoDataSapHeader
+func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error) {
+	var poProject []domain.PoDataSapHeaderTitle
 
-	xmlURL := fmt.Sprintf("http://qaecc.hec.indofood.co.id:8020/sap/opu/odata/sap/ZMGW_GET_DATA_PO_SRV/etHeaderSet('%s')?$expand=etPoHeaderSet", po)
+	xmlURL := fmt.Sprintf(`http://qaecc.hec.indofood.co.id:8020/sap/opu/odata/sap/ZMGW_GET_DATA_PO_SRV/etHeaderSet('` + id + `')?$expand=etPoHeaderSet,NavPoItemSet`)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", xmlURL, nil)
@@ -37,6 +37,7 @@ func (r *repository) FindByPo(po string) ([]domain.PoDataSapHeader, error) {
 	password := "acer620"
 
 	req.Header.Set("Content-Type", "application/xml")
+	req.Header.Set("Charset", "utf-8")
 	req.SetBasicAuth(username, password)
 
 	resp, err := client.Do(req)
@@ -50,12 +51,12 @@ func (r *repository) FindByPo(po string) ([]domain.PoDataSapHeader, error) {
 		return nil, err
 	}
 
-	poHeader, err := domain.ParseXML(result)
+	poHeaderTitle, err := domain.ParseXMLTitle(result)
 	if err != nil {
 		return nil, err
 	}
 
-	poProject = append(poProject, poHeader) // Append the parsed header to the slice
+	poProject = append(poProject, poHeaderTitle) // Append the parsed header to the slice
 
 	return poProject, nil
 }

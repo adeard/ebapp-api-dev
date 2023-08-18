@@ -16,13 +16,13 @@ func NewPoDataSapHeaderHandler(v1 *gin.RouterGroup, poDataSapHeaderService Servi
 
 	poDataSapHeader := v1.Group("po_sap_header")
 
-	poDataSapHeader.GET("/:id", handler.GetData)
+	poDataSapHeader.GET("/:id", handler.GetTitle)
 }
 
-func (h *poDataSapHeaderHandler) GetData(c *gin.Context) {
-	po := c.Param("id")
+func (h *poDataSapHeaderHandler) GetTitle(c *gin.Context) {
+	id := c.Param("id")
 
-	poDataSapHeader, err := h.poDataSapHeaderService.GetByPo(po)
+	poDataSapHeaderTitle, err := h.poDataSapHeaderService.GetTitle(id)
 	if err != nil {
 		if err == domain.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -34,15 +34,15 @@ func (h *poDataSapHeaderHandler) GetData(c *gin.Context) {
 
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Gagal mengambil data Header" + err.Error(),
+			"message": "Gagal mengambil data Header",
 		})
 		return
 	}
 
-	response := domain.PoDataSapHeaderResponse{
+	response := domain.PoDataSapHeaderTitleResponse{
 		Status:  http.StatusOK,
 		Message: "Berhasil mengambil data Header",
-		Data:    poDataSapHeader,
+		Data:    poDataSapHeaderTitle,
 	}
 
 	c.JSON(http.StatusOK, response)
