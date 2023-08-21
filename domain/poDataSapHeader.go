@@ -5,13 +5,18 @@ import (
 )
 
 type PoDataSapHeaderTitle struct {
-	PoNumber  string `xml:"link>inline>feed>entry>content>properties>PoNumber"`
-	CompCode  string `xml:"link>inline>feed>entry>content>properties>CompCode"`
-	DocDate   string `xml:"link>inline>feed>entry>content>properties>DocDate"`
-	Vendor    string `xml:"link>inline>feed>entry>content>properties>Vendor"`
-	Plant     string `xml:"link>inline>feed>entry>content>properties>Plant"`
-	Currency  string `xml:"link>inline>feed>entry>content>properties>Currency"`
-	CreatedBy string `xml:"link>inline>feed>entry>content>properties>CreatedBy"`
+	PoNumber  string   `xml:"link>inline>feed>entry>content>properties>PoNumber"`
+	CompCode  string   `xml:"link>inline>feed>entry>content>properties>CompCode"`
+	DocDate   string   `xml:"link>inline>feed>entry>content>properties>DocDate"`
+	Vendor    string   `xml:"link>inline>feed>entry>content>properties>Vendor"`
+	Plant     string   `xml:"link>inline>feed>entry>content>properties>Plant"`
+	Currency  string   `xml:"link>inline>feed>entry>content>properties>Currency"`
+	CreatedBy string   `xml:"link>inline>feed>entry>content>properties>CreatedBy"`
+	PoItem    []PoItem `xml:"NavPoItemSet>entry>content>properties>PoItem"`
+}
+
+type PoItem struct {
+	Item string `xml:"d>Item"`
 }
 
 func ParseXMLTitle(xmlData []byte) (PoDataSapHeaderTitle, error) {
