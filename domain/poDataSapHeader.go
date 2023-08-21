@@ -12,11 +12,12 @@ type PoDataSapHeaderTitle struct {
 	Plant     string   `xml:"link>inline>feed>entry>content>properties>Plant"`
 	Currency  string   `xml:"link>inline>feed>entry>content>properties>Currency"`
 	CreatedBy string   `xml:"link>inline>feed>entry>content>properties>CreatedBy"`
-	PoItem    []PoItem `xml:"link>inline>feed>entry>content>properties>PoItem"`
+	Item      []PoItem `xml:"link>inline>feed>entry>content>properties>PoItem"`
 }
 
 type PoItem struct {
-	PoItem string `xml:"link>inline>feed>entry>content>properties>PoItem"`
+	PoItem string `xml:",innerxml"`
+	// ShortText string
 }
 
 func ParseXMLTitle(xmlData []byte) (PoDataSapHeaderTitle, error) {
