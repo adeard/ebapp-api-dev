@@ -30,3 +30,15 @@ type PoDataSapHeaderTitleResponse struct {
 	Message string                 `json:"message"`
 	Data    []PoDataSapHeaderTitle `json:"data"`
 }
+
+type DataMasterPlant struct {
+	Werks string `json:"werks" gorm:"column:WERKS"`
+	Area  string `json:"area" gorm:"column:AREA"`
+	Area1 string `json:"area1" gorm:"column:AREA1"`
+}
+
+type DataMasterPlantResponse struct {
+	Status  int               `json:"status"`
+	Message string            `json:"message"`
+	Data    []DataMasterPlant `json:"data"`
+}

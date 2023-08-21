@@ -11,6 +11,7 @@ import (
 
 type Repository interface {
 	CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error)
+	CheckArea(id string) (domain.DataMasterPlant, error)
 }
 
 type repository struct {
@@ -59,4 +60,10 @@ func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error
 	poProject = append(poProject, poHeaderTitle) // Append the parsed header to the slice
 
 	return poProject, nil
+}
+
+func (r *repository) CheckArea(id string) (domain.DataMasterPlant, error) {
+	var DataMasterPlant domain.DataMasterPlant
+	err := r.db.Table("MasterPlantArea").Where("WERKS = ?", id).First(&DataMasterPlant).Error
+	return DataMasterPlant, err
 }

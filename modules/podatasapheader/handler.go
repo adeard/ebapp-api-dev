@@ -17,6 +17,7 @@ func NewPoDataSapHeaderHandler(v1 *gin.RouterGroup, poDataSapHeaderService Servi
 	poDataSapHeader := v1.Group("po_sap_header")
 
 	poDataSapHeader.GET("/:id", handler.GetTitle)
+	poDataSapHeader.GET("/area/:id", handler.GetArea)
 }
 
 func (h *poDataSapHeaderHandler) GetTitle(c *gin.Context) {
@@ -43,6 +44,36 @@ func (h *poDataSapHeaderHandler) GetTitle(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Berhasil mengambil data Header",
 		Data:    poDataSapHeaderTitle,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *poDataSapHeaderHandler) GetArea(c *gin.Context) {
+	id := c.Param("id")
+
+	dataMasterPlant, err := h.poDataSapHeaderService.GetArea(id)
+	if err != nil {
+		// Cek apakah error disebabkan oleh data tidak ditemukan.
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Master Plant tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil Data Master Plant",
+		})
+		return
+	}
+
+	response := domain.DataMasterPlantResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil Data Master Plant",
+		Data:    []domain.DataMasterPlant{dataMasterPlant},
 	}
 
 	c.JSON(http.StatusOK, response)

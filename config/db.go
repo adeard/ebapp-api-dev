@@ -39,6 +39,30 @@ func Connect() *gorm.DB {
 	return Db
 }
 
+func Connect2() *gorm.DB {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	Dbdriver := os.Getenv("DB_DRIVER2")
+	DbHost := os.Getenv("DB_HOST2")
+	DbUser := os.Getenv("DB_USER2")
+	DbPassword := os.Getenv("DB_PASSWORD2")
+	DbName := os.Getenv("DB_NAME2")
+	DbPort := os.Getenv("DB_PORT2")
+
+	switch Dbdriver {
+	case "sqlsvr":
+		SqlsvrDev(DbUser, DbPassword, DbHost, DbName, Dbdriver)
+	case "mysql":
+		MysqlDev(DbUser, DbPassword, DbHost, DbPort, DbName, Dbdriver)
+	}
+
+	return Db
+}
+
 func MysqlDev(DbUser string, DbPassword string, DbHost string, DbPort string, DbName string, Dbdriver string) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
@@ -57,24 +81,3 @@ func SqlsvrDev(DbUser string, DbPassword string, DbHost string, DbName string, D
 		log.Fatal("Database Connection Error")
 	}
 }
-
-// func FetchXMLData(username, password, url string) ([]byte, error) {
-// 	client := &http.Client{}
-// 	req, err := http.NewRequest("GET", url, nil)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	req.SetBasicAuth(username, password)
-
-// 	resp, err := client.Do(req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer resp.Body.Close()
-
-// 	data, err := ioutil.ReadAll(resp.Body)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return data, nil
-// }
