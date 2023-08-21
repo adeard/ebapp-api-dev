@@ -5,19 +5,33 @@ import (
 )
 
 type PoDataSapHeaderTitle struct {
-	PoNumber  string   `xml:"link>inline>feed>entry>content>properties>PoNumber"`
-	CompCode  string   `xml:"link>inline>feed>entry>content>properties>CompCode"`
-	DocDate   string   `xml:"link>inline>feed>entry>content>properties>DocDate"`
-	Vendor    string   `xml:"link>inline>feed>entry>content>properties>Vendor"`
-	Plant     string   `xml:"link>inline>feed>entry>content>properties>Plant"`
-	Currency  string   `xml:"link>inline>feed>entry>content>properties>Currency"`
-	CreatedBy string   `xml:"link>inline>feed>entry>content>properties>CreatedBy"`
-	Item      []PoItem `xml:"link>inline>feed>entry>content>properties>PoItem"`
+	PoNumber  string      `xml:"link>inline>feed>entry>content>properties>PoNumber"`
+	CompCode  string      `xml:"link>inline>feed>entry>content>properties>CompCode"`
+	DocDate   string      `xml:"link>inline>feed>entry>content>properties>DocDate"`
+	Vendor    string      `xml:"link>inline>feed>entry>content>properties>Vendor"`
+	Plant     string      `xml:"link>inline>feed>entry>content>properties>Plant"`
+	Currency  string      `xml:"link>inline>feed>entry>content>properties>Currency"`
+	CreatedBy string      `xml:"link>inline>feed>entry>content>properties>CreatedBy"`
+	PoItem    []PoItem    `xml:"link>inline>feed>entry>content>properties>PoItem"`
+	ShortText []ShortText `xml:"link>inline>feed>entry>content>properties>ShortText"`
+	NetPrice  []NetPrice  `xml:"link>inline>feed>entry>content>properties>NetPrice"`
+	PoUnit    []PoUnit    `xml:"link>inline>feed>entry>content>properties>PoUnit"`
 }
 
 type PoItem struct {
 	PoItem string `xml:",innerxml"`
-	// ShortText string
+}
+
+type ShortText struct {
+	ShortText string `xml:",innerxml"`
+}
+
+type NetPrice struct {
+	NetPrice string `xml:",innerxml"`
+}
+
+type PoUnit struct {
+	PoUnit string `xml:",innerxml"`
 }
 
 func ParseXMLTitle(xmlData []byte) (PoDataSapHeaderTitle, error) {

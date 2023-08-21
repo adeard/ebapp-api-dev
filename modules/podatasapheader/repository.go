@@ -57,7 +57,7 @@ func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error
 		return nil, err
 	}
 
-	poProject = append(poProject, poHeaderTitle) // Append the parsed header to the slice
+	poProject = append(poProject, poHeaderTitle)
 
 	return poProject, nil
 }
