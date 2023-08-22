@@ -16,6 +16,7 @@ type PoDataSapHeaderTitle struct {
 	ShortText []ShortText `xml:"link>inline>feed>entry>content>properties>ShortText"`
 	NetPrice  []NetPrice  `xml:"link>inline>feed>entry>content>properties>NetPrice"`
 	PoUnit    []PoUnit    `xml:"link>inline>feed>entry>content>properties>PoUnit"`
+	Quantity  []Quantity  `xml:"link>inline>feed>entry>content>properties>Quantity"`
 }
 
 type PoItem struct {
@@ -28,6 +29,10 @@ type ShortText struct {
 
 type NetPrice struct {
 	NetPrice string `xml:",innerxml"`
+}
+
+type Quantity struct {
+	Quantity string `xml:",innerxml"`
 }
 
 type PoUnit struct {
