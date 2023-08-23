@@ -17,6 +17,7 @@ type PoDataSapHeaderTitle struct {
 	NetPrice  []NetPrice  `xml:"link>inline>feed>entry>content>properties>NetPrice"`
 	PoUnit    []PoUnit    `xml:"link>inline>feed>entry>content>properties>PoUnit"`
 	Quantity  []Quantity  `xml:"link>inline>feed>entry>content>properties>Quantity"`
+	Cera      []Cera      `xml:"link>inline>feed>entry>content>properties>VendMat"`
 }
 
 type PoItem struct {
@@ -39,6 +40,10 @@ type PoUnit struct {
 	PoUnit string `xml:",innerxml"`
 }
 
+type Cera struct {
+	Cera string `xml:",innerxml"`
+}
+
 func ParseXMLTitle(xmlData []byte) (PoDataSapHeaderTitle, error) {
 	var parsedData PoDataSapHeaderTitle
 
@@ -54,6 +59,31 @@ type PoDataSapHeaderTitleResponse struct {
 	Status  int                    `json:"status"`
 	Message string                 `json:"message"`
 	Data    []PoDataSapHeaderTitle `json:"data"`
+}
+
+type ReadWbs struct {
+	Wbs []Wbs `xml:"link>inline>feed>entry>content>properties>WbsElement"`
+}
+
+type Wbs struct {
+	Wbs string `xml:",innerxml"`
+}
+
+func ParseXMLWbs(xmlWbs []byte) (ReadWbs, error) {
+	var wbs ReadWbs
+
+	err := xml.Unmarshal(xmlWbs, &wbs)
+	if err != nil {
+		return ReadWbs{}, err
+	}
+
+	return wbs, nil
+}
+
+type PoDataSapHeaderWbsResponse struct {
+	Status  int       `json:"status"`
+	Message string    `json:"message"`
+	Data    []ReadWbs `json:"data"`
 }
 
 type DataMasterPlant struct {

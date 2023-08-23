@@ -17,6 +17,7 @@ func NewPoDataSapHeaderHandler(v1 *gin.RouterGroup, poDataSapHeaderService Servi
 	poDataSapHeader := v1.Group("po_sap_header")
 
 	poDataSapHeader.GET("/:id", handler.GetTitle)
+	poDataSapHeader.GET("/wbs/:id", handler.GetWbs)
 	poDataSapHeader.GET("/area/:id", handler.GetArea)
 }
 
@@ -44,6 +45,35 @@ func (h *poDataSapHeaderHandler) GetTitle(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Berhasil mengambil data Header",
 		Data:    poDataSapHeaderTitle,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *poDataSapHeaderHandler) GetWbs(c *gin.Context) {
+	id := c.Param("id")
+
+	poDataSapHeaderWbs, err := h.poDataSapHeaderService.GetWbs(id)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data WBS tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data WBS",
+		})
+		return
+	}
+
+	response := domain.PoDataSapHeaderWbsResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data Header",
+		Data:    poDataSapHeaderWbs,
 	}
 
 	c.JSON(http.StatusOK, response)
