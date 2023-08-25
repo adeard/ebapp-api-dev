@@ -10,6 +10,7 @@ import (
 	"ebapp-api-dev/modules/parentries"
 	"ebapp-api-dev/modules/podatasapheader"
 	"ebapp-api-dev/modules/poproject"
+	"ebapp-api-dev/modules/user"
 	"log"
 	"net/http"
 	"os"
@@ -48,6 +49,7 @@ func main() {
 	parentries.NewParEntriesHandler(v1, parentries.ParEntriesRegistry(db))
 	poproject.NewPoProjectHandler(v1, poproject.PoProjectRegistry(db))
 	podatasapheader.NewPoDataSapHeaderHandler(v1, podatasapheader.PoDataSapHeaderRegistry(db2))
+	user.NewUserHandler(v1, user.UserRegistry(db))
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)
