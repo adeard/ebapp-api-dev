@@ -16,7 +16,29 @@ func NewUserHandler(v1 *gin.RouterGroup, userService Service) {
 
 	user := v1.Group("user")
 
+	user.GET("", handler.GetAll)
 	user.GET("/:id", handler.GetById)
+}
+
+func (h *userHandler) GetAll(c *gin.Context) {
+	var input domain.UserRequest
+
+	users, err := h.userHandlerService.GetAll(input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data User",
+		})
+		return
+	}
+
+	response := domain.UserResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data User",
+		Data:    users,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *userHandler) GetById(c *gin.Context) {

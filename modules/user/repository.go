@@ -8,6 +8,7 @@ import (
 )
 
 type Repository interface {
+	FindAll(input domain.UserRequest) ([]domain.User, error)
 	FindByUserId(userId string) (domain.User, error)
 }
 
@@ -17,6 +18,12 @@ type repository struct {
 
 func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
+}
+
+func (r *repository) FindAll(input domain.UserRequest) ([]domain.User, error) {
+	var User []domain.User
+	err := r.db.Table("user").Find(&User).Error
+	return User, err
 }
 
 func (r *repository) FindByUserId(userId string) (domain.User, error) {
