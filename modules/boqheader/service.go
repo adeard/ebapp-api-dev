@@ -7,6 +7,7 @@ import (
 
 type Service interface {
 	GetAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error)
+	GetActive(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error)
 	GetByID(id string) (domain.BoqHeader, error)
 	Store(input domain.BoqHeader) (domain.BoqHeader, error)
 	Update(input domain.BoqHeader, id string) (domain.BoqHeader, error)
@@ -22,6 +23,11 @@ func NewService(repository Repository) *service {
 
 func (s *service) GetAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error) {
 	boqHeaders, err := s.repository.FindAll(input)
+	return boqHeaders, err
+}
+
+func (s *service) GetActive(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error) {
+	boqHeaders, err := s.repository.FindAllActive(input)
 	return boqHeaders, err
 }
 

@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	FindAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error)
+	FindAllActive(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error)
 	FindById(id string) (domain.BoqHeader, error)
 	Store(input domain.BoqHeader) (domain.BoqHeader, error)
 	Update(input domain.BoqHeader) (domain.BoqHeader, error)
@@ -24,6 +25,12 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) FindAll(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error) {
 	var boqHeaders []domain.BoqHeader
 	err := r.db.Table("boq_header").Find(&boqHeaders).Error
+	return boqHeaders, err
+}
+
+func (r *repository) FindAllActive(input domain.BoqHeaderRequest) ([]domain.BoqHeader, error) {
+	var boqHeaders []domain.BoqHeader
+	err := r.db.Table("boq_header").Where("header_status =?", true).Find(&boqHeaders).Error
 	return boqHeaders, err
 }
 

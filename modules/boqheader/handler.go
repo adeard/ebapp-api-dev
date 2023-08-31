@@ -19,6 +19,7 @@ func NewBoqHeaderHandler(v1 *gin.RouterGroup, boqHeaderService Service) {
 	boqHeader := v1.Group("boq_header")
 
 	boqHeader.GET("", handler.GetAll)
+	boqHeader.GET("/active", handler.GetActive)
 	boqHeader.GET("/:id", handler.GetByID)
 	boqHeader.POST("", handler.Store)
 	boqHeader.PUT("/:id", handler.Update)
@@ -44,6 +45,27 @@ func (h *boqHeaderHandler) GetAll(c *gin.Context) {
 	}
 
 	// Mengirimkan response dengan data BoQ Header yang sudah diubah formatnya.
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *boqHeaderHandler) GetActive(c *gin.Context) {
+	var input domain.BoqHeaderRequest
+
+	boqHeaders, err := h.boqHeaderService.GetActive(input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Header",
+		})
+		return
+	}
+
+	response := domain.BoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data BoQ Header",
+		Data:    boqHeaders,
+	}
+
 	c.JSON(http.StatusOK, response)
 }
 
