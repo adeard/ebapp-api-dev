@@ -45,3 +45,9 @@ type PoBoqBodyResponse struct {
 	Note              string              `json:"note"`
 	Children          []PoBoqBodyResponse `json:"children"`
 }
+
+type PoBoqBodyResponseFinal struct {
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Data    []PoBoqBody `json:"data"`
+}

@@ -42,7 +42,7 @@ func (r *repository) FindAll(input domain.BoqBodyRequest) ([]domain.BoqBody, err
 func (r *repository) FindByRunNum(runNum string) ([]domain.BoqBody, error) {
 	var boqBody []domain.BoqBody
 
-	q := r.db.Table("boq_body").Debug()
+	q := r.db.Table("boq_body")
 
 	if runNum != "" {
 		q = q.Where("run_num = ?", runNum)
