@@ -2,6 +2,7 @@ package poproject
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/helper"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,25 @@ func NewPoProjectHandler(v1 *gin.RouterGroup, poProjectService Service) {
 	poProject.GET("", handler.GetAll)
 	poProject.GET("/:id", handler.GetByPo)
 	poProject.POST("", handler.Store)
+	poProject.GET("/roll", handler.rollNum)
+}
+
+func (h *poProjectHandler) rollNum(c *gin.Context) {
+	rollNum, err := helper.GenerateHeaderBoq(3)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+	}
+
+	response := domain.PoProjectResponse2{
+		Status:  http.StatusOK,
+		Message: "Data berhasil dibuat",
+		Data:    rollNum,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *poProjectHandler) GetAll(c *gin.Context) {
