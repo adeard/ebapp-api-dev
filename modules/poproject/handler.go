@@ -24,7 +24,7 @@ func NewPoProjectHandler(v1 *gin.RouterGroup, poProjectService Service) {
 }
 
 func (h *poProjectHandler) rollNum(c *gin.Context) {
-	rollNum, err := helper.GenerateHeaderBoq(3)
+	rollNum, err := helper.GenerateHeaderBoq2(3)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,

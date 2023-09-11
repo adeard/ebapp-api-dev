@@ -36,6 +36,17 @@ func GenerateHeaderBoq(numberOfDigits int) (string, error) {
 	return generate, nil
 }
 
+func GenerateHeaderBoq2(numberOfDigits int) (string, error) {
+	uniqueNumber, err := GenerateRandomSecureToken(numberOfDigits)
+	if err != nil {
+		return "", err
+	}
+	timeValue := getCurrentTime()
+
+	generate := strconv.Itoa(uniqueNumber) + timeValue
+	return generate, nil
+}
+
 func GenerateRandomSecureToken(numberOfDigits int) (int, error) {
 	maxLimit := int(math.Pow10(numberOfDigits)) - 1
 	randomNumber, err := rand.Int(rand.Reader, big.NewInt(int64(maxLimit)))
