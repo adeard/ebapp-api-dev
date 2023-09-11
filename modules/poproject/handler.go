@@ -20,6 +20,8 @@ func NewPoProjectHandler(v1 *gin.RouterGroup, poProjectService Service) {
 	poProject.GET("", handler.GetAll)
 	poProject.GET("/:id", handler.GetByPo)
 	poProject.POST("", handler.Store)
+
+	//tambahan untuk header PO
 	poProject.GET("/roll", handler.rollNum)
 }
 
