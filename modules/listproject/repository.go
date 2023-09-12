@@ -10,6 +10,9 @@ type Repository interface {
 	FindAll(input domain.ListProjectRequest) ([]domain.ListProject, error)
 	FindById(id string) (domain.ListProject, error)
 	Store(input domain.ListProject) (domain.ListProject, error)
+	Store2(input domain.ListProject2) (domain.ListProject2, error)
+	Store3(input domain.ListProject3) (domain.ListProject3, error)
+	Store4(input domain.ListProject4) (domain.ListProject4, error)
 }
 
 type repository struct {
@@ -33,6 +36,21 @@ func (r *repository) FindById(id string) (domain.ListProject, error) {
 }
 
 func (r *repository) Store(input domain.ListProject) (domain.ListProject, error) {
+	err := r.db.Table("list_project").Create(&input).Error
+	return input, err
+}
+
+func (r *repository) Store2(input domain.ListProject2) (domain.ListProject2, error) {
+	err := r.db.Table("list_project").Create(&input).Error
+	return input, err
+}
+
+func (r *repository) Store3(input domain.ListProject3) (domain.ListProject3, error) {
+	err := r.db.Table("list_project").Create(&input).Error
+	return input, err
+}
+
+func (r *repository) Store4(input domain.ListProject4) (domain.ListProject4, error) {
 	err := r.db.Table("list_project").Create(&input).Error
 	return input, err
 }

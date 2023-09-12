@@ -20,6 +20,9 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 	listProject.GET("", handler.GetAll)
 	project.GET("/:id", handler.GetByID)
 	project.POST("", handler.Store)
+	project.POST("/draft2", handler.Store2)
+	project.POST("/draft3", handler.Store3)
+	project.POST("/draft4", handler.Store4)
 }
 
 func (h *listProjectHandler) GetAll(c *gin.Context) {
@@ -116,6 +119,142 @@ func (h *listProjectHandler) Store(c *gin.Context) {
 		Status:  http.StatusCreated,
 		Message: "Berhasil menyimpan data Po Project",
 		Data:    []domain.ListProject{project},
+	}
+
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *listProjectHandler) Store2(c *gin.Context) {
+	var input domain.ListProjectRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	createProject := domain.ListProject2{
+		Po:            input.Po,
+		PoDate:        input.PoDate,
+		PekerjaanNo:   input.PekerjaanNo,
+		PekerjaanName: input.PekerjaanName,
+		PekerjaanDate: input.PekerjaanDate,
+		StartDate:     input.StartDate,
+		EndDate:       input.EndDate,
+		UnitUsaha:     input.UnitUsaha,
+		Pt:            input.Pt,
+		Vendor:        input.Vendor,
+		Status:        input.Status,
+		Total:         input.Total,
+		Currency:      input.Currency,
+		Area:          input.Area,
+	}
+
+	project, err := h.listProjectService.Store2(createProject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data Project",
+		})
+		return
+	}
+
+	response := domain.ListProjectsResponse2{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data Po Project",
+		Data:    []domain.ListProject2{project},
+	}
+
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *listProjectHandler) Store3(c *gin.Context) {
+	var input domain.ListProjectRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	createProject := domain.ListProject3{
+		Po:              input.Po,
+		PoDate:          input.PoDate,
+		PekerjaanNo:     input.PekerjaanNo,
+		PekerjaanName:   input.PekerjaanName,
+		PekerjaanDate:   input.PekerjaanDate,
+		StartDateActual: input.StartDateActual,
+		EndDateActual:   input.EndDateActual,
+		UnitUsaha:       input.UnitUsaha,
+		Pt:              input.Pt,
+		Vendor:          input.Vendor,
+		Status:          input.Status,
+		Total:           input.Total,
+		Currency:        input.Currency,
+		Area:            input.Area,
+	}
+
+	project, err := h.listProjectService.Store3(createProject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data Project",
+		})
+		return
+	}
+
+	response := domain.ListProjectsResponse3{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data Po Project",
+		Data:    []domain.ListProject3{project},
+	}
+
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *listProjectHandler) Store4(c *gin.Context) {
+	var input domain.ListProjectRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	createProject := domain.ListProject4{
+		Po:            input.Po,
+		PoDate:        input.PoDate,
+		PekerjaanNo:   input.PekerjaanNo,
+		PekerjaanName: input.PekerjaanName,
+		PekerjaanDate: input.PekerjaanDate,
+		UnitUsaha:     input.UnitUsaha,
+		Pt:            input.Pt,
+		Vendor:        input.Vendor,
+		Status:        input.Status,
+		Total:         input.Total,
+		Currency:      input.Currency,
+		Area:          input.Area,
+	}
+
+	project, err := h.listProjectService.Store4(createProject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data Project",
+		})
+		return
+	}
+
+	response := domain.ListProjectsResponse4{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data Po Project",
+		Data:    []domain.ListProject4{project},
 	}
 
 	c.JSON(http.StatusCreated, response)
