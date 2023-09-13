@@ -36,7 +36,7 @@ func (h *poDataSapHeaderHandler) GetTitle(c *gin.Context) {
 
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Gagal mengambil data Header",
+			"message": "Gagal mengambil data Header => error dari sini : " + err.Error(),
 		})
 		return
 	}
