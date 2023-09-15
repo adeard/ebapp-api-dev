@@ -11,6 +11,7 @@ import (
 	"ebapp-api-dev/modules/poboqbody"
 	"ebapp-api-dev/modules/podatasapheader"
 	"ebapp-api-dev/modules/poproject"
+	"ebapp-api-dev/modules/poprojectaddendum"
 	"ebapp-api-dev/modules/user"
 	"log"
 	"net/http"
@@ -49,6 +50,7 @@ func main() {
 	listproject.NewListProjectHandler(v1, listproject.ListProjectRegistry(db))
 	parentries.NewParEntriesHandler(v1, parentries.ParEntriesRegistry(db))
 	poproject.NewPoProjectHandler(v1, poproject.PoProjectRegistry(db))
+	poprojectaddendum.NewPoProjectAddendumHandler(v1, poprojectaddendum.PoProjectAddendumRegistry(db))
 	poboqbody.NewPoBoqBodyHandler(v1, poboqbody.PoBoqBodyRegistry(db))
 	podatasapheader.NewPoDataSapHeaderHandler(v1, podatasapheader.PoDataSapHeaderRegistry(db2))
 	user.NewUserHandler(v1, user.UserRegistry(db))
