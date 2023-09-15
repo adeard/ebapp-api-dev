@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	FindByPo(po string) ([]domain.PoProjectAddendum, error)
+	Store(input domain.PoProjectAddendum) (domain.PoProjectAddendum, error)
 }
 
 type repository struct {
@@ -30,4 +31,9 @@ func (r *repository) FindByPo(po string) ([]domain.PoProjectAddendum, error) {
 	err := q.Order("id asc").Find(&poProjectAddendum).Error
 
 	return poProjectAddendum, err
+}
+
+func (r *repository) Store(input domain.PoProjectAddendum) (domain.PoProjectAddendum, error) {
+	err := r.db.Table("po_project_addendum").Create(&input).Error
+	return input, err
 }
