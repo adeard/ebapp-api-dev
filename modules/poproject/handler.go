@@ -3,6 +3,7 @@ package poproject
 import (
 	"ebapp-api-dev/domain"
 	"ebapp-api-dev/helper"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,7 @@ func NewPoProjectHandler(v1 *gin.RouterGroup, poProjectService Service) {
 	poProject := v1.Group("po_project")
 
 	poProject.GET("", handler.GetAll)
-	poProject.GET("/:id", handler.GetByPo)
+	poProject.GET("/:id/:no/:var1/:var2/:var3", handler.GetByPo)
 	poProject.POST("", handler.Store)
 
 	//tambahan untuk header PO
@@ -66,8 +67,14 @@ func (h *poProjectHandler) GetAll(c *gin.Context) {
 
 func (h *poProjectHandler) GetByPo(c *gin.Context) {
 	po := c.Param("id")
+	noPekerjaan := c.Param("no")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	addon := string("/")
 
-	poProject, err := h.poProjectService.GetByPo(po)
+	poProject, err := h.poProjectService.GetByPo(po, noPekerjaan+addon+var1+addon+var2+addon+var3)
+	fmt.Printf(var1 + addon + var2 + addon + var3)
 	if err != nil {
 		// Cek apakah error disebabkan oleh data tidak ditemukan.
 		if err == domain.ErrNotFound {
@@ -95,7 +102,7 @@ func (h *poProjectHandler) GetByPo(c *gin.Context) {
 }
 
 func (h *poProjectHandler) Store(c *gin.Context) {
-	var input domain.PoProjectRequest
+	var input []domain.PoProjectRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -105,29 +112,33 @@ func (h *poProjectHandler) Store(c *gin.Context) {
 		return
 	}
 
-	createPoProject := domain.PoProject{
-		Po:          input.Po,
-		Item:        input.Item,
-		Description: input.Description,
-		Qty:         input.Qty,
-		Price:       input.Price,
-		Wbs:         input.Wbs,
-		Cera:        input.Cera,
-	}
+	for _, item := range input {
+		createPoProject := domain.PoProject{
+			Po:          item.Po,
+			PekerjaanNo: item.PekerjaanNo,
+			Item:        item.Item,
+			Description: item.Description,
+			Qty:         item.Qty,
+			PoUnit:      item.PoUnit,
+			Price:       item.Price,
+			Currency:    item.Currency,
+			Wbs:         item.Wbs,
+			Cera:        item.Cera,
+		}
 
-	poProjects, err := h.poProjectService.Store(createPoProject)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Gagal meneruskan data Po Project",
-		})
-		return
+		// Simpan setiap entri ke dalam basis data
+		if _, err := h.poProjectService.Store(createPoProject); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": "Gagal meneruskan data Po Project",
+			})
+			return
+		}
 	}
 
 	response := domain.PoProjectResponse{
 		Status:  http.StatusCreated,
 		Message: "Berhasil menyimpan data Po Project",
-		Data:    []domain.PoProject{poProjects},
 	}
 
 	c.JSON(http.StatusCreated, response)

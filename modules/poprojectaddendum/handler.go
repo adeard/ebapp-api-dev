@@ -73,7 +73,9 @@ func (h *poProjectAddendumHandler) Store(c *gin.Context) {
 			Item:        item.Item,
 			Description: item.Description,
 			Qty:         item.Qty,
+			PoUnit:      item.PoUnit,
 			Price:       item.Price,
+			Currency:    item.Currency,
 			Wbs:         item.Wbs,
 			Cera:        item.Cera,
 		}

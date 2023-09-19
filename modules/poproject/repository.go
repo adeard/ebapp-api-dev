@@ -8,7 +8,7 @@ import (
 
 type Repository interface {
 	FindAll(input domain.PoProjectRequest) ([]domain.PoProject, error)
-	FindByPo(po string) ([]domain.PoProject, error)
+	FindByPo(po string, no string) ([]domain.PoProject, error)
 	Store(input domain.PoProject) (domain.PoProject, error)
 }
 
@@ -26,13 +26,13 @@ func (r *repository) FindAll(input domain.PoProjectRequest) ([]domain.PoProject,
 	return poProject, err
 }
 
-func (r *repository) FindByPo(po string) ([]domain.PoProject, error) {
+func (r *repository) FindByPo(po string, no string) ([]domain.PoProject, error) {
 	var poProject []domain.PoProject
 
 	q := r.db.Table("po_project").Debug()
 
 	if po != "" {
-		q = q.Where("po = ?", po)
+		q = q.Where("po = ?", po).Where("pekerjaan_no = ?", no)
 	}
 
 	err := q.Order("id asc").Find(&poProject).Error
