@@ -9,6 +9,7 @@ type Service interface {
 
 	GetCompany(ba string) ([]domain.Company, error)
 	GetPlant(id string) ([]domain.Plant, error)
+	GetVendor(id string) ([]domain.Vendor, error)
 }
 
 type service struct {
@@ -26,6 +27,11 @@ func (s *service) GetCompany(ba string) ([]domain.Company, error) {
 
 func (s *service) GetPlant(id string) ([]domain.Plant, error) {
 	addon, err := s.repository.FindPlantByWreks(id)
+	return addon, err
+}
+
+func (s *service) GetVendor(id string) ([]domain.Vendor, error) {
+	addon, err := s.repository.FindVendorByCode(id)
 	return addon, err
 }
 

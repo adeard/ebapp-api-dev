@@ -13,6 +13,7 @@ type Repository interface {
 
 	FindCompanyByBA(ba string) ([]domain.Company, error)
 	FindPlantByWreks(id string) ([]domain.Plant, error)
+	FindVendorByCode(id string) ([]domain.Vendor, error)
 }
 
 type repository struct {
@@ -44,6 +45,20 @@ func (r *repository) FindPlantByWreks(id string) ([]domain.Plant, error) {
 
 	if id != "" {
 		q = q.Where("WERKS = ?", id)
+	}
+
+	err := q.Find(&addon).Error
+
+	return addon, err
+}
+
+func (r *repository) FindVendorByCode(id string) ([]domain.Vendor, error) {
+	var addon []domain.Vendor
+
+	q := r.db.Table("MasterVendor").Debug()
+
+	if id != "" {
+		q = q.Where("LIFNR = ?", id)
 	}
 
 	err := q.Find(&addon).Error

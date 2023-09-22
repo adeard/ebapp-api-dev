@@ -30,9 +30,11 @@ func NewPoProjectHandlerAddon(v1 *gin.RouterGroup, poProjectService Service) {
 
 	addon := v1.Group("addons_project_company")
 	addon2 := v1.Group("addons_project_plant")
+	addon3 := v1.Group("addons_project_vendor")
 
 	addon.GET("/:id", handler.GetCompany)
 	addon2.GET("/:id", handler.GetPlant)
+	addon3.GET("/:id", handler.GetVendor)
 }
 
 func (h *poProjectHandler) GetCompany(c *gin.Context) {
@@ -87,6 +89,36 @@ func (h *poProjectHandler) GetPlant(c *gin.Context) {
 	}
 
 	response := domain.AddonResponse2{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data addon",
+		Data:    addonProject,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *poProjectHandler) GetVendor(c *gin.Context) {
+	code := c.Param("id")
+
+	addonProject, err := h.poProjectService.GetVendor(code)
+	if err != nil {
+		// Cek apakah error disebabkan oleh data tidak ditemukan.
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data addon tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data addon",
+		})
+		return
+	}
+
+	response := domain.AddonResponse3{
 		Status:  http.StatusOK,
 		Message: "Berhasil mengambil data addon",
 		Data:    addonProject,

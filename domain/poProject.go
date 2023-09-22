@@ -38,6 +38,12 @@ type Plant struct {
 	Name1 string `json:"plant" gorm:"column:NAME1"`
 }
 
+type Vendor struct {
+	Lifnr string `json:"code" gorm:"column:LIFNR"`
+	Anred string `json:"anred" gorm:"column:ANRED"`
+	Name1 string `json:"name" gorm:"column:NAME1"`
+}
+
 type PoProjectResponse struct {
 	Status  int         `json:"status"`
 	Message string      `json:"message"`
@@ -60,4 +66,10 @@ type AddonResponse2 struct {
 	Status  int     `json:"status"`
 	Message string  `json:"message"`
 	Data    []Plant `json:"data"`
+}
+
+type AddonResponse3 struct {
+	Status  int      `json:"status"`
+	Message string   `json:"message"`
+	Data    []Vendor `json:"data"`
 }
