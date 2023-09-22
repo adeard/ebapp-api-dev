@@ -10,6 +10,9 @@ type Repository interface {
 	FindAll(input domain.PoProjectRequest) ([]domain.PoProject, error)
 	FindByPo(po string, no string) ([]domain.PoProject, error)
 	Store(input domain.PoProject) (domain.PoProject, error)
+
+	FindCompanyByBA(ba string) ([]domain.Company, error)
+	FindPlantByWreks(id string) ([]domain.Plant, error)
 }
 
 type repository struct {
@@ -18,6 +21,34 @@ type repository struct {
 
 func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
+}
+
+func (r *repository) FindCompanyByBA(ba string) ([]domain.Company, error) {
+	var addon []domain.Company
+
+	q := r.db.Table("MasterCompany").Debug()
+
+	if ba != "" {
+		q = q.Where("BUKRS = ?", ba)
+	}
+
+	err := q.Find(&addon).Error
+
+	return addon, err
+}
+
+func (r *repository) FindPlantByWreks(id string) ([]domain.Plant, error) {
+	var addon []domain.Plant
+
+	q := r.db.Table("MasterPlant").Debug()
+
+	if id != "" {
+		q = q.Where("WERKS = ?", id)
+	}
+
+	err := q.Find(&addon).Error
+
+	return addon, err
 }
 
 func (r *repository) FindAll(input domain.PoProjectRequest) ([]domain.PoProject, error) {

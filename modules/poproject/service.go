@@ -6,6 +6,9 @@ type Service interface {
 	GetAll(input domain.PoProjectRequest) ([]domain.PoProject, error)
 	GetByPo(po string, no string) ([]domain.PoProject, error)
 	Store(input domain.PoProject) (domain.PoProject, error)
+
+	GetCompany(ba string) ([]domain.Company, error)
+	GetPlant(id string) ([]domain.Plant, error)
 }
 
 type service struct {
@@ -14,6 +17,16 @@ type service struct {
 
 func NewService(repository Repository) Service {
 	return &service{repository}
+}
+
+func (s *service) GetCompany(ba string) ([]domain.Company, error) {
+	addon, err := s.repository.FindCompanyByBA(ba)
+	return addon, err
+}
+
+func (s *service) GetPlant(id string) ([]domain.Plant, error) {
+	addon, err := s.repository.FindPlantByWreks(id)
+	return addon, err
 }
 
 func (s *service) GetAll(input domain.PoProjectRequest) ([]domain.PoProject, error) {

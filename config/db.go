@@ -70,7 +70,6 @@ func MysqlDev(DbUser string, DbPassword string, DbHost string, DbPort string, Db
 		fmt.Println("Cannot connect to database ", Dbdriver)
 		log.Fatal("Database Connection Error")
 	}
-
 }
 
 func SqlsvrDev(DbUser string, DbPassword string, DbHost string, DbName string, Dbdriver string) {

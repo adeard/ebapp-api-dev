@@ -3,7 +3,6 @@ package poproject
 import (
 	"ebapp-api-dev/domain"
 	"ebapp-api-dev/helper"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +23,76 @@ func NewPoProjectHandler(v1 *gin.RouterGroup, poProjectService Service) {
 
 	//tambahan untuk header PO
 	poProject.GET("/roll", handler.rollNum)
+}
+
+func NewPoProjectHandlerAddon(v1 *gin.RouterGroup, poProjectService Service) {
+	handler := &poProjectHandler{poProjectService}
+
+	addon := v1.Group("addons_project_company")
+	addon2 := v1.Group("addons_project_plant")
+
+	addon.GET("/:id", handler.GetCompany)
+	addon2.GET("/:id", handler.GetPlant)
+}
+
+func (h *poProjectHandler) GetCompany(c *gin.Context) {
+	ba := c.Param("id")
+
+	addonProject, err := h.poProjectService.GetCompany(ba)
+	if err != nil {
+		// Cek apakah error disebabkan oleh data tidak ditemukan.
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data addon tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data addon",
+		})
+		return
+	}
+
+	response := domain.AddonResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data addon",
+		Data:    addonProject,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *poProjectHandler) GetPlant(c *gin.Context) {
+	werks := c.Param("id")
+
+	addonProject, err := h.poProjectService.GetPlant(werks)
+	if err != nil {
+		// Cek apakah error disebabkan oleh data tidak ditemukan.
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data addon tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data addon",
+		})
+		return
+	}
+
+	response := domain.AddonResponse2{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data addon",
+		Data:    addonProject,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *poProjectHandler) rollNum(c *gin.Context) {
@@ -74,7 +143,6 @@ func (h *poProjectHandler) GetByPo(c *gin.Context) {
 	addon := string("/")
 
 	poProject, err := h.poProjectService.GetByPo(po, noPekerjaan+addon+var1+addon+var2+addon+var3)
-	fmt.Printf(var1 + addon + var2 + addon + var3)
 	if err != nil {
 		// Cek apakah error disebabkan oleh data tidak ditemukan.
 		if err == domain.ErrNotFound {

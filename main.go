@@ -50,6 +50,7 @@ func main() {
 	listproject.NewListProjectHandler(v1, listproject.ListProjectRegistry(db))
 	parentries.NewParEntriesHandler(v1, parentries.ParEntriesRegistry(db))
 	poproject.NewPoProjectHandler(v1, poproject.PoProjectRegistry(db))
+	poproject.NewPoProjectHandlerAddon(v1, poproject.PoProjectRegistry(db2))
 	poprojectaddendum.NewPoProjectAddendumHandler(v1, poprojectaddendum.PoProjectAddendumRegistry(db))
 	poboqbody.NewPoBoqBodyHandler(v1, poboqbody.PoBoqBodyRegistry(db))
 	podatasapheader.NewPoDataSapHeaderHandler(v1, podatasapheader.PoDataSapHeaderRegistry(db2))
