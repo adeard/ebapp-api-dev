@@ -23,6 +23,8 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 	project.POST("/draft2", handler.Store2)
 	project.POST("/draft3", handler.Store3)
 	project.POST("/draft4", handler.Store4)
+
+	project.PUT("/status", handler.UpdateStatus)
 }
 
 func (h *listProjectHandler) GetAll(c *gin.Context) {
@@ -258,4 +260,38 @@ func (h *listProjectHandler) Store4(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *listProjectHandler) UpdateStatus(c *gin.Context) {
+	var input domain.UpdateStatus
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Permintaan tidak valid: " + err.Error(),
+		})
+		return
+	}
+
+	// Buat struct untuk pembaruan status
+	updateStatus := domain.UpdateStatus{
+		PekerjaanNo: input.PekerjaanNo,
+		Status:      input.Status, // Gunakan status dari input JSON
+	}
+
+	// Panggil service untuk melakukan pembaruan status
+	updatedProject, err := h.listProjectService.UpdateStatus(updateStatus, input.PekerjaanNo)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal memperbarui status proyek",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Status proyek berhasil diperbarui",
+		"data":    updatedProject,
+	})
 }

@@ -102,6 +102,17 @@ type ListProjectRequest struct {
 	Currency        string    `json:"currency"`
 }
 
+type UpdateStatus struct {
+	PekerjaanNo string `json:"pekerjaan_no"`
+	Status      string `json:"status"`
+}
+
+type UpdateStatusResponse struct {
+	Data    []UpdateStatus `json:"data"`
+	Status  int            `json:"status"`
+	Message string         `json:"message"`
+}
+
 type ListProjectsResponse struct {
 	Data    []ListProject `json:"data"`
 	Status  int           `json:"status"`
