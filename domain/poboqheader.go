@@ -5,8 +5,8 @@ type PoBoqHeader struct {
 	Po          string  `json:"po"`
 	Item        string  `json:"item"`
 	Description string  `json:"description"`
-	Qty         float32 `json:"qty"`
-	Unit        string  `json:"unit"`
+	Qty         float32 `json:"sum" gorm:"column:qty"`
+	Unit        string  `json:"pounit" gorm:"column:unit"`
 	Price       float32 `json:"price"`
 	Currency    string  `json:"currency"`
 	Order       string  `json:"order"`
