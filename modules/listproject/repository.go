@@ -28,7 +28,7 @@ func NewRepository(db *gorm.DB) *repository {
 
 func (r *repository) FindAll(input domain.ListProjectRequest) ([]domain.ListProject, error) {
 	var listProjects []domain.ListProject
-	err := r.db.Table("list_project").Find(&listProjects).Error
+	err := r.db.Table("list_project").Order("pekerjaan_date ASC").Find(&listProjects).Error
 	return listProjects, err
 }
 
