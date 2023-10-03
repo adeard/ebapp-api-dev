@@ -64,6 +64,7 @@ func (h *poBoqBodyHandler) GetPoBoqBodyByRunNum(c *gin.Context) {
 			Id:                body.Id,
 			ParentId:          body.ParentId,
 			RunNum:            body.RunNum,
+			Order:             body.Order,
 			ItemNo:            body.ItemNo,
 			ItemLevel:         body.ItemLevel,
 			ItemDescription:   body.ItemDescription,
