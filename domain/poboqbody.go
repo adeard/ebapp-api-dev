@@ -4,6 +4,7 @@ type PoBoqBody struct {
 	Id                int     `json:"id" gorm:"column:id"`
 	ParentId          int     `json:"parent_id" gorm:"parent_id"`
 	RunNum            string  `json:"run_num" gorm:"column:run_num"`
+	Order             string  `json:"order" gorm:"column:order"`
 	ItemNo            string  `json:"item_no" gorm:"column:item_no"`
 	ItemLevel         int     `json:"item_level" gorm:"column:item_level"`
 	ItemDescription   string  `json:"item_description" gorm:"column:item_description"`
@@ -19,6 +20,7 @@ type PoBoqBodyRequest struct {
 	Id                int     `json:"id"`
 	ParentId          int     `json:"parent_id"`
 	RunNum            string  `json:"run_num"`
+	Order             string  `json:"order"`
 	ItemNo            string  `json:"item_no"`
 	ItemLevel         int     `json:"item_level"`
 	ItemDescription   string  `json:"item_description"`
@@ -34,6 +36,7 @@ type PoBoqBodyResponse struct {
 	Id                int                 `json:"id"`
 	ParentId          int                 `json:"parent_id"`
 	RunNum            string              `json:"run_num"`
+	Order             string              `json:"order"`
 	ItemNo            string              `json:"item_no"`
 	ItemLevel         int                 `json:"item_level"`
 	ItemDescription   string              `json:"item_description"`
