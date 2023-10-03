@@ -17,6 +17,7 @@ func NewPoBoqHeaderHandler(v1 *gin.RouterGroup, poBoqHeaderService Service) {
 	hHeader := v1.Group("poboq_header")
 
 	hHeader.GET("/:id/:var1/:var2/:var3", handler.GetByPekerjaanNo)
+	hHeader.POST("", handler.Store)
 }
 
 func (h *poBoqHeaderHandler) GetByPekerjaanNo(c *gin.Context) {
@@ -49,4 +50,45 @@ func (h *poBoqHeaderHandler) GetByPekerjaanNo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *poBoqHeaderHandler) Store(c *gin.Context) {
+	var input []domain.PoBoqHeader
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	for _, item := range input {
+		createHeader := domain.PoBoqHeader{
+			PekerjaanNo: item.PekerjaanNo,
+			Po:          item.Po,
+			Item:        item.Item,
+			Description: item.Description,
+			Qty:         item.Qty,
+			Unit:        item.Unit,
+			Price:       item.Price,
+			Currency:    item.Currency,
+			Order:       item.Order,
+		}
+
+		if _, err := h.poBoqHeaderService.Store(createHeader); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": "Gagal meneruskan data header",
+			})
+			return
+		}
+	}
+
+	response := domain.PoBoqHeaderResponse{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data header",
+	}
+
+	c.JSON(http.StatusCreated, response)
 }

@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	FindByPekerjaanNo(id string) ([]domain.PoBoqHeader, error)
+	Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error)
 }
 
 type repository struct {
@@ -30,4 +31,9 @@ func (r *repository) FindByPekerjaanNo(id string) ([]domain.PoBoqHeader, error) 
 	err := q.Order("'order' asc").Find(&headers).Error
 
 	return headers, err
+}
+
+func (r *repository) Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error) {
+	err := r.db.Table("po_boq_header").Create(&input).Error
+	return input, err
 }
