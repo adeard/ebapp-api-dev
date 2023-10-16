@@ -91,7 +91,7 @@ func (h *poBoqBodyHandler) GetPoBoqBodyByRunNum(c *gin.Context) {
 }
 
 func (h *poBoqBodyHandler) Store(c *gin.Context) {
-	var input domain.PoBoqBodyRequest
+	var input []domain.PoBoqBodyRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -101,45 +101,51 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 		return
 	}
 
-	existingBoqBody, _ := h.poBoqBodyService.FindByItemNo(input.ItemNo)
+	createdPoBoqBodies := []domain.PoBoqBody{}
 
-	if existingBoqBody.Id != 0 && existingBoqBody.RunNum == input.RunNum {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  http.StatusBadRequest,
-			"message": "ItemNo sudah ada di database untuk RunNum yang sama",
-		})
-		return
-	}
+	for _, requestData := range input {
+		existingBoqBody, _ := h.poBoqBodyService.FindByItemNo(requestData.ItemNo)
 
-	createdPoBoqBody := domain.PoBoqBody{
-		RunNum:            input.RunNum,
-		Id:                input.Id,
-		ParentId:          input.ParentId,
-		ItemNo:            input.ItemNo,
-		ItemLevel:         input.ItemLevel,
-		ItemDescription:   input.ItemDescription,
-		ItemSpecification: input.ItemSpecification,
-		Qty:               input.Qty,
-		Unit:              input.Unit,
-		Price:             input.Price,
-		Currency:          input.Currency,
-		Note:              input.Note,
-		Order:             input.Order,
-	}
+		if existingBoqBody.Id != 0 && existingBoqBody.RunNum == requestData.RunNum {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  http.StatusBadRequest,
+				"message": "ItemNo sudah ada di database untuk RunNum yang sama",
+			})
+			return
+		}
 
-	poBoqBodies, err := h.poBoqBodyService.Store(createdPoBoqBody)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Gagal meneruskan data BoQ Body",
-		})
-		return
+		createdPoBoqBody := domain.PoBoqBody{
+			RunNum:            requestData.RunNum,
+			Id:                requestData.Id,
+			ParentId:          requestData.ParentId,
+			ItemNo:            requestData.ItemNo,
+			ItemLevel:         requestData.ItemLevel,
+			ItemDescription:   requestData.ItemDescription,
+			ItemSpecification: requestData.ItemSpecification,
+			Qty:               requestData.Qty,
+			Unit:              requestData.Unit,
+			Price:             requestData.Price,
+			Currency:          requestData.Currency,
+			Note:              requestData.Note,
+			Order:             requestData.Order,
+		}
+
+		poBoqBodies, err := h.poBoqBodyService.Store(createdPoBoqBody)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": "Gagal meneruskan data BoQ Body",
+			})
+			return
+		}
+
+		createdPoBoqBodies = append(createdPoBoqBodies, poBoqBodies)
 	}
 
 	response := domain.PoBoqBodyResponseFinal{
 		Status:  http.StatusCreated,
 		Message: "Berhasil menyimpan data BoQ Body",
-		Data:    []domain.PoBoqBody{poBoqBodies},
+		Data:    createdPoBoqBodies,
 	}
 
 	c.JSON(http.StatusCreated, response)
