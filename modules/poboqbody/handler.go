@@ -17,7 +17,7 @@ func NewPoBoqBodyHandler(v1 *gin.RouterGroup, poBoqService Service) {
 
 	poboqbody := v1.Group("po_boq_body")
 
-	poboqbody.GET("/:id", handler.GetPoBoqBodyByRunNum)
+	poboqbody.GET("/:id/:var1/:var2/:var3", handler.GetPoBoqBodyByRunNum)
 	poboqbody.POST("", handler.Store)
 
 }
@@ -38,8 +38,12 @@ func groupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain
 
 func (h *poBoqBodyHandler) GetPoBoqBodyByRunNum(c *gin.Context) {
 	runNum := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	addons := "/"
 
-	poBoqBody, err := h.poBoqBodyService.GetByRunNum(runNum)
+	poBoqBody, err := h.poBoqBodyService.GetByRunNum(runNum + addons + var1 + addons + var2 + addons + var3)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
