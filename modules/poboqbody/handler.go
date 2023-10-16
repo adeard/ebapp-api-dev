@@ -81,7 +81,7 @@ func (h *poBoqBodyHandler) GetPoBoqBodyByRunNum(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
-		"message": "Berhasil mengambil data BoQ Body",
+		"message": "Berhasil mengambil data PO BoQ Body",
 		"data":    result,
 	})
 }
@@ -109,6 +109,7 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 
 	createdPoBoqBody := domain.PoBoqBody{
 		RunNum:            input.RunNum,
+		Id:                input.Id,
 		ParentId:          input.ParentId,
 		ItemNo:            input.ItemNo,
 		ItemLevel:         input.ItemLevel,
@@ -119,6 +120,7 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 		Price:             input.Price,
 		Currency:          input.Currency,
 		Note:              input.Note,
+		Order:             input.Order,
 	}
 
 	poBoqBodies, err := h.poBoqBodyService.Store(createdPoBoqBody)

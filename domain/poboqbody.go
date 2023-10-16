@@ -1,7 +1,7 @@
 package domain
 
 type PoBoqBody struct {
-	Id                int     `json:"id" gorm:"column:id"`
+	Id                int     `json:"id" gorm:"column:main_id"`
 	ParentId          int     `json:"parent_id" gorm:"parent_id"`
 	RunNum            string  `json:"run_num" gorm:"column:run_num"`
 	Order             string  `json:"order" gorm:"column:order"`
@@ -17,7 +17,7 @@ type PoBoqBody struct {
 }
 
 type PoBoqBodyRequest struct {
-	Id                int     `json:"id"`
+	Id                int     `json:"id" gorm:"column:main_id"`
 	ParentId          int     `json:"parent_id"`
 	RunNum            string  `json:"run_num"`
 	Order             string  `json:"order"`
