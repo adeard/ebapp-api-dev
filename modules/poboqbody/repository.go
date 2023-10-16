@@ -29,7 +29,7 @@ func (r *repository) FindByRunNum(runNum string) ([]domain.PoBoqBody, error) {
 		q = q.Where("run_num = ?", runNum)
 	}
 
-	err := q.Order("id asc").Find(&boqBody).Error
+	err := q.Order("main_id asc").Find(&boqBody).Error
 
 	return boqBody, err
 }
