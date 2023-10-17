@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	FindByRunNum(runNum string) ([]domain.PoBoqBody, error)
+	FindByRunNum(runNum string, order string) ([]domain.PoBoqBody, error)
 	Store(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBody, error)
 }
@@ -20,13 +20,13 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindByRunNum(runNum string) ([]domain.PoBoqBody, error) {
+func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBody, error) {
 	var boqBody []domain.PoBoqBody
 
 	q := r.db.Table("po_boq_body")
 
 	if runNum != "" {
-		q = q.Where("run_num = ?", runNum)
+		q = q.Where("run_num = ?", runNum).Where("[order] = ?", order)
 	}
 
 	err := q.Order("main_id asc").Find(&boqBody).Error

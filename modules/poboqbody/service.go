@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	GetByRunNum(runNum string) ([]domain.PoBoqBody, error)
+	GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, error)
 	Store(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBody, error)
 }
@@ -18,8 +18,8 @@ func NewService(repository Repository) *service {
 	return &service{repository}
 }
 
-func (s *service) GetByRunNum(runNum string) ([]domain.PoBoqBody, error) {
-	poboqbody, err := s.repository.FindByRunNum(runNum)
+func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, error) {
+	poboqbody, err := s.repository.FindByRunNum(runNum, order)
 	return poboqbody, err
 }
 

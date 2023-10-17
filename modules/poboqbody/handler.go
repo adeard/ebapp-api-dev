@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,7 @@ func NewPoBoqBodyHandler(v1 *gin.RouterGroup, poBoqService Service) {
 
 	poboqbody := v1.Group("po_boq_body")
 
-	poboqbody.GET("/:id/:var1/:var2/:var3", handler.GetPoBoqBodyByRunNum)
+	poboqbody.GET("/:id/:var1/:var2/:var3/:var4", handler.GetPoBoqBodyByRunNum)
 	poboqbody.POST("", handler.Store)
 
 }
@@ -41,9 +42,10 @@ func (h *poBoqBodyHandler) GetPoBoqBodyByRunNum(c *gin.Context) {
 	var1 := c.Param("var1")
 	var2 := c.Param("var2")
 	var3 := c.Param("var3")
+	var4 := c.Param("var4")
 	addons := "/"
 
-	poBoqBody, err := h.poBoqBodyService.GetByRunNum(runNum + addons + var1 + addons + var2 + addons + var3)
+	poBoqBody, err := h.poBoqBodyService.GetByRunNum(runNum+addons+var1+addons+var2+addons+var3, var4)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
@@ -106,10 +108,12 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 	for _, requestData := range input {
 		existingBoqBody, _ := h.poBoqBodyService.FindByItemNo(requestData.ItemNo)
 
-		if existingBoqBody.Id != 0 && existingBoqBody.RunNum == requestData.RunNum {
+		fmt.Println("Ini datanya : ", existingBoqBody)
+
+		if existingBoqBody.Id != 0 && existingBoqBody.RunNum == requestData.RunNum && existingBoqBody.Order == requestData.Order {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status":  http.StatusBadRequest,
-				"message": "ItemNo sudah ada di database untuk RunNum yang sama",
+				"message": "ItemNo sudah ada di database untuk RunNum yang sama dan Order yang sama",
 			})
 			return
 		}
