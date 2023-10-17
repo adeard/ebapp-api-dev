@@ -14,6 +14,10 @@ type PoBoqBody struct {
 	Price             float64 `json:"price" gorm:"column:price"`
 	Currency          string  `json:"currency" gorm:"column:currency"`
 	Note              string  `json:"note" gorm:"column:note"`
+	StartDate         string  `json:"start_date" gorm:"column:start_date;default:NULL"`
+	EndDate           string  `json:"end_date" gorm:"column:end_date;default:NULL"`
+	StartDateActual   string  `json:"start_date_actual" gorm:"column:start_date_actual;default:NULL"`
+	EndDateActual     string  `json:"end_date_actual" gorm:"column:end_date_actual;default:NULL"`
 }
 
 type PoBoqBodyRequest struct {
@@ -30,6 +34,10 @@ type PoBoqBodyRequest struct {
 	Price             float64 `json:"price"`
 	Currency          string  `json:"currency"`
 	Note              string  `json:"note"`
+	StartDate         string  `json:"start_date"`
+	EndDate           string  `json:"end_date"`
+	StartDateActual   string  `json:"start_date_actual"`
+	EndDateActual     string  `json:"end_date_actual"`
 }
 
 type PoBoqBodyResponse struct {
@@ -46,6 +54,10 @@ type PoBoqBodyResponse struct {
 	Price             float64             `json:"price"`
 	Currency          string              `json:"currency"`
 	Note              string              `json:"note"`
+	StartDate         string              `json:"start_date"`
+	EndDate           string              `json:"end_date"`
+	StartDateActual   string              `json:"start_date_actual"`
+	EndDateActual     string              `json:"End_date_actual"`
 	Children          []PoBoqBodyResponse `json:"children"`
 }
 

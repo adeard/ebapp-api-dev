@@ -80,6 +80,10 @@ func (h *poBoqBodyHandler) GetPoBoqBodyByRunNum(c *gin.Context) {
 			Price:             body.Price,
 			Currency:          body.Currency,
 			Note:              body.Note,
+			StartDate:         body.StartDate,
+			EndDate:           body.EndDate,
+			StartDateActual:   body.StartDateActual,
+			EndDateActual:     body.EndDateActual,
 		})
 	}
 
@@ -118,23 +122,23 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 			return
 		}
 
-		createdPoBoqBody := domain.PoBoqBody{
-			RunNum:            requestData.RunNum,
-			Id:                requestData.Id,
-			ParentId:          requestData.ParentId,
-			ItemNo:            requestData.ItemNo,
-			ItemLevel:         requestData.ItemLevel,
-			ItemDescription:   requestData.ItemDescription,
-			ItemSpecification: requestData.ItemSpecification,
-			Qty:               requestData.Qty,
-			Unit:              requestData.Unit,
-			Price:             requestData.Price,
-			Currency:          requestData.Currency,
-			Note:              requestData.Note,
-			Order:             requestData.Order,
-		}
+		// createdPoBoqBody := domain.PoBoqBody{
+		// 	RunNum:            requestData.RunNum,
+		// 	Id:                requestData.Id,
+		// 	ParentId:          requestData.ParentId,
+		// 	ItemNo:            requestData.ItemNo,
+		// 	ItemLevel:         requestData.ItemLevel,
+		// 	ItemDescription:   requestData.ItemDescription,
+		// 	ItemSpecification: requestData.ItemSpecification,
+		// 	Qty:               requestData.Qty,
+		// 	Unit:              requestData.Unit,
+		// 	Price:             requestData.Price,
+		// 	Currency:          requestData.Currency,
+		// 	Note:              requestData.Note,
+		// 	Order:             requestData.Order,
+		// }
 
-		poBoqBodies, err := h.poBoqBodyService.Store(createdPoBoqBody)
+		poBoqBodies, err := h.poBoqBodyService.Store(domain.PoBoqBody(requestData))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status":  http.StatusInternalServerError,
