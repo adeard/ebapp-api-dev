@@ -57,7 +57,7 @@ type PoBoqBodyResponse struct {
 	StartDate         string              `json:"start_date"`
 	EndDate           string              `json:"end_date"`
 	StartDateActual   string              `json:"start_date_actual"`
-	EndDateActual     string              `json:"End_date_actual"`
+	EndDateActual     string              `json:"end_date_actual"`
 	Children          []PoBoqBodyResponse `json:"children"`
 }
 
