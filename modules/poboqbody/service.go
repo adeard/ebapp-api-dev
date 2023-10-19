@@ -8,6 +8,7 @@ type Service interface {
 	GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, error)
 	Store(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBody, error)
+	Delete(id string, order string, mainId string) error
 }
 
 type service struct {
@@ -31,4 +32,19 @@ func (s *service) Store(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBody, error) {
 	boqBody, err := s.repository.FindByItemNo(itemNo)
 	return boqBody, err
+}
+
+func (s *service) Delete(id string, order string, mainId string) error {
+	// Cek terlebih dahulu apakah data dengan ID tersebut ada atau tidak
+	_, err := s.repository.FindBoq(id, order, mainId)
+	if err != nil {
+		return err
+	}
+
+	err = s.repository.Delete(id, order, mainId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

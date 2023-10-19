@@ -311,25 +311,6 @@ func (h *boqBodyHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	// boqBody, err := h.boqBodyService.GetByParentId(id)
-	// if err != nil {
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"status":  http.StatusInternalServerError,
-	// 		"message": "Gagal mengambil data BoQ Body",
-	// 		"data":    nil,
-	// 	})
-	// 	return
-	// }
-
-	// if len(boqBody) == 0 {
-	// 	c.JSON(http.StatusNotFound, gin.H{
-	// 		"status":  http.StatusNotFound,
-	// 		"message": "Data BoQ Body tidak ditemukan",
-	// 		"data":    nil,
-	// 	})
-	// 	return
-	// }
-
 	// Algoritma rekurisnya
 	var result []int
 	parentID, _ := strconv.Atoi(id)
