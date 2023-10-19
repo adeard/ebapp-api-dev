@@ -4,6 +4,7 @@ import (
 	"ebapp-api-dev/domain"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -171,10 +172,25 @@ func (h *poBoqBodyHandler) Update(c *gin.Context) {
 		return
 	}
 
-	//CEK DULU ADA GA ITEMNYA ADA ATAU TIDAK
-	// h.poBoqBodyService.CheckBoqBody()
-	//======================================
+	// Cek apakah item ada di database
+	result, err := h.poBoqBodyService.CheckBoqBody(input.RunNum, input.Order, strconv.Itoa(input.Id))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak dapat menemukan Item",
+		})
+		return
+	}
 
+	if len(result) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Item yang dicari tidak ditemukan",
+		})
+		return
+	}
+
+	// Melakukan pembaruan item jika ada
 	_, updateErr := h.poBoqBodyService.Update(input)
 	if updateErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

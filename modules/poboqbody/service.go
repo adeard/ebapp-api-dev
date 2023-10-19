@@ -7,7 +7,7 @@ import (
 
 type Service interface {
 	GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, error)
-	CheckBoqBody(input domain.PoBoqBody) (domain.PoBoqBody, error)
+	CheckBoqBody(id string, order string, mainId string) ([]domain.PoBoqBody, error)
 	Store(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBody, error)
 	Delete(id string, order string, mainId string) error
@@ -53,16 +53,42 @@ func (s *service) Delete(id string, order string, mainId string) error {
 }
 
 func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
-	poBoqBody, err := s.repository.FindBoq(input.RunNum, input.Order, strconv.Itoa(input.Id))
+	result, err := s.repository.FindBoq(input.RunNum, input.Order, strconv.Itoa(input.Id))
 	if err != nil {
-		return poBoqBody[0], err
+		return domain.PoBoqBody{}, err
 	}
 
-	poBoqBodies, err := s.repository.Update(input)
+	if len(result) == 0 {
+		return domain.PoBoqBody{}, nil
+	}
+
+	poBoqBody := result[0]
+
+	dataForUpdate := domain.PoBoqBody{
+		Id:                poBoqBody.Id,
+		ParentId:          poBoqBody.ParentId,
+		RunNum:            poBoqBody.RunNum,
+		Order:             poBoqBody.Order,
+		ItemNo:            input.ItemNo,
+		ItemLevel:         poBoqBody.ItemLevel,
+		ItemDescription:   input.ItemDescription,
+		ItemSpecification: input.ItemSpecification,
+		Qty:               input.Qty,
+		Unit:              input.Unit,
+		Price:             input.Price,
+		Currency:          input.Currency,
+		Note:              input.Note,
+		StartDate:         input.StartDate,
+		EndDate:           input.EndDate,
+		StartDateActual:   input.StartDateActual,
+		EndDateActual:     input.EndDateActual,
+	}
+
+	poBoqBodies, err := s.repository.Update(dataForUpdate)
 	return poBoqBodies, err
 }
 
-func (s *service) CheckBoqBody(id string, order string, mainId string) (domain.PoBoqBody, error) {
+func (s *service) CheckBoqBody(id string, order string, mainId string) ([]domain.PoBoqBody, error) {
 	data, err := s.repository.FindBoq(id, order, mainId)
-	return data[0], err
+	return data, err
 }
