@@ -171,6 +171,10 @@ func (h *poBoqBodyHandler) Update(c *gin.Context) {
 		return
 	}
 
+	//CEK DULU ADA GA ITEMNYA ADA ATAU TIDAK
+	// h.poBoqBodyService.CheckBoqBody()
+	//======================================
+
 	_, updateErr := h.poBoqBodyService.Update(input)
 	if updateErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

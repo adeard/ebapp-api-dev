@@ -7,6 +7,7 @@ import (
 
 type Service interface {
 	GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, error)
+	CheckBoqBody(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	Store(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBody, error)
 	Delete(id string, order string, mainId string) error
@@ -59,4 +60,9 @@ func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 
 	poBoqBodies, err := s.repository.Update(input)
 	return poBoqBodies, err
+}
+
+func (s *service) CheckBoqBody(id string, order string, mainId string) (domain.PoBoqBody, error) {
+	data, err := s.repository.FindBoq(id, order, mainId)
+	return data[0], err
 }
