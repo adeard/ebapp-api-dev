@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"strconv"
 )
 
 type Service interface {
@@ -47,4 +48,13 @@ func (s *service) Delete(id string, order string, mainId string) error {
 	}
 
 	return nil
+}
+
+func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
+	poBoqBody, err := s.repository.FindBoq(input.RunNum, input.Order, strconv.Itoa(input.Id))
+	if err != nil {
+		return poBoqBody[0], err
+	}
+
+	return poBoqBody[0], err
 }
