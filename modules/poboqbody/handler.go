@@ -21,7 +21,7 @@ func NewPoBoqBodyHandler(v1 *gin.RouterGroup, poBoqService Service) {
 	poboqbody.GET("/:id/:var1/:var2/:var3/:var4", handler.GetPoBoqBodyByRunNum)
 	poboqbody.POST("", handler.Store)
 	poboqbody.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
-
+	poboqbody.PUT("", handler.Update)
 }
 
 func groupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse {
@@ -158,6 +158,35 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *poBoqBodyHandler) Update(c *gin.Context) {
+	var input domain.PoBoqBody
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	_, updateErr := h.poBoqBodyService.Update(input)
+	if updateErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengupdate data PoBoqBody",
+		})
+		return
+	}
+
+	response := domain.PoBoqBodyResponseFinal{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengupdate data PoBoqBody",
+		Data:    nil,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *poBoqBodyHandler) Delete(c *gin.Context) {

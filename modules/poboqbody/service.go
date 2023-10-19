@@ -10,6 +10,7 @@ type Service interface {
 	Store(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBody, error)
 	Delete(id string, order string, mainId string) error
+	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
 }
 
 type service struct {
@@ -56,5 +57,6 @@ func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 		return poBoqBody[0], err
 	}
 
-	return poBoqBody[0], err
+	poBoqBodies, err := s.repository.Update(input)
+	return poBoqBodies, err
 }
