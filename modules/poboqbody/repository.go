@@ -68,6 +68,42 @@ func (r *repository) Delete(id string, orderId string, mainId string) error {
 }
 
 func (r *repository) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
-	err := r.db.Table("po_boq_body").Where("run_num =?", input.RunNum).Where("[order] =?", input.Order).Where("main_id =?", input.Id).Save(&input).Error
+	err := r.db.Table("po_boq_body").Where("run_num = ?", input.RunNum).Where("[order] = ?", input.Order).Where("main_id = ?", input.Id).Save(&input).Error
+
+	if err != nil {
+		return input, err
+	}
+
+	// Mengecek dan mengatasi kolom date yang kosong
+	if input.StartDate == "" || input.EndDate == "" || input.StartDateActual == "" || input.EndDateActual == "" {
+		updateCols := make(map[string]interface{})
+
+		if input.StartDate == "" {
+			updateCols["start_date"] = nil
+		}
+
+		if input.EndDate == "" {
+			updateCols["end_date"] = nil
+		}
+
+		if input.StartDateActual == "" {
+			updateCols["start_date_actual"] = nil
+		}
+
+		if input.EndDateActual == "" {
+			updateCols["end_date_actual"] = nil
+		}
+
+		err := r.db.Table("po_boq_body").
+			Where("run_num = ?", input.RunNum).
+			Where("[order] = ?", input.Order).
+			Where("main_id = ?", input.Id).
+			Updates(updateCols).Error
+
+		if err != nil {
+			return input, err
+		}
+	}
+
 	return input, err
 }
