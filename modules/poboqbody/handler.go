@@ -2,7 +2,6 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -114,8 +113,6 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 	for _, requestData := range input {
 		existingBoqBody, _ := h.poBoqBodyService.FindByItemNo(requestData.ItemNo)
 
-		fmt.Println("Ini datanya : ", existingBoqBody)
-
 		if existingBoqBody.Id != 0 && existingBoqBody.RunNum == requestData.RunNum && existingBoqBody.Order == requestData.Order {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status":  http.StatusBadRequest,
@@ -123,22 +120,6 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 			})
 			return
 		}
-
-		// createdPoBoqBody := domain.PoBoqBody{
-		// 	RunNum:            requestData.RunNum,
-		// 	Id:                requestData.Id,
-		// 	ParentId:          requestData.ParentId,
-		// 	ItemNo:            requestData.ItemNo,
-		// 	ItemLevel:         requestData.ItemLevel,
-		// 	ItemDescription:   requestData.ItemDescription,
-		// 	ItemSpecification: requestData.ItemSpecification,
-		// 	Qty:               requestData.Qty,
-		// 	Unit:              requestData.Unit,
-		// 	Price:             requestData.Price,
-		// 	Currency:          requestData.Currency,
-		// 	Note:              requestData.Note,
-		// 	Order:             requestData.Order,
-		// }
 
 		poBoqBodies, err := h.poBoqBodyService.Store(domain.PoBoqBody(requestData))
 		if err != nil {
