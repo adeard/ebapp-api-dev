@@ -19,6 +19,7 @@ func NewPoPicHandler(v1 *gin.RouterGroup, poPicService Service) {
 
 	poPic.GET("/:id/:var1/:var2/:var3", handler.GetByRunNum)
 	poPic.POST("", handler.Store)
+	poPic.PUT("", handler.Update)
 	poPic.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 }
 
@@ -106,6 +107,65 @@ func (h *poPicHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *poPicHandler) Update(c *gin.Context) {
+	var input []domain.PoPicRequest
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	// Lakukan iterasi melalui input
+	for _, item := range input {
+		// Panggil fungsi untuk mencari data yang akan diupdate
+		existingData, findErr := h.poPicService.FindPicByLevel(item.Uid, item.RunNum, item.Id)
+		if findErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": "Gagal mencari data yang akan diupdate",
+			})
+			return
+		}
+
+		// Periksa apakah data ditemukan
+		if existingData.Name == "" {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data tidak ditemukan",
+			})
+			return
+		}
+
+		// Lakukan pembaruan data
+		updatedData := domain.PoPic{
+			RunNum: item.RunNum,
+			Id:     item.Id,
+			Uid:    item.Uid,
+			Name:   item.Name,
+			Email:  item.Email,
+			Role:   item.Role,
+			Status: item.Status,
+		}
+
+		if _, updateErr := h.poPicService.Update(updatedData); updateErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": "Gagal melakukan pembaruan data",
+			})
+			return
+		}
+	}
+
+	// Berhasil melakukan pembaruan data
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Berhasil melakukan pembaruan data",
+	})
 }
 
 func (h *poPicHandler) Delete(c *gin.Context) {

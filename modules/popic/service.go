@@ -7,6 +7,7 @@ type Service interface {
 	FindPicByLevel(uid string, po string, level int) (domain.PoPic, error)
 	FindPicByPo(po string) ([]domain.PoPic, error)
 	Store(input domain.PoPic) (domain.PoPic, error)
+	Update(input domain.PoPic) (domain.PoPic, error)
 	Delete(uid string, po string, level int) (domain.PoPic, error)
 }
 
@@ -35,6 +36,11 @@ func (s *service) FindPicByPo(po string) ([]domain.PoPic, error) {
 
 func (s *service) Store(input domain.PoPic) (domain.PoPic, error) {
 	pic, err := s.repository.Store(input)
+	return pic, err
+}
+
+func (s *service) Update(input domain.PoPic) (domain.PoPic, error) {
+	pic, err := s.repository.Update(input)
 	return pic, err
 }
 
