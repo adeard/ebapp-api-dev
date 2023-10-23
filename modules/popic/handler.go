@@ -3,6 +3,7 @@ package popic
 import (
 	"ebapp-api-dev/domain"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +19,7 @@ func NewPoPicHandler(v1 *gin.RouterGroup, poPicService Service) {
 
 	poPic.GET("/:id/:var1/:var2/:var3", handler.GetByRunNum)
 	poPic.POST("", handler.Store)
+	poPic.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 }
 
 func (h *poPicHandler) GetByRunNum(c *gin.Context) {
@@ -104,4 +106,51 @@ func (h *poPicHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *poPicHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+	var5 := c.Param("var5")
+	addons := "/"
+
+	// Konversi var5 menjadi int
+	intVar5, err := strconv.Atoi(var5)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Gagal melakukan konversi var5 ke int",
+			"data":    nil,
+		})
+		return
+	}
+
+	// Memeriksa apakah data ditemukan sebelum menghapusnya
+	if _, findErr := h.poPicService.FindPicByLevel(var4, id+addons+var1+addons+var2+addons+var3, intVar5); findErr != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Data tidak ditemukan",
+			"data":    nil,
+		})
+		return
+	}
+
+	// Lakukan pemanggilan fungsi Delete() dengan intVar5
+	if _, deleteErr := h.poPicService.Delete(var4, id+addons+var1+addons+var2+addons+var3, intVar5); deleteErr != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal menghapus data",
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Data berhasil dihapus",
+		"data":    nil,
+	})
 }

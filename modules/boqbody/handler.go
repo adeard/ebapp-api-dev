@@ -2,7 +2,6 @@ package boqbody
 
 import (
 	"ebapp-api-dev/domain"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -299,7 +298,6 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 
 func (h *boqBodyHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
-	fmt.Println("Ini Id yang didapat : ", id)
 
 	_, err := h.boqBodyService.GetByParentId(id)
 	if err != nil {
