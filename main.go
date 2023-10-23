@@ -11,6 +11,7 @@ import (
 	"ebapp-api-dev/modules/poboqbody"
 	"ebapp-api-dev/modules/poboqheader"
 	"ebapp-api-dev/modules/podatasapheader"
+	"ebapp-api-dev/modules/popic"
 	"ebapp-api-dev/modules/poproject"
 	"ebapp-api-dev/modules/poprojectaddendum"
 	"ebapp-api-dev/modules/user"
@@ -56,6 +57,7 @@ func main() {
 	poboqheader.NewPoBoqHeaderHandler(v1, poboqheader.PoBoqHeaderRegistry(db))
 	poboqbody.NewPoBoqBodyHandler(v1, poboqbody.PoBoqBodyRegistry(db))
 	podatasapheader.NewPoDataSapHeaderHandler(v1, podatasapheader.PoDataSapHeaderRegistry(db2))
+	popic.NewPoPicHandler(v1, popic.PoPicRegistry(db))
 	user.NewUserHandler(v1, user.UserRegistry(db))
 
 	// Mengatur mode GIN menjadi release
