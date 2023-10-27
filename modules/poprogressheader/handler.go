@@ -18,6 +18,7 @@ func NewPoProgressHeaderHandler(v1 *gin.RouterGroup, poProgressHeaderService Ser
 
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetProgrssByRunNum)
 	header.GET("/:id/:var1/:var2/:var3", handler.GetAllProgressByRunNum)
+	header.POST("", handler.Store)
 }
 
 func (h *poProgressHeaderHandler) GetProgrssByRunNum(c *gin.Context) {
