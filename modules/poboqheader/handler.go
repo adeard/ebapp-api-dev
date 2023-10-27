@@ -74,6 +74,7 @@ func (h *poBoqHeaderHandler) Store(c *gin.Context) {
 			Price:       item.Price,
 			Currency:    item.Currency,
 			Order:       item.Order,
+			IsAddendum:  item.IsAddendum,
 		}
 
 		if _, err := h.poBoqHeaderService.Store(createHeader); err != nil {
