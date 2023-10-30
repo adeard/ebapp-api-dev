@@ -4,6 +4,7 @@ import "ebapp-api-dev/domain"
 
 type Service interface {
 	GetByPo(po string) ([]domain.PoProjectAddendum, error)
+	Delete(id string, po string, item string) error
 	Store(input domain.PoProjectAddendum) (domain.PoProjectAddendum, error)
 }
 
@@ -18,6 +19,15 @@ func NewService(repository Repository) Service {
 func (s *service) GetByPo(po string) ([]domain.PoProjectAddendum, error) {
 	poProjectAddendum, err := s.repository.FindByPo(po)
 	return poProjectAddendum, err
+}
+
+func (s *service) Delete(id string, po string, item string) error {
+	err := s.repository.Delete(id, po, item)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *service) Store(input domain.PoProjectAddendum) (domain.PoProjectAddendum, error) {

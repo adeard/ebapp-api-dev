@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	FindByPo(po string) ([]domain.PoProjectAddendum, error)
+	Delete(id string, po string, item string) error
 	Store(input domain.PoProjectAddendum) (domain.PoProjectAddendum, error)
 }
 
@@ -31,6 +32,11 @@ func (r *repository) FindByPo(po string) ([]domain.PoProjectAddendum, error) {
 	err := q.Order("id asc").Find(&poProjectAddendum).Error
 
 	return poProjectAddendum, err
+}
+
+func (r *repository) Delete(id string, po string, item string) error {
+	err := r.db.Table("po_project_addendum").Where("pekerjaan_no =?", id).Where("po =?", po).Where("item =?", item).Delete(&domain.PoProjectAddendum{}).Error
+	return err
 }
 
 func (r *repository) Store(input domain.PoProjectAddendum) (domain.PoProjectAddendum, error) {

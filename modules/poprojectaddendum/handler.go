@@ -17,6 +17,7 @@ func NewPoProjectAddendumHandler(v1 *gin.RouterGroup, poProjectAddendumService S
 	poProjectAddendum := v1.Group("po_addendum")
 
 	poProjectAddendum.GET("/:id/:var1/:var2/:var3", handler.GetByPo)
+	poProjectAddendum.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 	poProjectAddendum.POST("", handler.Store)
 }
 
@@ -52,6 +53,31 @@ func (h *poProjectAddendumHandler) GetByPo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *poProjectAddendumHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3
+	po := c.Param("var4")
+	item := c.Param("var5")
+
+	if deleteErr := h.poProjectAddendumService.Delete(FinalId, po, item); deleteErr != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal menghapus data",
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Data berhasil dihapus",
+		"data":    nil,
+	})
 }
 
 func (h *poProjectAddendumHandler) Store(c *gin.Context) {
