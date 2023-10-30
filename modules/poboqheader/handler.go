@@ -17,7 +17,9 @@ func NewPoBoqHeaderHandler(v1 *gin.RouterGroup, poBoqHeaderService Service) {
 	hHeader := v1.Group("poboq_header")
 
 	hHeader.GET("/:id/:var1/:var2/:var3", handler.GetByPekerjaanNo)
+	hHeader.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 	hHeader.POST("", handler.Store)
+
 }
 
 func (h *poBoqHeaderHandler) GetByPekerjaanNo(c *gin.Context) {
@@ -50,6 +52,31 @@ func (h *poBoqHeaderHandler) GetByPekerjaanNo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *poBoqHeaderHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3
+	po := c.Param("var4")
+	order := c.Param("var5")
+
+	if deleteErr := h.poBoqHeaderService.Delete(FinalId, po, order); deleteErr != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal menghapus data",
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Data berhasil dihapus",
+		"data":    nil,
+	})
 }
 
 func (h *poBoqHeaderHandler) Store(c *gin.Context) {

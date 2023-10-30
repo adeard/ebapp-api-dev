@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	FindByPekerjaanNo(id string) ([]domain.PoBoqHeader, error)
+	Delete(id string, po string, order string) error
 	Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error)
 }
 
@@ -31,6 +32,11 @@ func (r *repository) FindByPekerjaanNo(id string) ([]domain.PoBoqHeader, error) 
 	err := q.Order("'order' asc").Find(&headers).Error
 
 	return headers, err
+}
+
+func (r *repository) Delete(id string, po string, order string) error {
+	err := r.db.Table("po_boq_header").Where("pekerjaan_no =?", id).Where("po =?", po).Where("[order] =?", order).Where("is_addendum = 1").Delete(&domain.PoBoqHeader{}).Error
+	return err
 }
 
 func (r *repository) Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error) {

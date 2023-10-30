@@ -10,7 +10,7 @@ type PoBoqHeader struct {
 	Price       float32 `json:"price"`
 	Currency    string  `json:"currency"`
 	Order       string  `json:"order"`
-	IsAddendum  int     `json:"is_addendum"`
+	IsAddendum  int     `json:"is_addendum" gorm:"column:is_addendum"`
 }
 
 type PoBoqHeaderResponse struct {
