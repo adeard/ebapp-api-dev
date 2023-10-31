@@ -12,6 +12,7 @@ type PoProjectAddendum struct {
 	Currency    string  `json:"currency"`
 	Wbs         string  `json:"wbs"`
 	Cera        string  `json:"cera"`
+	Order       int     `json:"order" gorm:"column:order"`
 }
 
 type PoProjectAddendumRequest struct {
@@ -26,6 +27,7 @@ type PoProjectAddendumRequest struct {
 	Currency    string  `json:"currency"`
 	Wbs         string  `json:"wbs"`
 	Cera        string  `json:"cera"`
+	Order       int     `json:"order" gorm:"column:order"`
 }
 
 type PoProjectAddendumResponse struct {
