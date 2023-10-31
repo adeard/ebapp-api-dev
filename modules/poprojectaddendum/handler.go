@@ -104,6 +104,7 @@ func (h *poProjectAddendumHandler) Store(c *gin.Context) {
 			Currency:    item.Currency,
 			Wbs:         item.Wbs,
 			Cera:        item.Cera,
+			Order:       item.Order,
 		}
 
 		// Simpan setiap entri ke dalam basis data
