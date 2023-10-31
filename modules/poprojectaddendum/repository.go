@@ -29,7 +29,7 @@ func (r *repository) FindByPo(po string) ([]domain.PoProjectAddendum, error) {
 		q = q.Where("pekerjaan_no = ?", po)
 	}
 
-	err := q.Order("id asc").Find(&poProjectAddendum).Error
+	err := q.Order("[order] asc").Find(&poProjectAddendum).Error
 
 	return poProjectAddendum, err
 }
