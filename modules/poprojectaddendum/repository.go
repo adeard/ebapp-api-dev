@@ -35,7 +35,7 @@ func (r *repository) FindByPo(po string) ([]domain.PoProjectAddendum, error) {
 }
 
 func (r *repository) Delete(id string, po string, item string) error {
-	err := r.db.Table("po_project_addendum").Where("pekerjaan_no =?", id).Where("po =?", po).Where("item =?", item).Delete(&domain.PoProjectAddendum{}).Error
+	err := r.db.Table("po_project_addendum").Where("pekerjaan_no =?", id).Where("po =?", po).Where("[order] =?", item).Delete(&domain.PoProjectAddendum{}).Error
 	return err
 }
 

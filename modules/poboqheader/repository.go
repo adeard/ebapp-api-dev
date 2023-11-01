@@ -35,7 +35,7 @@ func (r *repository) FindByPekerjaanNo(id string) ([]domain.PoBoqHeader, error) 
 }
 
 func (r *repository) Delete(id string, po string, item string) error {
-	err := r.db.Table("po_boq_header").Where("pekerjaan_no =?", id).Where("po =?", po).Where("item =?", item).Where("is_addendum = 1").Delete(&domain.PoBoqHeader{}).Error
+	err := r.db.Table("po_boq_header").Where("pekerjaan_no =?", id).Where("po =?", po).Where("[order] =?", item).Where("is_addendum = 1").Delete(&domain.PoBoqHeader{}).Error
 	return err
 }
 
