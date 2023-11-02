@@ -11,6 +11,7 @@ type Service interface {
 	Store(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBody, error)
 	Delete(id string, order string, mainId string) error
+	DeleteByOrder(id string, order string) error
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
 }
 
@@ -45,6 +46,15 @@ func (s *service) Delete(id string, order string, mainId string) error {
 	}
 
 	err = s.repository.Delete(id, order, mainId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *service) DeleteByOrder(id string, order string) error {
+	err := s.repository.DeleteByOrder(id, order)
 	if err != nil {
 		return err
 	}

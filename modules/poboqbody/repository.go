@@ -13,6 +13,7 @@ type Repository interface {
 	FindBoq(runNum string, order string, mainId string) ([]domain.PoBoqBody, error)
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	Delete(id string, orderId string, mainId string) error
+	DeleteByOrder(id string, orderId string) error
 }
 
 type repository struct {
@@ -64,6 +65,11 @@ func (r *repository) FindBoq(runNum string, order string, mainId string) ([]doma
 
 func (r *repository) Delete(id string, orderId string, mainId string) error {
 	err := r.db.Table("po_boq_body").Where("run_num =?", id).Where("[order] =?", orderId).Where("main_id =?", mainId).Delete(&domain.PoBoqBody{}).Error
+	return err
+}
+
+func (r *repository) DeleteByOrder(id string, orderId string) error {
+	err := r.db.Table("po_boq_body").Where("run_num =?", id).Where("[order] =?", orderId).Delete(&domain.PoBoqBody{}).Error
 	return err
 }
 
