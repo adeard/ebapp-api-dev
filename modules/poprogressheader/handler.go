@@ -18,6 +18,7 @@ func NewPoProgressHeaderHandler(v1 *gin.RouterGroup, poProgressHeaderService Ser
 
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetProgrssByRunNum)
 	header.GET("/:id/:var1/:var2/:var3", handler.GetAllProgressByRunNum)
+	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
 	header.POST("", handler.Store)
 }
 
@@ -67,6 +68,31 @@ func (h *poProgressHeaderHandler) GetAllProgressByRunNum(c *gin.Context) {
 		"status":  http.StatusOK,
 		"message": "Berhasil mengambil data Progress",
 		"data":    datas,
+	})
+}
+
+func (h *poProgressHeaderHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+	addon := "/"
+
+	err := h.poProgressHeaderService.Delete(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal menghapus data Progress " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4,
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Berhasil menghapus data Progress " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4,
+		"data":    nil,
 	})
 }
 

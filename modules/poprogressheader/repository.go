@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	FindProg(id string) (domain.PoProgressHeader, error)
 	FindAllProg(id string) ([]domain.PoProgressHeader, error)
+	Delete(id string) error
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
 }
 
@@ -30,6 +31,12 @@ func (r *repository) FindAllProg(id string) ([]domain.PoProgressHeader, error) {
 	var progress []domain.PoProgressHeader
 	err := r.db.Table("po_progress_header").Where("run_num LIKE ?", id+"%").Find(&progress).Error
 	return progress, err
+}
+
+func (r *repository) Delete(id string) error {
+	var progress domain.PoProgressHeader
+	err := r.db.Table("po_progress_header").Where("run_num =?", id).Delete(&progress).Error
+	return err
 }
 
 func (r *repository) Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error) {

@@ -5,6 +5,7 @@ import "ebapp-api-dev/domain"
 type Service interface {
 	FindProg(id string) (domain.PoProgressHeader, error)
 	FindAllProg(id string) ([]domain.PoProgressHeader, error)
+	Delete(id string) error
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
 }
 
@@ -24,6 +25,11 @@ func (s *service) FindProg(id string) (domain.PoProgressHeader, error) {
 func (s *service) FindAllProg(id string) ([]domain.PoProgressHeader, error) {
 	datas, err := s.repository.FindAllProg(id)
 	return datas, err
+}
+
+func (s *service) Delete(id string) error {
+	err := s.repository.Delete(id)
+	return err
 }
 
 func (s *service) Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error) {
