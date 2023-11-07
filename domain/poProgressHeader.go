@@ -9,6 +9,7 @@ type PoProgressHeader struct {
 	IsEbapp  int       `json:"is_ebapp" gorm:"column:isebapp"`
 	LastProg float32   `json:"last_prog" gorm:"last_prog"`
 	NewProg  float32   `json:"new_prog" gorm:"new_prog"`
+	Lock     int       `json:"lock" gorm:"lock"`
 }
 
 type PoProgressHeaderResponse struct {
