@@ -10,6 +10,7 @@ import (
 	"ebapp-api-dev/modules/parentries"
 	"ebapp-api-dev/modules/poboqbody"
 	"ebapp-api-dev/modules/poboqheader"
+	"ebapp-api-dev/modules/poboqheaderprogress"
 	"ebapp-api-dev/modules/podatasapheader"
 	"ebapp-api-dev/modules/popic"
 	"ebapp-api-dev/modules/poprogressheader"
@@ -60,6 +61,7 @@ func main() {
 	podatasapheader.NewPoDataSapHeaderHandler(v1, podatasapheader.PoDataSapHeaderRegistry(db2))
 	popic.NewPoPicHandler(v1, popic.PoPicRegistry(db))
 	poprogressheader.NewPoProgressHeaderHandler(v1, poprogressheader.PoProgressHeaderRegistry(db))
+	poboqheaderprogress.NewPoBoqHeaderProgressHandler(v1, poboqheaderprogress.PoBoqHeaderProgressRegistry(db))
 	user.NewUserHandler(v1, user.UserRegistry(db))
 
 	// Mengatur mode GIN menjadi release
