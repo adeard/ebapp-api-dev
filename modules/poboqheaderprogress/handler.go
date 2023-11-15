@@ -16,8 +16,38 @@ func NewPoBoqHeaderProgressHandler(v1 *gin.RouterGroup, poBoqHeaderProgressServi
 
 	header := v1.Group("poboq_header_progress")
 
+	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetProgress)
 	header.POST("", handler.Store)
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
+}
+
+func (h *poBoqHeaderProgressHandler) GetProgress(c *gin.Context) {
+	FinalId := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+
+	headers, err := h.poBoqHeaderProgressService.GetProgress(FinalId)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Header",
+		})
+		return
+	}
+
+	response := domain.PoBoqHeaderProgressResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data Header",
+		Data:    headers,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *poBoqHeaderProgressHandler) Store(c *gin.Context) {
