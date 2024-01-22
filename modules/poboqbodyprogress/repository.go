@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	Store(input domain.PoBoqBodyProgress) (domain.PoBoqBodyProgress, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)
+	Delete(id string) error
 }
 
 type repository struct {
@@ -28,4 +29,9 @@ func (r *repository) FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, erro
 	var poBoqBodyProgress domain.PoBoqBodyProgress
 	err := r.db.Table("po_boq_body_progress").Where("item_no = ?", itemNo).First(&poBoqBodyProgress).Error
 	return poBoqBodyProgress, err
+}
+
+func (r *repository) Delete(id string) error {
+	err := r.db.Table("po_boq_body_progress").Where("run_num = ?", id).Delete(&domain.PoBoqBodyProgress{}).Error
+	return err
 }
