@@ -11,6 +11,7 @@ type PoBoqHeaderProgress struct {
 	Currency    string  `json:"currency"`
 	Order       string  `json:"order"`
 	IsAddendum  int     `json:"is_addendum" gorm:"column:is_addendum"`
+	Percentage  string  `json:"percentage" gorm:"column:percentage"`
 }
 
 type PoBoqHeaderProgressResponse struct {

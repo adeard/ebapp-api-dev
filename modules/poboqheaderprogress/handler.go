@@ -73,6 +73,7 @@ func (h *poBoqHeaderProgressHandler) Store(c *gin.Context) {
 			Currency:    item.Currency,
 			Order:       item.Order,
 			IsAddendum:  item.IsAddendum,
+			Percentage:  item.Percentage,
 		}
 
 		if _, err := h.poBoqHeaderProgressService.Store(createHeader); err != nil {

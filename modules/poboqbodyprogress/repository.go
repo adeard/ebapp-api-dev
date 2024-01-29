@@ -2,6 +2,7 @@ package poboqbodyprogress
 
 import (
 	"ebapp-api-dev/domain"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -9,6 +10,7 @@ import (
 type Repository interface {
 	Store(input domain.PoBoqBodyProgress) (domain.PoBoqBodyProgress, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)
+	FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
 	Delete(id string) error
 }
 
@@ -29,6 +31,24 @@ func (r *repository) FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, erro
 	var poBoqBodyProgress domain.PoBoqBodyProgress
 	err := r.db.Table("po_boq_body_progress").Where("item_no = ?", itemNo).First(&poBoqBodyProgress).Error
 	return poBoqBodyProgress, err
+}
+
+func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error) {
+	var boqBody []domain.PoBoqBodyProgress
+
+	q := r.db.Table("po_boq_body_progress")
+
+	if runNum != "" {
+		q = q.Where("run_num = ?", runNum).Where("[order] = ?", order)
+	}
+
+	err := q.Order("main_id asc").Find(&boqBody).Error
+
+	fmt.Println("Ini run_num : ", runNum)
+	fmt.Println("Ini order : ", order)
+	fmt.Println("Ini hasil ", boqBody)
+
+	return boqBody, err
 }
 
 func (r *repository) Delete(id string) error {
