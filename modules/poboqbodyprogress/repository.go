@@ -2,7 +2,6 @@ package poboqbodyprogress
 
 import (
 	"ebapp-api-dev/domain"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -43,10 +42,6 @@ func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBo
 	}
 
 	err := q.Order("main_id asc").Find(&boqBody).Error
-
-	fmt.Println("Ini run_num : ", runNum)
-	fmt.Println("Ini order : ", order)
-	fmt.Println("Ini hasil ", boqBody)
 
 	return boqBody, err
 }
