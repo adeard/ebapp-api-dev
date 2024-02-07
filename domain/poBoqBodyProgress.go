@@ -18,6 +18,8 @@ type PoBoqBodyProgress struct {
 	EndDate           string  `json:"end_date" gorm:"column:end_date;default:NULL"`
 	StartDateActual   string  `json:"start_date_actual" gorm:"column:start_date_actual;default:NULL"`
 	EndDateActual     string  `json:"end_date_actual" gorm:"column:end_date_actual;default:NULL"`
+	PreviousVolume    float64 `json:"prev_volume" gorm:"column:previous_volume;default:NULL"`
+	CurrentVolume     float64 `json:"current_volume" gorm:"column:current_volume;default:NULL"`
 }
 
 type PoBoqBodyProgressRequest struct {
@@ -38,6 +40,8 @@ type PoBoqBodyProgressRequest struct {
 	EndDate           string  `json:"end_date"`
 	StartDateActual   string  `json:"start_date_actual"`
 	EndDateActual     string  `json:"end_date_actual"`
+	PreviousVolume    float64 `json:"prev_volume"`
+	CurrentVolume     float64 `json:"current_volume"`
 }
 
 type PoBoqBodyProgressResponse struct {
@@ -58,6 +62,8 @@ type PoBoqBodyProgressResponse struct {
 	EndDate           string                      `json:"end_date"`
 	StartDateActual   string                      `json:"start_date_actual"`
 	EndDateActual     string                      `json:"end_date_actual"`
+	PreviousVolume    float64                     `json:"prev_volume"`
+	CurrentVolume     float64                     `json:"current_volume"`
 	Children          []PoBoqBodyProgressResponse `json:"children"`
 }
 

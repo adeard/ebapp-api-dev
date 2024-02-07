@@ -5,6 +5,7 @@ import "ebapp-api-dev/domain"
 type Service interface {
 	GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
 	Store(input domain.PoBoqBodyProgress) (domain.PoBoqBodyProgress, error)
+	Update(runNum string, order string, mainId int, parentId int, current_volume float64) (domain.PoBoqBodyProgress, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)
 	Delete(id string) error
 }
@@ -20,6 +21,16 @@ func NewService(repository Repository) *service {
 func (s *service) Store(input domain.PoBoqBodyProgress) (domain.PoBoqBodyProgress, error) {
 	poBoqBodyProgress, err := s.repository.Store(input)
 	return poBoqBodyProgress, err
+}
+
+func (s *service) Update(runNum string, order string, mainId int, parentId int, current_volume float64) (domain.PoBoqBodyProgress, error) {
+	updatedProgress, err := s.repository.Update(runNum, order, mainId, parentId, current_volume)
+	if err != nil {
+		// Mengembalikan error jika terjadi kesalahan saat melakukan pembaruan
+		return domain.PoBoqBodyProgress{}, err
+	}
+
+	return updatedProgress, nil
 }
 
 func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error) {

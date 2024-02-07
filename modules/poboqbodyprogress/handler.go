@@ -17,6 +17,7 @@ func NewPoBoqBodyProgressHandler(v1 *gin.RouterGroup, poBoqBodyProgressService S
 	poboqbodyprogress := v1.Group("po_boq_body_progress")
 
 	poboqbodyprogress.POST("", handler.Store)
+	poboqbodyprogress.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
 	poboqbodyprogress.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyByID)
 	poboqbodyprogress.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
 }
@@ -138,6 +139,51 @@ func (h *poBoqBodyProgressHandler) Store(c *gin.Context) {
 
 		c.JSON(http.StatusCreated, response)
 	}
+}
+
+func (h *poBoqBodyProgressHandler) Update(c *gin.Context) {
+	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+
+	// Membaca data yang dikirimkan dalam body permintaan
+	var requestBody struct {
+		Order         string  `json:"order"`
+		MainId        int     `json:"main_id"`
+		ParentId      int     `json:"parent_id"`
+		CurrentVolume float64 `json:"current_volume"`
+	}
+
+	// Melakukan penguraian data JSON yang diterima ke dalam struktur requestBody
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		// Mengirimkan respons jika terjadi kesalahan saat penguraian JSON
+		response := domain.PoBoqBodyProgressResponseFinal{
+			Status:  http.StatusBadRequest,
+			Message: "Gagal memperbarui data BoQ Body: " + err.Error(),
+			Data:    nil,
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// Memanggil service untuk melakukan pembaruan data
+	updatedProgress, err := h.poBoqBodyProgressService.Update(runNum, requestBody.Order, requestBody.MainId, requestBody.ParentId, requestBody.CurrentVolume)
+	if err != nil {
+		// Mengirimkan respons jika terjadi kesalahan saat melakukan pembaruan
+		response := domain.PoBoqBodyProgressResponseFinal{
+			Status:  http.StatusInternalServerError,
+			Message: "Gagal memperbarui data BoQ Body " + err.Error(),
+			Data:    nil,
+		}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// Mengirimkan respons dengan data yang telah diperbarui
+	response := domain.PoBoqBodyProgressResponseFinal{
+		Status:  http.StatusOK,
+		Message: "Berhasil memperbarui data BoQ Body",
+		Data:    []domain.PoBoqBodyProgress{updatedProgress},
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *poBoqBodyProgressHandler) Delete(c *gin.Context) {
