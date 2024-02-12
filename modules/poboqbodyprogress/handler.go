@@ -84,6 +84,8 @@ func (h *poBoqBodyProgressHandler) GetBodyByID(c *gin.Context) {
 			EndDate:           body.EndDate,
 			StartDateActual:   body.StartDateActual,
 			EndDateActual:     body.EndDateActual,
+			PreviousVolume:    body.PreviousVolume,
+			CurrentVolume:     body.CurrentVolume,
 		})
 	}
 

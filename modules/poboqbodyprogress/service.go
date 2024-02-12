@@ -1,6 +1,9 @@
 package poboqbodyprogress
 
-import "ebapp-api-dev/domain"
+import (
+	"ebapp-api-dev/domain"
+	"fmt"
+)
 
 type Service interface {
 	GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
@@ -40,6 +43,11 @@ func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error) 
 
 func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error) {
 	poboqbody, err := s.repository.FindByRunNum(runNum, order)
+
+	if order == "5" {
+		fmt.Println(poboqbody)
+	}
+
 	return poboqbody, err
 }
 
