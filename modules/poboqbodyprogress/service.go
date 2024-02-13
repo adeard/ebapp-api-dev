@@ -6,6 +6,7 @@ import (
 
 type Service interface {
 	GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
+	CountByRunNum(runNum string) (int, error)
 	Store(input domain.PoBoqBodyProgress) (domain.PoBoqBodyProgress, error)
 	Update(runNum string, order string, mainId int, parentId int, current_volume float64) (domain.PoBoqBodyProgress, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)

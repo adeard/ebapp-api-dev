@@ -16,6 +16,7 @@ func NewPoBoqBodyProgressHandler(v1 *gin.RouterGroup, poBoqBodyProgressService S
 
 	poboqbodyprogress := v1.Group("po_boq_body_progress")
 
+	poboqbodyprogress.GET("/count/:id/:var1/:var2/:var3/:var4", handler.CountByRunNum)
 	poboqbodyprogress.POST("", handler.Store)
 	poboqbodyprogress.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
 	poboqbodyprogress.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyByID)
@@ -95,6 +96,27 @@ func (h *poBoqBodyProgressHandler) GetBodyByID(c *gin.Context) {
 		"status":  http.StatusOK,
 		"message": "Berhasil mengambil data PO BoQ Body",
 		"data":    result,
+	})
+}
+
+func (h *poBoqBodyProgressHandler) CountByRunNum(c *gin.Context) {
+	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+
+	// Panggil service untuk menghitung jumlah entri dengan runNum tertentu
+	total, err := h.poBoqBodyProgressService.CountByRunNum(runNum)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal menghitung jumlah entri",
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Jumlah entri berhasil dihitung",
+		"total":   total,
 	})
 }
 
