@@ -2,7 +2,6 @@ package poboqbodyprogress
 
 import (
 	"ebapp-api-dev/domain"
-	"fmt"
 )
 
 type Service interface {
@@ -43,12 +42,16 @@ func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error) 
 
 func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error) {
 	poboqbody, err := s.repository.FindByRunNum(runNum, order)
+	return poboqbody, err
+}
 
-	if order == "5" {
-		fmt.Println(poboqbody)
+func (s *service) CountByRunNum(runNum string) (int, error) {
+	total, err := s.repository.CountRunNum(runNum)
+	if err != nil {
+		return 0, err
 	}
 
-	return poboqbody, err
+	return total, nil
 }
 
 func (s *service) Delete(id string) error {

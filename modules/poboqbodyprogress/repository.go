@@ -11,6 +11,7 @@ type Repository interface {
 	Update(runNum string, order string, mainId int, parentId int, current_volume float64) (domain.PoBoqBodyProgress, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)
 	FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
+	CountRunNum(runNum string) (int, error)
 	Delete(id string) error
 }
 
@@ -45,6 +46,19 @@ func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBo
 	err := q.Order("main_id asc").Find(&boqBody).Error
 
 	return boqBody, err
+}
+
+func (r *repository) CountRunNum(runNum string) (int, error) {
+	var total int
+
+	query := "SELECT COUNT(*) AS total FROM eBAPP.dbo.po_boq_body_progress WHERE run_num = ?"
+
+	err := r.db.Raw(query, runNum).Scan(&total).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return total, nil
 }
 
 func (r *repository) Delete(id string) error {
