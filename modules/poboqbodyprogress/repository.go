@@ -12,6 +12,7 @@ type Repository interface {
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)
 	FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
 	CountRunNum(runNum string) (int, error)
+	SelectMaxOrder(runNum string) (int, error)
 	Delete(id string) error
 }
 
@@ -52,6 +53,19 @@ func (r *repository) CountRunNum(runNum string) (int, error) {
 	var total int
 
 	query := "SELECT COUNT(*) AS total FROM eBAPP.dbo.po_boq_body_progress WHERE run_num = ?"
+
+	err := r.db.Raw(query, runNum).Scan(&total).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return total, nil
+}
+
+func (r *repository) SelectMaxOrder(runNum string) (int, error) {
+	var total int
+
+	query := "SELECT MAX(CAST([order] AS INT)) AS max_order	FROM eBAPP.dbo.po_boq_body_progress	WHERE run_num = ?"
 
 	err := r.db.Raw(query, runNum).Scan(&total).Error
 	if err != nil {
