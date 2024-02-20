@@ -15,6 +15,7 @@ import (
 	"ebapp-api-dev/modules/podatasapheader"
 	"ebapp-api-dev/modules/popic"
 	"ebapp-api-dev/modules/poprogressheader"
+	"ebapp-api-dev/modules/poprogressheaderaddendum"
 	"ebapp-api-dev/modules/poproject"
 	"ebapp-api-dev/modules/poprojectaddendum"
 	"ebapp-api-dev/modules/user"
@@ -62,6 +63,7 @@ func main() {
 	podatasapheader.NewPoDataSapHeaderHandler(v1, podatasapheader.PoDataSapHeaderRegistry(db2))
 	popic.NewPoPicHandler(v1, popic.PoPicRegistry(db))
 	poprogressheader.NewPoProgressHeaderHandler(v1, poprogressheader.PoProgressHeaderRegistry(db))
+	poprogressheaderaddendum.NewPoProgressHeaderAddendumHandler(v1, poprogressheaderaddendum.PoProgressHeaderAddendumRegistry(db))
 	poboqheaderprogress.NewPoBoqHeaderProgressHandler(v1, poboqheaderprogress.PoBoqHeaderProgressRegistry(db))
 	poboqbodyprogress.NewPoBoqBodyProgressHandler(v1, poboqbodyprogress.PoBoqBodyProgressRegistry(db))
 	user.NewUserHandler(v1, user.UserRegistry(db))
