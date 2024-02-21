@@ -13,7 +13,7 @@ type poProgressHeaderAddendumHandler struct {
 func NewPoProgressHeaderAddendumHandler(v1 *gin.RouterGroup, poProgressHeaderAddendumService Service) {
 	handler := &poProgressHeaderAddendumHandler{poProgressHeaderAddendumService}
 
-	header := v1.Group("progressheader")
+	header := v1.Group("progressheaderaddendum")
 
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
 }
