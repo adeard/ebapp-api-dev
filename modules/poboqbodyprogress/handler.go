@@ -175,15 +175,15 @@ func (h *poBoqBodyProgressHandler) Store(c *gin.Context) {
 		}
 
 		createdPoBoqBodiesProgress = append(createdPoBoqBodiesProgress, poBoqBodies)
-
-		response := domain.PoBoqBodyProgressResponseFinal{
-			Status:  http.StatusCreated,
-			Message: "Berhasil menyimpan data BoQ Body",
-			Data:    createdPoBoqBodiesProgress,
-		}
-
-		c.JSON(http.StatusCreated, response)
 	}
+
+	response := domain.PoBoqBodyProgressResponseFinal{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data BoQ Body",
+		Data:    createdPoBoqBodiesProgress,
+	}
+
+	c.JSON(http.StatusCreated, response)
 }
 
 func (h *poBoqBodyProgressHandler) Update(c *gin.Context) {
