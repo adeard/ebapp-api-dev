@@ -19,6 +19,7 @@ func NewPoProgressHeaderAddendumHandler(v1 *gin.RouterGroup, poProgressHeaderAdd
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetAllProgressByRunNum)
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
 	header.POST("", handler.Store)
+	header.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
 }
 
 func (h *poProgressHeaderAddendumHandler) GetAllProgressByRunNum(c *gin.Context) {
@@ -90,6 +91,30 @@ func (h *poProgressHeaderAddendumHandler) Store(c *gin.Context) {
 		Status:  http.StatusCreated,
 		Message: "Berhasil menyimpan data data Header Progress",
 		Data:    []domain.PoProgressHeaderAddendum{data},
+	}
+
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *poProgressHeaderAddendumHandler) Update(c *gin.Context) {
+	id := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+
+	var input domain.PoProgressHeaderAddendumUpdate
+	c.BindJSON(&input)
+
+	data, err := h.poProgressHeaderAddendumService.Update(id, input.Po, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data Header Progress " + err.Error(),
+		})
+		return
+	}
+
+	response := domain.PoProgressHeaderAddendumResponseUpdate{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data data Header Progress",
+		Data:    []domain.PoProgressHeaderAddendumUpdate{data},
 	}
 
 	c.JSON(http.StatusCreated, response)

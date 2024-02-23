@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	FindAllProg(id string) ([]domain.PoProgressHeaderAddendum, error)
 	Store(input domain.PoProgressHeaderAddendum) (domain.PoProgressHeaderAddendum, error)
+	Update(id string, po string, input domain.PoProgressHeaderAddendumUpdate) (domain.PoProgressHeaderAddendumUpdate, error)
 	Delete(id string) error
 }
 
@@ -28,6 +29,11 @@ func (r *repository) FindAllProg(id string) ([]domain.PoProgressHeaderAddendum, 
 
 func (r *repository) Store(input domain.PoProgressHeaderAddendum) (domain.PoProgressHeaderAddendum, error) {
 	err := r.db.Table("po_progress_header_addendum").Create(&input).Error
+	return input, err
+}
+
+func (r *repository) Update(id string, po string, input domain.PoProgressHeaderAddendumUpdate) (domain.PoProgressHeaderAddendumUpdate, error) {
+	err := r.db.Table("po_progress_header_addendum").Where("run_num =?", id).Where("po =?", po).Save(&input).Error
 	return input, err
 }
 
