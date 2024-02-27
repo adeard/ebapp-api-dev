@@ -10,6 +10,7 @@ type Repository interface {
 	FindProg(id string) (domain.PoProgressHeader, error)
 	FindAllProg(id string) ([]domain.PoProgressHeader, error)
 	Delete(id string) error
+	Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error)
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
 }
 
@@ -42,4 +43,19 @@ func (r *repository) Delete(id string) error {
 func (r *repository) Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error) {
 	err := r.db.Table("po_progress_header").Create(&input).Error
 	return input, err
+}
+
+func (r *repository) Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error) {
+	err := r.db.Table("po_progress_header").Where("run_num = ?", id).Updates(input).Error
+	var data domain.PoProgressHeader
+	if err != nil {
+		return data, err
+	}
+
+	err = r.db.Table("po_progress_header").Where("run_num = ?", id).First(&data).Error
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
 }
