@@ -13,7 +13,6 @@ type PoProgressHeaderAddendum struct {
 
 type PoProgressHeaderAddendumUpdate struct {
 	Po          string    `json:"po" gorm:"column:po"`
-	LastProg    float32   `json:"last_prog" gorm:"column:last_prog;default:NULL"`
 	NewProg     float32   `json:"new_prog" gorm:"column:new_prog;default:NULL"`
 	LastUpdated time.Time `json:"last_updated" gorm:"column:last_updated;default:NULL"`
 }
