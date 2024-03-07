@@ -36,7 +36,7 @@ func (h *poProgressHeaderHandler) GetProgrssByRunNum(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Gagal mengambil data Progress " + id,
+			"message": err.Error(),
 			"data":    nil,
 		})
 		return
