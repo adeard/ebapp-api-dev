@@ -1,12 +1,15 @@
 package poprogressheader
 
-import "ebapp-api-dev/domain"
+import (
+	"ebapp-api-dev/domain"
+)
 
 type Service interface {
 	FindProg(id string) (domain.PoProgressHeader, error)
 	FindAllProg(id string) ([]domain.PoProgressHeader, error)
 	Delete(id string) error
 	Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error)
+	EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error)
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
 }
 
@@ -35,6 +38,11 @@ func (s *service) Delete(id string) error {
 
 func (s *service) Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error) {
 	data, err := s.repository.Update(id, input)
+	return data, err
+}
+
+func (s *service) EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error) {
+	data, err := s.repository.EbappUpdate(id, input)
 	return data, err
 }
 
