@@ -3,8 +3,9 @@ package podatasapheader
 import (
 	"ebapp-api-dev/domain"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 
 	"gorm.io/gorm"
 )
@@ -27,8 +28,8 @@ func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error
 	var poProject []domain.PoDataSapHeaderTitle
 
 	//Setting
-	username := "SIT_GUNAWAN"
-	password := "acer620"
+	username := os.Getenv("SAP_USERNAME")
+	password := os.Getenv("SAP_PASSWORD")
 
 	// FIRST URL
 	xmlURL := fmt.Sprintf(`http://qaecc.hec.indofood.co.id:8020/sap/opu/odata/sap/ZMGW_GET_DATA_PO_SRV/etHeaderSet('` + id + `')?$expand=etPoHeaderSet,NavPoItemSet`)
@@ -49,7 +50,7 @@ func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error
 	}
 	defer resp.Body.Close()
 
-	result, err := ioutil.ReadAll(resp.Body)
+	result, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +90,7 @@ func (r *repository) CheckWbs(id string) ([]domain.ReadWbs, error) {
 	}
 	defer resp.Body.Close()
 
-	result, err := ioutil.ReadAll(resp.Body)
+	result, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
