@@ -39,6 +39,16 @@ func (h *progressAttachmentHandler) Store(c *gin.Context) {
 		return
 	}
 
+	// Mengecek ukuran file
+	maxFileSize := int64(2 << 20) // 2MB
+	if file.Size > maxFileSize {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Ukuran file melebihi batas maksimum (2MB)",
+		})
+		return
+	}
+
 	// Menetapkan tahun saat ini
 	currentYear := time.Now().Year()
 
