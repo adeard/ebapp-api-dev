@@ -168,7 +168,7 @@ func (h *poProgressHeaderHandler) Store(c *gin.Context) {
 
 	response := domain.PoProgressHeaderResponse{
 		Status:  http.StatusCreated,
-		Message: "Berhasil menyimpan data data Header Progress",
+		Message: "Berhasil menyimpan data Header Progress",
 		Data:    []domain.PoProgressHeader{data},
 	}
 

@@ -18,6 +18,7 @@ import (
 	"ebapp-api-dev/modules/poprogressheaderaddendum"
 	"ebapp-api-dev/modules/poproject"
 	"ebapp-api-dev/modules/poprojectaddendum"
+	"ebapp-api-dev/modules/progressattachment"
 	"ebapp-api-dev/modules/user"
 	"log"
 	"net/http"
@@ -66,6 +67,7 @@ func main() {
 	poprogressheaderaddendum.NewPoProgressHeaderAddendumHandler(v1, poprogressheaderaddendum.PoProgressHeaderAddendumRegistry(db))
 	poboqheaderprogress.NewPoBoqHeaderProgressHandler(v1, poboqheaderprogress.PoBoqHeaderProgressRegistry(db))
 	poboqbodyprogress.NewPoBoqBodyProgressHandler(v1, poboqbodyprogress.PoBoqBodyProgressRegistry(db))
+	progressattachment.NewProgressAttachmentHandler(v1, progressattachment.ProgressAttachmentRegistry(db))
 	user.NewUserHandler(v1, user.UserRegistry(db))
 
 	// Mengatur mode GIN menjadi release
