@@ -81,6 +81,9 @@ func (h *progressAttachmentHandler) Store(c *gin.Context) {
 	// Menetapkan waktu saat ini sebagai tanggal unggah
 	input.Date = time.Now()
 
+	// Menetapkan file name
+	input.FileName = file.Filename
+
 	// Simpan file ke direktori yang ditentukan
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

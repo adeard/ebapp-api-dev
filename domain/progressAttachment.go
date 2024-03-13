@@ -7,6 +7,7 @@ type ProgressAttachment struct {
 	FilePath string    `json:"file_path" gorm:"column:file_path"`
 	Date     time.Time `json:"date" gorm:"column:date;default:NULL"`
 	UploadBy string    `json:"upload_by" gorm:"upload_by"`
+	FileName string    `json:"file_name" gorm:"column:file_name"`
 }
 
 type ProgressAttachmentResponse struct {
