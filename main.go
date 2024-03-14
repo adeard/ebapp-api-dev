@@ -6,6 +6,7 @@ import (
 	"ebapp-api-dev/modules/auth"
 	"ebapp-api-dev/modules/boqbody"
 	"ebapp-api-dev/modules/boqheader"
+	"ebapp-api-dev/modules/download"
 	"ebapp-api-dev/modules/listproject"
 	"ebapp-api-dev/modules/parentries"
 	"ebapp-api-dev/modules/poboqbody"
@@ -68,6 +69,7 @@ func main() {
 	poboqheaderprogress.NewPoBoqHeaderProgressHandler(v1, poboqheaderprogress.PoBoqHeaderProgressRegistry(db))
 	poboqbodyprogress.NewPoBoqBodyProgressHandler(v1, poboqbodyprogress.PoBoqBodyProgressRegistry(db))
 	progressattachment.NewProgressAttachmentHandler(v1, progressattachment.ProgressAttachmentRegistry(db))
+	download.NewDownlaodHandler(v1, download.DownloadRegistry(db))
 	user.NewUserHandler(v1, user.UserRegistry(db))
 
 	// Mengatur mode GIN menjadi release

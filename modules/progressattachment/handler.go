@@ -3,6 +3,7 @@ package progressattachment
 import (
 	"ebapp-api-dev/domain"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -21,6 +22,36 @@ func NewProgressAttachmentHandler(v1 *gin.RouterGroup, progressAttachmentService
 	attachment := v1.Group("progress_attachment")
 
 	attachment.POST("", handler.Store)
+	attachment.GET("/:id/:var1/:var2/:var3/:var4", handler.GetAttachment)
+}
+
+func (h *progressAttachmentHandler) GetAttachment(c *gin.Context) {
+	id := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+
+	fileInfo, err := h.progressAttachmentService.GetAttachment(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Attachments",
+		})
+		return
+	}
+
+	attachmentFolder := os.Getenv("ATTACHMENT_FOLDER_NAME")
+
+	// Update file_path with attachmentFolder value
+	for i := range fileInfo {
+		fileInfo[i].FilePath = attachmentFolder + "\\" + fileInfo[i].FilePath
+		fileInfo[i].FilePath = "/download?file=" + url.PathEscape(fileInfo[i].FilePath)
+	}
+
+	response := domain.ProgressAttachmentResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data Attachments",
+		Data:    fileInfo,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *progressAttachmentHandler) Store(c *gin.Context) {
