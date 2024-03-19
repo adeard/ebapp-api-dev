@@ -11,6 +11,7 @@ type Service interface {
 	GetByID(id string) (domain.BoqHeader, error)
 	Store(input domain.BoqHeader) (domain.BoqHeader, error)
 	Update(input domain.BoqHeader, id string) (domain.BoqHeader, error)
+	Clone(oldId string, newId string) (string, error)
 }
 
 type service struct {
@@ -63,4 +64,9 @@ func (s *service) Update(input domain.BoqHeader, id string) (domain.BoqHeader, e
 
 	boqHeaders, err := s.repository.Update(finalUpdateBoqHeader)
 	return boqHeaders, err
+}
+
+func (s *service) Clone(oldId string, newId string) (string, error) {
+	data, err := s.repository.Clone(oldId, newId)
+	return data, err
 }

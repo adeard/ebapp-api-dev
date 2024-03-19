@@ -36,6 +36,11 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
+type BoqClone struct {
+	RunNum string `json:"run_num" gorm:"column:run_num"`
+	BoqNo  string `json:"boq_no" gorm:"column:boq_no"`
+}
+
 type BoqHeaderResponse struct {
 	Data    []BoqHeader `json:"data"`
 	Status  int         `json:"status"`

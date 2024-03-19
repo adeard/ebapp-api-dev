@@ -12,6 +12,7 @@ type Repository interface {
 	FindById(id string) (domain.BoqHeader, error)
 	Store(input domain.BoqHeader) (domain.BoqHeader, error)
 	Update(input domain.BoqHeader) (domain.BoqHeader, error)
+	Clone(oldId string, newId string) (string, error)
 }
 
 type repository struct {
@@ -41,7 +42,6 @@ func (r *repository) FindById(id string) (domain.BoqHeader, error) {
 }
 
 func (r *repository) Store(input domain.BoqHeader) (domain.BoqHeader, error) {
-
 	err := r.db.Table("boq_header").Create(&input).Error
 	return input, err
 }
@@ -49,4 +49,36 @@ func (r *repository) Store(input domain.BoqHeader) (domain.BoqHeader, error) {
 func (r *repository) Update(input domain.BoqHeader) (domain.BoqHeader, error) {
 	err := r.db.Table("boq_header").Where("run_num =?", input.RunNum).Save(&input).Error
 	return input, err
+}
+
+// Clone body from header
+func (r *repository) Clone(oldId string, newId string) (string, error) {
+	// Lakukan query untuk meng-INSERT data baru berdasarkan data yang ada dengan menggunakan parameter oldId dan newId
+	query := `INSERT INTO eBAPP.dbo.boq_body (run_num, item_no, item_level, item_description, item_specification, qty, unit, price, currency, note, parent_id)
+               SELECT 
+                   ? AS run_num,
+                   item_no,
+                   item_level,
+                   item_description,
+                   item_specification,
+                   qty,
+                   unit,
+                   price,
+                   currency,
+                   note,
+                   parent_id
+               FROM eBAPP.dbo.boq_body
+               WHERE run_num = ?`
+
+	// Eksekusi query dengan parameter oldId dan newId
+	result := r.db.Exec(query, newId, oldId)
+
+	// Periksa jika terjadi kesalahan saat menjalankan query
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	// Jika berhasil, kembalikan pesan berhasil
+	message := "Data BOQ berhasil diduplikasi"
+	return message, nil
 }

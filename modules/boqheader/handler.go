@@ -23,6 +23,7 @@ func NewBoqHeaderHandler(v1 *gin.RouterGroup, boqHeaderService Service) {
 	boqHeader.GET("/:id", handler.GetByID)
 	boqHeader.POST("", handler.Store)
 	boqHeader.PUT("/:id", handler.Update)
+	boqHeader.POST("/clone", handler.Clone)
 }
 
 func (h *boqHeaderHandler) GetAll(c *gin.Context) {
@@ -144,6 +145,80 @@ func (h *boqHeaderHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *boqHeaderHandler) Clone(c *gin.Context) {
+	var input domain.BoqClone
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	boqHeader, err := h.boqHeaderService.GetByID(input.RunNum)
+	if err != nil {
+		// Cek apakah error disebabkan oleh data tidak ditemukan.
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data BoQ Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Header",
+		})
+		return
+	}
+
+	newBoqHeaderID, _ := helper.GenerateHeaderBoq(3)
+
+	cloneBoq := domain.BoqHeader{
+		RunNum:            newBoqHeaderID,
+		BoqNo:             input.BoqNo,
+		HeaderDescription: boqHeader.HeaderDescription,
+		HeaderVersion:     boqHeader.HeaderVersion,
+		HeaderStatus:      boqHeader.HeaderStatus,
+		Created:           time.Now(),
+		CreatedBy:         boqHeader.CreatedBy,
+		LastUpdated:       time.Now(),
+		LastUpdatedBy:     boqHeader.LastUpdatedBy,
+		Category:          boqHeader.Category,
+		Remarks:           boqHeader.Remarks,
+	}
+
+	headerClone, err := h.boqHeaderService.Store(cloneBoq)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data BoQ Header",
+		})
+		return
+	}
+
+	data, err := h.boqHeaderService.Clone(input.RunNum, headerClone.RunNum)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal menduplikasi data BoQ Body",
+		})
+		return
+	}
+
+	// Mengubah data BoQ Header menjadi response yang sesuai dengan BoqHeaderResponse.
+	response := domain.BoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: data,
+		Data:    []domain.BoqHeader{headerClone}, // Menggunakan slice dari BoqHeader
+	}
+
+	// Mengirimkan response dengan data BoQ Header yang sudah diubah formatnya.
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *boqHeaderHandler) Update(c *gin.Context) {
