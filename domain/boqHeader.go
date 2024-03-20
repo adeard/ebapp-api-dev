@@ -10,7 +10,7 @@ type BoqHeader struct {
 	BoqNo             string    `json:"boq_no" gorm:"column:boq_no"`
 	HeaderDescription string    `json:"header_description" gorm:"column:header_description"`
 	HeaderVersion     string    `json:"header_version" gorm:"column:header_version"`
-	HeaderStatus      bool      `json:"header_status" gorm:"column:header_status"`
+	HeaderStatus      int       `json:"header_status" gorm:"column:header_status"`
 	Created           time.Time `json:"created" gorm:"column:created"`
 	CreatedBy         string    `json:"created_by" gorm:"column:created_by"`
 	LastUpdated       time.Time `json:"last_updated" gorm:"column:lastupdated; default:nil"`
@@ -23,7 +23,7 @@ type BoqHeaderRequest struct {
 	BoqNo             string    `json:"boq_no"`
 	HeaderDescription string    `json:"header_description"`
 	HeaderVersion     string    `json:"header_version"`
-	HeaderStatus      bool      `json:"header_status"`
+	HeaderStatus      int       `json:"header_status"`
 	CreatedAt         time.Time `json:"created_at"`
 	CreatedBy         string    `json:"created_by"`
 	LastUpdated       time.Time `json:"last_updated"`
