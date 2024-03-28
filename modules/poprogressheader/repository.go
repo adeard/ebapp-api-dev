@@ -47,7 +47,11 @@ func (r *repository) Store(input domain.PoProgressHeader) (domain.PoProgressHead
 }
 
 func (r *repository) Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error) {
-	err := r.db.Table("po_progress_header").Where("run_num = ?", id).Updates(input).Error
+	updateData := map[string]interface{}{
+		"new_prog": input.NewProg,
+	}
+
+	err := r.db.Table("po_progress_header").Where("run_num = ?", id).Updates(updateData).Error
 	var data domain.PoProgressHeader
 	if err != nil {
 		return data, err
