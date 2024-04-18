@@ -7,6 +7,7 @@ import (
 type Service interface {
 	GetAll(input domain.ListProjectRequest) ([]domain.ListProject, error)
 	GetByID(id string) (domain.ListProject, error)
+	GetByPlant(ids []string) ([]domain.ListProject, error)
 	Store(input domain.ListProject) (domain.ListProject, error)
 	Store2(input domain.ListProject2) (domain.ListProject2, error)
 	Store3(input domain.ListProject3) (domain.ListProject3, error)
@@ -31,6 +32,11 @@ func (s *service) GetAll(input domain.ListProjectRequest) ([]domain.ListProject,
 func (s *service) GetByID(id string) (domain.ListProject, error) {
 	project, err := s.repository.FindById(id)
 	return project, err
+}
+
+func (s *service) GetByPlant(ids []string) ([]domain.ListProject, error) {
+	projects, err := s.repository.FindByPlant(ids)
+	return projects, err
 }
 
 func (s *service) Store(input domain.ListProject) (domain.ListProject, error) {

@@ -2,6 +2,7 @@ package listproject
 
 import (
 	"ebapp-api-dev/domain"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -9,6 +10,7 @@ import (
 type Repository interface {
 	FindAll(input domain.ListProjectRequest) ([]domain.ListProject, error)
 	FindById(id string) (domain.ListProject, error)
+	FindByPlant(ids []string) ([]domain.ListProject, error)
 	Store(input domain.ListProject) (domain.ListProject, error)
 	Store2(input domain.ListProject2) (domain.ListProject2, error)
 	Store3(input domain.ListProject3) (domain.ListProject3, error)
@@ -36,6 +38,25 @@ func (r *repository) FindById(id string) (domain.ListProject, error) {
 	var project domain.ListProject
 	err := r.db.Table("list_project").Where("id =?", id).First(&project).Error
 	return project, err
+}
+
+func (r *repository) FindByPlant(ids []string) ([]domain.ListProject, error) {
+	var projects []domain.ListProject
+
+	for _, id := range ids {
+		var tmpProject []domain.ListProject
+		parts := strings.Split(id, " ")
+
+		err := r.db.Table("list_project").Where("unit_usaha LIKE ?", parts[0]+"%").Find(&tmpProject).Error
+		for _, v := range tmpProject {
+			projects = append(projects, v)
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	return projects, nil
 }
 
 func (r *repository) Store(input domain.ListProject) (domain.ListProject, error) {

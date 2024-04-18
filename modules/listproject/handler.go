@@ -2,6 +2,8 @@ package listproject
 
 import (
 	"ebapp-api-dev/domain"
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +21,7 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 
 	listProject.GET("", handler.GetAll)
 	project.GET("/:id", handler.GetByID)
+	project.GET("/plant", handler.GetByPlant)
 	project.POST("", handler.Store)
 	project.POST("/draft2", handler.Store2)
 	project.POST("/draft3", handler.Store3)
@@ -73,6 +76,42 @@ func (h *listProjectHandler) GetByID(c *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "Berhasil mengambil data BoQ Header",
 		Data:    []domain.ListProject{project},
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *listProjectHandler) GetByPlant(c *gin.Context) {
+	// Mendapatkan nilai header dengan nama "Ids"
+	idsJSON := c.GetHeader("Ids")
+
+	// Parsing JSON dari nilai header
+	var idSlice []string
+	err := json.Unmarshal([]byte(idsJSON), &idSlice)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Gagal memproses data ID",
+		})
+		return
+	}
+
+	fmt.Println(idSlice)
+
+	// Memanggil service untuk mendapatkan data dengan menggunakan IDs yang diberikan
+	listProjects, err := h.listProjectService.GetByPlant(idSlice)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Project List",
+		})
+		return
+	}
+
+	response := domain.ListProjectsResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil mengambil data List Project",
+		Data:    listProjects,
 	}
 
 	c.JSON(http.StatusOK, response)
