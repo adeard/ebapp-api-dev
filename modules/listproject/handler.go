@@ -3,7 +3,6 @@ package listproject
 import (
 	"ebapp-api-dev/domain"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -95,8 +94,6 @@ func (h *listProjectHandler) GetByPlant(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(idSlice)
 
 	// Memanggil service untuk mendapatkan data dengan menggunakan IDs yang diberikan
 	listProjects, err := h.listProjectService.GetByPlant(idSlice)
