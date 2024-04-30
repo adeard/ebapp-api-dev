@@ -14,6 +14,7 @@ type Service interface {
 	Store4(input domain.ListProject4) (domain.ListProject4, error)
 
 	UpdateStatus(input domain.UpdateStatus, Id string) (domain.UpdateStatus, error)
+	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) (error)
 }
 
 type service struct {
@@ -72,4 +73,9 @@ func (s *service) UpdateStatus(input domain.UpdateStatus, Id string) (domain.Upd
 
 	status, err := s.repository.UpdateStatus(updateStatus)
 	return status, err
+}
+
+func (s *service) UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) (error) {
+	err := s.repository.UpdatePlanningActualDate(input)
+	return err
 }

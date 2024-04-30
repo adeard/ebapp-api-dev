@@ -136,3 +136,11 @@ type ListProjectsResponse4 struct {
 	Status  int            `json:"status"`
 	Message string         `json:"message"`
 }
+
+type ModelUpdateActualPlanningDate struct {
+	PekerjaanNo     string    `json:"pekerjaan_no"`
+	StartDate       time.Time `json:"start_date"`
+	EndDate         time.Time `json:"end_date"`
+	StartDateActual time.Time `json:"start_date_actual" gorm:"column:start_date_actual"`
+	EndDateActual   time.Time `json:"end_date_actual" gorm:"column:end_date_actual"`
+}

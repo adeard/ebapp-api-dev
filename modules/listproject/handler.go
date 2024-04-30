@@ -27,6 +27,7 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 	project.POST("/draft4", handler.Store4)
 
 	project.PUT("/status", handler.UpdateStatus)
+	project.PUT("/update_planning_actual_date", handler.UpdatePlanningActualDate)
 }
 
 func (h *listProjectHandler) GetAll(c *gin.Context) {
@@ -329,5 +330,32 @@ func (h *listProjectHandler) UpdateStatus(c *gin.Context) {
 		"status":  http.StatusOK,
 		"message": "Status proyek berhasil diperbarui",
 		"data":    updatedProject,
+	})
+}
+
+func (h *listProjectHandler) UpdatePlanningActualDate(c *gin.Context) {
+	var input domain.ModelUpdateActualPlanningDate
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Permintaan tidak valid: " + err.Error(),
+		})
+		return
+	}
+
+	// Panggil service untuk melakukan pembaruan status
+	err := h.listProjectService.UpdatePlanningActualDate(input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal memperbarui status proyek",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Planning dan Actual Date proyek berhasil diperbarui",
 	})
 }
