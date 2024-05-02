@@ -10,6 +10,7 @@ type Service interface {
 	Delete(id string) error
 	Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error)
 	EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error)
+	EbappUpdate2(id string, status string) (domain.PoProgressHeader, error)
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
 }
 
@@ -43,6 +44,11 @@ func (s *service) Update(id string, input domain.PoProgressHeaderUpdate) (domain
 
 func (s *service) EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error) {
 	data, err := s.repository.EbappUpdate(id, input)
+	return data, err
+}
+
+func (s *service) EbappUpdate2(id string, status string) (domain.PoProgressHeader, error) {
+	data, err := s.repository.EbappUpdate2(id, status)
 	return data, err
 }
 

@@ -26,6 +26,11 @@ type PoProgressHeaderUpdateEbapp struct {
 	LastUpdated time.Time `json:"last_updated" gorm:"column:last_updated;"`
 }
 
+type PoProgressHeaderUpdateEbapp2 struct {
+	Status      string    `json:"status" gorm:"column:status;default:NULL"`
+	LastUpdated time.Time `json:"last_updated" gorm:"column:last_updated;"`
+}
+
 type PoProgressHeaderResponse struct {
 	Status  int                `json:"status"`
 	Message string             `json:"message"`

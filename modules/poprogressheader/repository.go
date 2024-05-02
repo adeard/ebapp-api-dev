@@ -2,6 +2,7 @@ package poprogressheader
 
 import (
 	"ebapp-api-dev/domain"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -12,6 +13,7 @@ type Repository interface {
 	Delete(id string) error
 	Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error)
 	EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error)
+	EbappUpdate2(id string, status string) (domain.PoProgressHeader, error)
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
 }
 
@@ -75,7 +77,27 @@ func (r *repository) EbappUpdate(id string, input domain.PoProgressHeaderUpdateE
 		updateData["isebapp"] = 1
 	}
 
-	err := r.db.Debug().Table("po_progress_header").Where("run_num = ?", id).Updates(updateData).Error
+	err := r.db.Table("po_progress_header").Where("run_num = ?", id).Updates(updateData).Error
+	var data domain.PoProgressHeader
+	if err != nil {
+		return data, err
+	}
+
+	err = r.db.Table("po_progress_header").Where("run_num = ?", id).First(&data).Error
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
+func (r *repository) EbappUpdate2(id string, status string) (domain.PoProgressHeader, error) {
+	updateData := map[string]interface{}{
+		"status":       status,
+		"last_updated": time.Now(),
+	}
+
+	err := r.db.Table("po_progress_header").Where("run_num = ?", id).Updates(updateData).Error
 	var data domain.PoProgressHeader
 	if err != nil {
 		return data, err

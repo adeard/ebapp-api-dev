@@ -21,6 +21,7 @@ func NewPoProgressHeaderHandler(v1 *gin.RouterGroup, poProgressHeaderService Ser
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
 	header.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
 	header.PUT("/isebapp/:id/:var1/:var2/:var3/:var4", handler.UpdateEbapp)
+	header.PUT("/isebapp/message/:id/:var1/:var2/:var3/:var4", handler.UpdateEbappMessage)
 	header.POST("", handler.Store)
 }
 
@@ -129,6 +130,37 @@ func (h *poProgressHeaderHandler) UpdateEbapp(c *gin.Context) {
 	c.BindJSON(&input)
 
 	data, err := h.poProgressHeaderService.EbappUpdate(id, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal meneruskan data Main Header Progress " + err.Error(),
+		})
+		return
+	}
+
+	response := domain.PoProgressHeaderResponse{
+		Status:  http.StatusCreated,
+		Message: "Berhasil menyimpan data data Main Header Progress",
+		Data:    []domain.PoProgressHeader{data},
+	}
+
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *poProgressHeaderHandler) UpdateEbappMessage(c *gin.Context) {
+	id := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+
+	var input domain.PoProgressHeaderUpdateEbapp2
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	data, err := h.poProgressHeaderService.EbappUpdate2(id, input.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
