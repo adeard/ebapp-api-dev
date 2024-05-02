@@ -18,6 +18,7 @@ type Repository interface {
 
 	FindByPekerjaanNo(id string) (domain.UpdateStatus, error)
 	UpdateStatus(input domain.UpdateStatus) (domain.UpdateStatus, error)
+	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) (error)
 }
 
 type repository struct {
@@ -88,4 +89,9 @@ func (r *repository) FindByPekerjaanNo(id string) (domain.UpdateStatus, error) {
 func (r *repository) UpdateStatus(input domain.UpdateStatus) (domain.UpdateStatus, error) {
 	err := r.db.Table("list_project").Where("pekerjaan_no =?", input.PekerjaanNo).Save(&input).Error
 	return input, err
+}
+
+func (r *repository) UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) (error) {
+	err := r.db.Table("list_project").Where("pekerjaan_no =?", input.PekerjaanNo).Updates(map[string]interface{}{"start_date": input.StartDate, "end_date": input.EndDate, "start_date_actual": input.StartDateActual, "end_date_actual" : input.EndDateActual}).Error
+	return err
 }
