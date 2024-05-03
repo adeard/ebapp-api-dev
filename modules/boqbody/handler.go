@@ -209,6 +209,7 @@ func (h *boqBodyHandler) Store(c *gin.Context) {
 	}
 
 	createdBoqBody := domain.BoqBody{
+		Id:                0,
 		RunNum:            input.RunNum,
 		ParentId:          input.ParentId,
 		ItemNo:            input.ItemNo,

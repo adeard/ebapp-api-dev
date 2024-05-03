@@ -183,7 +183,7 @@ func (h *boqHeaderHandler) Clone(c *gin.Context) {
 		BoqNo:             input.BoqNo,
 		HeaderDescription: boqHeader.HeaderDescription,
 		HeaderVersion:     boqHeader.HeaderVersion,
-		HeaderStatus:      boqHeader.HeaderStatus,
+		HeaderStatus:      0,
 		Created:           time.Now(),
 		CreatedBy:         boqHeader.CreatedBy,
 		LastUpdated:       time.Now(),

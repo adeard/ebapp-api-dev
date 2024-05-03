@@ -80,8 +80,23 @@ func (r *repository) FindByItemNo(itemNo string) (domain.BoqBody, error) {
 }
 
 func (r *repository) Store(input domain.BoqBody) (domain.BoqBody, error) {
-	err := r.db.Table("boq_body").Create(&input).Error
-	return input, err
+	query := `SELECT TOP 1 id FROM boq_body order by id desc`
+	var id int
+	r.db.Raw(query).First(&id)
+	query2 := `INSERT INTO boq_body([run_num]
+		,[item_no]
+		,[item_level]
+		,[item_description]
+		,[item_specification]
+		,[qty]
+		,[unit]
+		,[price]
+		,[currency]
+		,[note]
+		,[id]
+		,[parent_id]) values(?,?,?,?,?,?,?,?,?,?,?,?)`
+	err := r.db.Exec(query2, input.RunNum, input.ItemNo, input.ItemLevel, input.ItemDescription, input.ItemSpecification, input.Qty, input.Unit, input.Price, input.Currency, input.Note, id+1, input.ParentId)
+	return input, err.Error
 }
 
 func (r *repository) Update(input domain.BoqBody) (domain.BoqBody, error) {
