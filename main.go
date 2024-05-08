@@ -10,9 +10,12 @@ import (
 	"ebapp-api-dev/modules/listproject"
 	"ebapp-api-dev/modules/parentries"
 	"ebapp-api-dev/modules/poboqbody"
+	"ebapp-api-dev/modules/poboqbodycpp"
 	"ebapp-api-dev/modules/poboqbodyprogress"
 	"ebapp-api-dev/modules/poboqheader"
+	"ebapp-api-dev/modules/poboqheadercpp"
 	"ebapp-api-dev/modules/poboqheaderprogress"
+	"ebapp-api-dev/modules/pocppheader"
 	"ebapp-api-dev/modules/podatasapheader"
 	"ebapp-api-dev/modules/popic"
 	"ebapp-api-dev/modules/poprogressheader"
@@ -71,6 +74,9 @@ func main() {
 	progressattachment.NewProgressAttachmentHandler(v1, progressattachment.ProgressAttachmentRegistry(db))
 	download.NewDownlaodHandler(v1, download.DownloadRegistry(db))
 	user.NewUserHandler(v1, user.UserRegistry(db))
+	poboqbodycpp.NewPoBoqBodyCppHandler(v1, poboqbodycpp.PoBoqBodyCppRegistry(db))
+	poboqheadercpp.NewPoBoqHeaderCppHandler(v1, poboqheadercpp.PoBoqHeaderCppRegistry(db))
+	pocppheader.NewPoCppHeaderHandler(v1, pocppheader.PoCppHeaderRegistry(db))
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)
