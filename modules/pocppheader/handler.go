@@ -35,12 +35,21 @@ func (h *poCppHeaderHandler) GetCppByRunNum(c *gin.Context) {
 
 	data, err := h.poCppHeaderService.FindCpp(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": err.Error(),
-			"data":    nil,
-		})
-		return
+		if err.Error() == "record not found" {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": err.Error(),
+				"data":    nil,
+			})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  http.StatusInternalServerError,
+				"message": err.Error(),
+				"data":    nil,
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
