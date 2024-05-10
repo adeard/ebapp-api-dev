@@ -8,11 +8,11 @@ import (
 
 type Repository interface {
 	Store(input domain.PoBoqBodyCpp) (domain.PoBoqBodyCpp, error)
-	Update(runNum string, order string, mainId int, parentId int, current_volume float64) (domain.PoBoqBodyCpp, error)
+	Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCpp, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error)
 	FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyCpp, error)
 	CountRunNum(runNum string) (int, error)
-	SelectMaxOrder(runNum string) (int, error)
+	// SelectMaxOrder(runNum string) (int, error)
 	Delete(id string) error
 }
 
@@ -62,32 +62,32 @@ func (r *repository) CountRunNum(runNum string) (int, error) {
 	return total, nil
 }
 
-func (r *repository) SelectMaxOrder(runNum string) (int, error) {
-	var total int
+// func (r *repository) SelectMaxOrder(runNum string) (int, error) {
+// 	var total int
 
-	query := "SELECT MAX(CAST([order] AS INT)) AS max_order	FROM eBAPP.dbo.po_boq_body_cpp	WHERE run_num = ?"
+// 	query := "SELECT MAX(CAST([order] AS INT)) AS max_order	FROM eBAPP.dbo.po_boq_body_cpp	WHERE run_num = ?"
 
-	err := r.db.Raw(query, runNum).Scan(&total).Error
-	if err != nil {
-		return 0, err
-	}
+// 	err := r.db.Raw(query, runNum).Scan(&total).Error
+// 	if err != nil {
+// 		return 0, err
+// 	}
 
-	return total, nil
-}
+// 	return total, nil
+// }
 
 func (r *repository) Delete(id string) error {
 	err := r.db.Table("po_boq_body_cpp").Where("run_num = ?", id).Delete(&domain.PoBoqBodyCpp{}).Error
 	return err
 }
 
-func (r *repository) Update(runNum string, order string, mainId int, parentId int, current_volume float64) (domain.PoBoqBodyCpp, error) {
+func (r *repository) Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCpp, error) {
 	// Membuat variabel untuk menampung hasil pembaruan
 	var updatedCpp domain.PoBoqBodyCpp
 
 	// Menggunakan fungsi Update dari GORM untuk memperbarui data di database
 	err := r.db.Table("po_boq_body_cpp").
 		Where("run_num = ? AND [order] = ? AND main_id = ? AND parent_id = ?", runNum, order, mainId, parentId).
-		Updates(map[string]interface{}{"current_volume": current_volume}).
+		Updates(map[string]interface{}{"status": status, "note": note}).
 		Error
 
 	if err != nil {
