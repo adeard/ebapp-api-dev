@@ -16,7 +16,8 @@ func NewPoCppHeaderHandler(v1 *gin.RouterGroup, poCppHeaderService Service) {
 
 	header := v1.Group("cppheader")
 
-	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetProgrssByRunNum)
+	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetCppByRunNum)
+	header.GET("/by_run_num_progress/:id/:var1/:var2/:var3/:var4", handler.GetCppByRunNumProgress)
 	header.GET("/:id/:var1/:var2/:var3", handler.GetAllCppByRunNum)
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
 	header.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
@@ -24,7 +25,7 @@ func NewPoCppHeaderHandler(v1 *gin.RouterGroup, poCppHeaderService Service) {
 	header.POST("", handler.Store)
 }
 
-func (h *poCppHeaderHandler) GetProgrssByRunNum(c *gin.Context) {
+func (h *poCppHeaderHandler) GetCppByRunNum(c *gin.Context) {
 	id := c.Param("id")
 	var1 := c.Param("var1")
 	var2 := c.Param("var2")
@@ -32,7 +33,32 @@ func (h *poCppHeaderHandler) GetProgrssByRunNum(c *gin.Context) {
 	var4 := c.Param("var4")
 	addon := "/"
 
-	data, err := h.poCppHeaderService.FindProg(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
+	data, err := h.poCppHeaderService.FindCpp(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Berhasil mengambil data Cpp",
+		"data":    data,
+	})
+}
+
+func (h *poCppHeaderHandler) GetCppByRunNumProgress(c *gin.Context) {
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+	addon := "/"
+
+	data, err := h.poCppHeaderService.FindCppByRunNumProgress(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
