@@ -54,5 +54,8 @@ func (s *service) UpdateStatus(id string, status string) (domain.PoCppHeader, er
 
 func (s *service) Store(input domain.PoCppHeader) (domain.PoCppHeader, error) {
 	data, err := s.repository.Store(input)
+	if err == nil {
+		s.repository.CloneProgress(input.RunNumProgress, input.RunNum)
+	}
 	return data, err
 }

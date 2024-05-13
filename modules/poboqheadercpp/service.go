@@ -23,9 +23,6 @@ func (s *service) GetCpp(id string) ([]domain.PoBoqHeaderCpp, error) {
 
 func (s *service) Store(input domain.PoBoqHeaderCpp) (domain.PoBoqHeaderCpp, error) {
 	headers, err := s.repository.Store(input)
-	if err == nil {
-		s.repository.CloneProgress(input.PekerjaanNoProgress, input.PekerjaanNo)
-	}
 	return headers, err
 }
 
