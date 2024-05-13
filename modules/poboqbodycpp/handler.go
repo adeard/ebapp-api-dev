@@ -17,7 +17,7 @@ func NewPoBoqBodyCppHandler(v1 *gin.RouterGroup, poBoqBodyCppService Service) {
 	poboqbodyCpp := v1.Group("po_boq_body_Cpp")
 
 	poboqbodyCpp.GET("/count/:id/:var1/:var2/:var3/:var4", handler.CountByRunNum)
-	// poboqbodyCpp.GET("/maxorder/:id/:var1/:var2/:var3/:var4", handler.SelectMaxOrder)
+	poboqbodyCpp.GET("/maxorder/:id/:var1/:var2/:var3/:var4", handler.SelectMaxOrder)
 	poboqbodyCpp.POST("", handler.Store)
 	poboqbodyCpp.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
 	poboqbodyCpp.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyByID)
@@ -111,25 +111,25 @@ func (h *poBoqBodyCppHandler) CountByRunNum(c *gin.Context) {
 	})
 }
 
-// func (h *poBoqBodyCppHandler) SelectMaxOrder(c *gin.Context) {
-// 	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+func (h *poBoqBodyCppHandler) SelectMaxOrder(c *gin.Context) {
+	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
 
-// 	total, err := h.poBoqBodyCppService.SelectMaxOrder(runNum)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"status":  http.StatusInternalServerError,
-// 			"message": "Gagal menghitung jumlah entri",
-// 			"data":    nil,
-// 		})
-// 		return
-// 	}
+	total, err := h.poBoqBodyCppService.SelectMaxOrder(runNum)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal menghitung jumlah entri",
+			"data":    nil,
+		})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"status":  http.StatusOK,
-// 		"message": "Jumlah entri berhasil dihitung",
-// 		"max":     total,
-// 	})
-// }
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Jumlah entri berhasil dihitung",
+		"max":     total,
+	})
+}
 
 func (h *poBoqBodyCppHandler) Store(c *gin.Context) {
 	var input []domain.PoBoqBodyCppRequest

@@ -12,7 +12,7 @@ type Repository interface {
 	FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error)
 	FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyCpp, error)
 	CountRunNum(runNum string) (int, error)
-	// SelectMaxOrder(runNum string) (int, error)
+	SelectMaxOrder(runNum string) (int, error)
 	Delete(id string) error
 }
 
@@ -62,18 +62,18 @@ func (r *repository) CountRunNum(runNum string) (int, error) {
 	return total, nil
 }
 
-// func (r *repository) SelectMaxOrder(runNum string) (int, error) {
-// 	var total int
+func (r *repository) SelectMaxOrder(runNum string) (int, error) {
+	var total int
 
-// 	query := "SELECT MAX(CAST([order] AS INT)) AS max_order	FROM eBAPP.dbo.po_boq_body_cpp	WHERE run_num = ?"
+	query := "SELECT MAX(CAST([order] AS INT)) AS max_order	FROM eBAPP.dbo.po_boq_body_cpp	WHERE run_num = ?"
 
-// 	err := r.db.Raw(query, runNum).Scan(&total).Error
-// 	if err != nil {
-// 		return 0, err
-// 	}
+	err := r.db.Raw(query, runNum).Scan(&total).Error
+	if err != nil {
+		return 0, err
+	}
 
-// 	return total, nil
-// }
+	return total, nil
+}
 
 func (r *repository) Delete(id string) error {
 	err := r.db.Table("po_boq_body_cpp").Where("run_num = ?", id).Delete(&domain.PoBoqBodyCpp{}).Error

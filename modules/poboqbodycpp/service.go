@@ -7,7 +7,7 @@ import (
 type Service interface {
 	GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyCpp, error)
 	CountByRunNum(runNum string) (int, error)
-	// SelectMaxOrder(runNum string) (int, error)
+	SelectMaxOrder(runNum string) (int, error)
 	Store(input domain.PoBoqBodyCpp) (domain.PoBoqBodyCpp, error)
 	Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCpp, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error)
@@ -56,14 +56,14 @@ func (s *service) CountByRunNum(runNum string) (int, error) {
 	return total, nil
 }
 
-// func (s *service) SelectMaxOrder(runNum string) (int, error) {
-// 	total, err := s.repository.SelectMaxOrder(runNum)
-// 	if err != nil {
-// 		return 0, err
-// 	}
+func (s *service) SelectMaxOrder(runNum string) (int, error) {
+	total, err := s.repository.SelectMaxOrder(runNum)
+	if err != nil {
+		return 0, err
+	}
 
-// 	return total, nil
-// }
+	return total, nil
+}
 
 func (s *service) Delete(id string) error {
 	err := s.repository.Delete(id)
