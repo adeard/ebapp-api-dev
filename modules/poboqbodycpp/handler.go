@@ -16,12 +16,12 @@ func NewPoBoqBodyCppHandler(v1 *gin.RouterGroup, poBoqBodyCppService Service) {
 
 	poboqbodyCpp := v1.Group("po_boq_body_Cpp")
 
-	poboqbodyCpp.GET("/count/:id/:var1/:var2/:var3/:var4", handler.CountByRunNum)
-	poboqbodyCpp.GET("/maxorder/:id/:var1/:var2/:var3/:var4", handler.SelectMaxOrder)
+	poboqbodyCpp.GET("/count/:id/:var1/:var2/:var3/:var4/:var5", handler.CountByRunNum)
+	poboqbodyCpp.GET("/maxorder/:id/:var1/:var2/:var3/:var4/:var5", handler.SelectMaxOrder)
 	poboqbodyCpp.POST("", handler.Store)
-	poboqbodyCpp.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
-	poboqbodyCpp.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyByID)
-	poboqbodyCpp.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
+	poboqbodyCpp.PUT("/:id/:var1/:var2/:var3/:var4/:var5", handler.Update)
+	poboqbodyCpp.GET("/:id/:var1/:var2/:var3/:var4/:var5/:var6", handler.GetBodyByID)
+	poboqbodyCpp.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 }
 
 func groupItemsByParent(items []domain.PoBoqBodyCppResponse, parentId int) []domain.PoBoqBodyCppResponse {
@@ -45,9 +45,10 @@ func (h *poBoqBodyCppHandler) GetBodyByID(c *gin.Context) {
 	var3 := c.Param("var3")
 	var4 := c.Param("var4")
 	var5 := c.Param("var5")
+	var6 := c.Param("var6")
 	addons := "/"
 
-	poBoqBodyCpp, err := h.poBoqBodyCppService.GetByRunNum(runNum+addons+var1+addons+var2+addons+var3+addons+var4, var5)
+	poBoqBodyCpp, err := h.poBoqBodyCppService.GetByRunNum(runNum+addons+var1+addons+var2+addons+var3+addons+var4+addons+var5, var6)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
@@ -91,7 +92,7 @@ func (h *poBoqBodyCppHandler) GetBodyByID(c *gin.Context) {
 }
 
 func (h *poBoqBodyCppHandler) CountByRunNum(c *gin.Context) {
-	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4") + "/" + c.Param("var5")
 
 	// Panggil service untuk menghitung jumlah entri dengan runNum tertentu
 	total, err := h.poBoqBodyCppService.CountByRunNum(runNum)
@@ -112,7 +113,7 @@ func (h *poBoqBodyCppHandler) CountByRunNum(c *gin.Context) {
 }
 
 func (h *poBoqBodyCppHandler) SelectMaxOrder(c *gin.Context) {
-	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4") + "/" + c.Param("var5")
 
 	total, err := h.poBoqBodyCppService.SelectMaxOrder(runNum)
 	if err != nil {
@@ -177,7 +178,7 @@ func (h *poBoqBodyCppHandler) Store(c *gin.Context) {
 }
 
 func (h *poBoqBodyCppHandler) Update(c *gin.Context) {
-	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+	runNum := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4") + "/" + c.Param("var5")
 
 	// Membaca data yang dikirimkan dalam body permintaan
 	var requestBody struct {
@@ -228,9 +229,10 @@ func (h *poBoqBodyCppHandler) Delete(c *gin.Context) {
 	var2 := c.Param("var2")
 	var3 := c.Param("var3")
 	var4 := c.Param("var4")
+	var5 := c.Param("var5")
 	addons := "/"
 
-	err := h.poBoqBodyCppService.Delete(runNum + addons + var1 + addons + var2 + addons + var3 + addons + var4)
+	err := h.poBoqBodyCppService.Delete(runNum + addons + var1 + addons + var2 + addons + var3 + addons + var4 + addons + var5)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
