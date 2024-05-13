@@ -16,12 +16,12 @@ func NewPoCppHeaderHandler(v1 *gin.RouterGroup, poCppHeaderService Service) {
 
 	header := v1.Group("cppheader")
 
-	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetCppByRunNum)
+	header.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetCppByRunNum)
 	header.GET("/by_run_num_progress/:id/:var1/:var2/:var3/:var4", handler.GetCppByRunNumProgress)
-	header.GET("/:id/:var1/:var2/:var3", handler.GetAllCppByRunNum)
-	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
-	header.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
-	header.PUT("/status/:id/:var1/:var2/:var3/:var4", handler.UpdateStatus)
+	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetAllCppByRunNum)
+	header.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
+	header.PUT("/:id/:var1/:var2/:var3/:var4/:var5", handler.Update)
+	header.PUT("/status/:id/:var1/:var2/:var3/:var4/:var5", handler.UpdateStatus)
 	header.POST("", handler.Store)
 }
 
@@ -31,9 +31,10 @@ func (h *poCppHeaderHandler) GetCppByRunNum(c *gin.Context) {
 	var2 := c.Param("var2")
 	var3 := c.Param("var3")
 	var4 := c.Param("var4")
+	var5 := c.Param("var5")
 	addon := "/"
 
-	data, err := h.poCppHeaderService.FindCpp(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
+	data, err := h.poCppHeaderService.FindCpp(id + addon + var1 + addon + var2 + addon + var3 + addon + var4 + addon + var5)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -89,9 +90,10 @@ func (h *poCppHeaderHandler) GetAllCppByRunNum(c *gin.Context) {
 	var1 := c.Param("var1")
 	var2 := c.Param("var2")
 	var3 := c.Param("var3")
+	var4 := c.Param("var4")
 	addon := "/"
 
-	datas, err := h.poCppHeaderService.FindAllProg(id + addon + var1 + addon + var2 + addon + var3 + addon)
+	datas, err := h.poCppHeaderService.FindAllProg(id + addon + var1 + addon + var2 + addon + var3 + addon + var4 + addon)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
@@ -114,13 +116,14 @@ func (h *poCppHeaderHandler) Delete(c *gin.Context) {
 	var2 := c.Param("var2")
 	var3 := c.Param("var3")
 	var4 := c.Param("var4")
+	var5 := c.Param("var5")
 	addon := "/"
 
-	err := h.poCppHeaderService.Delete(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
+	err := h.poCppHeaderService.Delete(id + addon + var1 + addon + var2 + addon + var3 + addon + var4 + addon + var5)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Gagal menghapus data Cpp " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4,
+			"message": "Gagal menghapus data Cpp " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4 + addon + var5,
 			"data":    nil,
 		})
 		return
@@ -128,13 +131,13 @@ func (h *poCppHeaderHandler) Delete(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
-		"message": "Berhasil menghapus data Cpp " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4,
+		"message": "Berhasil menghapus data Cpp " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4 + addon + var5,
 		"data":    nil,
 	})
 }
 
 func (h *poCppHeaderHandler) Update(c *gin.Context) {
-	id := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+	id := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4") + "/" + c.Param("var5")
 
 	var input domain.PoCppHeaderUpdate
 	c.BindJSON(&input)
@@ -158,7 +161,7 @@ func (h *poCppHeaderHandler) Update(c *gin.Context) {
 }
 
 func (h *poCppHeaderHandler) UpdateStatus(c *gin.Context) {
-	id := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4")
+	id := c.Param("id") + "/" + c.Param("var1") + "/" + c.Param("var2") + "/" + c.Param("var3") + "/" + c.Param("var4") + "/" + c.Param("var5")
 
 	var input domain.PoCppHeaderUpdateStatus
 
