@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	FindCpp(id string) (domain.PoCppHeader, error)
+	FindCpp(id string) ([]domain.PoCppHeader, error)
 	FindCppByRunNumProgress(id string) (domain.PoCppHeader, error)
 	FindAllProg(id string) ([]domain.PoCppHeader, error)
 	Delete(id string) error
@@ -22,7 +22,7 @@ func NewService(repository Repository) Service {
 	return &service{repository}
 }
 
-func (s *service) FindCpp(id string) (domain.PoCppHeader, error) {
+func (s *service) FindCpp(id string) ([]domain.PoCppHeader, error) {
 	data, err := s.repository.FindCpp(id)
 	return data, err
 }

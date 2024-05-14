@@ -10,7 +10,7 @@ type Repository interface {
 	Store(input domain.PoBoqBodyCpp) (domain.PoBoqBodyCpp, error)
 	Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCpp, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error)
-	FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyCppProgress, error)
+	FindByRunNum(runNum string, runNumProgress string, order string) ([]domain.PoBoqBodyCppProgress, error)
 	CountRunNum(runNum string) (int, error)
 	SelectMaxOrder(runNum string) (int, error)
 	Delete(id string) error
@@ -35,12 +35,12 @@ func (r *repository) FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error) {
 	return poBoqBodyCpp, err
 }
 
-func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBodyCppProgress, error) {
+func (r *repository) FindByRunNum(runNum string, runNumProgress string, order string) ([]domain.PoBoqBodyCppProgress, error) {
 	var boqBody []domain.PoBoqBodyCppProgress
 
-	query := `SELECT a.*, b.status as status_cpp, b.note as note_cpp, b.run_num as run_num_cpp FROM po_boq_body_progress a left join po_boq_body_cpp b on a.item_no = b.item_no and a.item_level = b.item_level 
-	and a.main_id = b.main_id and a.parent_id = b.parent_id where  a.run_num = ? and a.[order] = ? order by a.main_id asc`
-	err := r.db.Raw(query, runNum, order).Find(&boqBody).Error
+	query := `SELECT DISTINCT a.*, b.status as status_cpp, b.note as note_cpp, b.run_num as run_num_cpp FROM po_boq_body_progress a right join po_boq_body_cpp b on a.item_no = b.item_no and a.item_level = b.item_level 
+	and a.main_id = b.main_id and a.parent_id = b.parent_id where  b.run_num = ? and a.run_num = ? and a.[order] = ? order by a.main_id asc`
+	err := r.db.Raw(query, runNum, runNumProgress, order).Find(&boqBody).Error
 
 	// q := r.db.Table("po_boq_body_cpp")
 

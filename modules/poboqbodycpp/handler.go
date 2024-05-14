@@ -20,7 +20,7 @@ func NewPoBoqBodyCppHandler(v1 *gin.RouterGroup, poBoqBodyCppService Service) {
 	poboqbodyCpp.GET("/maxorder/:id/:var1/:var2/:var3/:var4/:var5", handler.SelectMaxOrder)
 	poboqbodyCpp.POST("", handler.Store)
 	poboqbodyCpp.PUT("/:id/:var1/:var2/:var3/:var4/:var5", handler.Update)
-	poboqbodyCpp.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyByID)
+	poboqbodyCpp.GET("/:id/:var1/:var2/:var3/:var4/:var5/:var6", handler.GetBodyByID)
 	poboqbodyCpp.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 }
 
@@ -45,9 +45,10 @@ func (h *poBoqBodyCppHandler) GetBodyByID(c *gin.Context) {
 	var3 := c.Param("var3")
 	var4 := c.Param("var4")
 	var5 := c.Param("var5")
+	var6 := c.Param("var6")
 	addons := "/"
 
-	poBoqBodyCpp, err := h.poBoqBodyCppService.GetByRunNum(runNum+addons+var1+addons+var2+addons+var3+addons+var4, var5)
+	poBoqBodyCpp, err := h.poBoqBodyCppService.GetByRunNum(runNum+addons+var1+addons+var2+addons+var3+addons+var4+addons+var5, runNum+addons+var1+addons+var2+addons+var3+addons+var4, var6)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,

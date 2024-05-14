@@ -16,7 +16,7 @@ func NewPoCppHeaderHandler(v1 *gin.RouterGroup, poCppHeaderService Service) {
 
 	header := v1.Group("cppheader")
 
-	header.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetCppByRunNum)
+	header.GET("/:id/:var1/:var2/:var3", handler.GetCppByRunNum)
 	header.GET("/by_run_num_progress/:id/:var1/:var2/:var3/:var4", handler.GetCppByRunNumProgress)
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetAllCppByRunNum)
 	header.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
@@ -30,11 +30,9 @@ func (h *poCppHeaderHandler) GetCppByRunNum(c *gin.Context) {
 	var1 := c.Param("var1")
 	var2 := c.Param("var2")
 	var3 := c.Param("var3")
-	var4 := c.Param("var4")
-	var5 := c.Param("var5")
 	addon := "/"
 
-	data, err := h.poCppHeaderService.FindCpp(id + addon + var1 + addon + var2 + addon + var3 + addon + var4 + addon + var5)
+	data, err := h.poCppHeaderService.FindCpp(id + addon + var1 + addon + var2 + addon + var3)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, gin.H{

@@ -8,7 +8,7 @@ import (
 )
 
 type Repository interface {
-	FindCpp(id string) (domain.PoCppHeader, error)
+	FindCpp(id string) ([]domain.PoCppHeader, error)
 	FindCppByRunNumProgress(id string) (domain.PoCppHeader, error)
 	FindAllProg(id string) ([]domain.PoCppHeader, error)
 	Delete(id string) error
@@ -26,9 +26,9 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
 }
 
-func (r *repository) FindCpp(id string) (domain.PoCppHeader, error) {
-	var Cpp domain.PoCppHeader
-	err := r.db.Table("po_cpp_header").Where("run_num =?", id).First(&Cpp).Error
+func (r *repository) FindCpp(id string) ([]domain.PoCppHeader, error) {
+	var Cpp []domain.PoCppHeader
+	err := r.db.Table("po_cpp_header").Where("run_num_progress LIKE ?", id+"%").Find(&Cpp).Error
 	return Cpp, err
 }
 

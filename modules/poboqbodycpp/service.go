@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyCppProgress, error)
+	GetByRunNum(runNum string, runNumProgress string, order string) ([]domain.PoBoqBodyCppProgress, error)
 	CountByRunNum(runNum string) (int, error)
 	SelectMaxOrder(runNum string) (int, error)
 	Store(input domain.PoBoqBodyCpp) (domain.PoBoqBodyCpp, error)
@@ -42,8 +42,8 @@ func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error) {
 	return boqBody, err
 }
 
-func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBodyCppProgress, error) {
-	poboqbody, err := s.repository.FindByRunNum(runNum, order)
+func (s *service) GetByRunNum(runNum string, runNumProgress string, order string) ([]domain.PoBoqBodyCppProgress, error) {
+	poboqbody, err := s.repository.FindByRunNum(runNum, runNumProgress, order)
 	return poboqbody, err
 }
 
