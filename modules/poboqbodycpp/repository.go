@@ -38,8 +38,7 @@ func (r *repository) FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error) {
 func (r *repository) FindByRunNum(runNum string, runNumProgress string, order string) ([]domain.PoBoqBodyCppProgress, error) {
 	var boqBody []domain.PoBoqBodyCppProgress
 
-	query := `SELECT DISTINCT a.*, b.status as status_cpp, b.note as note_cpp, b.run_num as run_num_cpp FROM po_boq_body_progress a right join po_boq_body_cpp b on a.item_no = b.item_no and a.item_level = b.item_level 
-	and a.main_id = b.main_id and a.parent_id = b.parent_id where  b.run_num = ? and a.run_num = ? and a.[order] = ? order by a.main_id asc`
+	query := `SELECT DISTINCT a.*, b.status as status_cpp, b.note as note_cpp, b.run_num as run_num_cpp FROM po_boq_body_progress a right join po_boq_body_cpp b on a.item_no = b.item_no and a.item_level = b.item_level and a.main_id = b.main_id and a.parent_id = b.parent_id and a.[order]  = b.[order] and a.item_no = b.item_no and a.item_level = b.item_level and a.item_description = b.item_description and a.item_specification = b.item_specification where  b.run_num = ? and a.run_num = ? and a.[order] = ? order by a.main_id asc`
 	err := r.db.Raw(query, runNum, runNumProgress, order).Find(&boqBody).Error
 
 	// q := r.db.Table("po_boq_body_cpp")
