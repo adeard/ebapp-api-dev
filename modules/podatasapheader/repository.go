@@ -2,10 +2,10 @@ package podatasapheader
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/helper"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"gorm.io/gorm"
 )
@@ -27,14 +27,25 @@ func NewRepository(db *gorm.DB) Repository {
 func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error) {
 	var poProject []domain.PoDataSapHeaderTitle
 
-	//Setting
-	username := os.Getenv("SAP_USERNAME")
-	password := os.Getenv("SAP_PASSWORD")
+	// Mendapatkan URL, Username, dan Password dari helper
+	urlV, usernameV, passwordV, err := helper.GetDataFromUserManagement()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil, err
+	}
 
-	// FIRST URL
-	xmlURL := fmt.Sprintf(`http://qaecc.hec.indofood.co.id:8020/sap/opu/odata/sap/ZMGW_GET_DATA_PO_SRV/etHeaderSet('` + id + `')?$expand=etPoHeaderSet,NavPoItemSet`)
+	// Print untuk debugging
+	fmt.Println("URL:", urlV)
+	fmt.Println("Username:", usernameV)
+	fmt.Println("Password:", passwordV)
+
+	username := usernameV
+	password := passwordV
+
+	xmlURL := fmt.Sprintf(`%s/sap/opu/odata/sap/ZMGW_GET_DATA_PO_SRV/etHeaderSet('%s')?$expand=etPoHeaderSet,NavPoItemSet`, urlV, id)
 
 	client := &http.Client{}
+
 	req, err := http.NewRequest("GET", xmlURL, nil)
 	if err != nil {
 		return nil, err
