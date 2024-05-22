@@ -100,7 +100,7 @@ func (r *repository) Store(input domain.BoqBody) (domain.BoqBody, error) {
 }
 
 func (r *repository) Update(input domain.BoqBody) (domain.BoqBody, error) {
-	err := r.db.Table("boq_body").Where("id =?", input.Id).Save(&input).Error
+	err := r.db.Table("boq_body").Where("id =?", input.Id).Where("run_num =?", input.RunNum).Save(&input).Error
 	return input, err
 }
 
