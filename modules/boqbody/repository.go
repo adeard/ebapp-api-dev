@@ -14,7 +14,7 @@ type Repository interface {
 	FindByItemNo(itemNo string) (domain.BoqBody, error)
 	Store(input domain.BoqBody) (domain.BoqBody, error)
 	Update(input domain.BoqBody) (domain.BoqBody, error)
-	DeleteByID(id string) error
+	DeleteByID(id string, runNum string) error
 }
 
 type repository struct {
@@ -104,7 +104,7 @@ func (r *repository) Update(input domain.BoqBody) (domain.BoqBody, error) {
 	return input, err
 }
 
-func (r *repository) DeleteByID(id string) error {
-	err := r.db.Table("boq_body").Where("id =?", id).Delete(&domain.BoqBody{}).Error
+func (r *repository) DeleteByID(id string, runNum string) error {
+	err := r.db.Table("boq_body").Where("id =?", id).Where("run_num =?", runNum).Delete(&domain.BoqBody{}).Error
 	return err
 }

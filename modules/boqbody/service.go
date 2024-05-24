@@ -12,7 +12,7 @@ type Service interface {
 	FindByItemNo(itemNo string) (domain.BoqBody, error)
 	Store(input domain.BoqBody) (domain.BoqBody, error)
 	Update(input domain.BoqBody, id string) (domain.BoqBody, error)
-	DeleteByID(id int) error
+	DeleteByID(id int, runNum string) error
 }
 
 type service struct {
@@ -73,7 +73,7 @@ func (s *service) FindByItemNo(itemNo string) (domain.BoqBody, error) {
 	return boqBody, err
 }
 
-func (s *service) DeleteByID(id int) error {
+func (s *service) DeleteByID(id int, runNum string) error {
 	// Cek terlebih dahulu apakah data dengan ID tersebut ada atau tidak
 	_, err := s.repository.FindById(strconv.Itoa(id))
 	if err != nil {
@@ -82,7 +82,7 @@ func (s *service) DeleteByID(id int) error {
 	}
 
 	// Panggil fungsi DeleteByID dari repository untuk menghapus data BoQ Body berdasarkan ID
-	err = s.repository.DeleteByID(strconv.Itoa(id))
+	err = s.repository.DeleteByID(strconv.Itoa(id), runNum)
 	if err != nil {
 		// Jika ada kesalahan saat menghapus, tangani sesuai kebutuhan (misalnya kembalikan pesan kesalahan)
 		return err

@@ -23,7 +23,7 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	boqBody.GET("/:id", handler.GetBoqByRunNum)
 	boqBody.POST("", handler.Store)
 	boqBody.PUT("/:id", handler.Update)
-	boqBody.DELETE("/:id", handler.Delete)
+	boqBody.DELETE("/:id/:run_num", handler.Delete)
 }
 
 func groupItemsByParent(items []domain.BoqBodyResponse, parentId int) []domain.BoqBodyResponse {
@@ -299,6 +299,7 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 
 func (h *boqBodyHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
+	runNum := c.Param("run_num")
 
 	_, err := h.boqBodyService.GetByParentId(id)
 	if err != nil {
@@ -330,10 +331,10 @@ func (h *boqBodyHandler) Delete(c *gin.Context) {
 
 	findData(parentID)
 
-	//buatkan funsi delete dibawah ini berdasarkan id yang ada di result -> contoh hasil result [19,20,21,22,23]
 	// Hapus data berdasarkan ID yang ada di result
+	// Ada perubahan dasar di database karena id sudah tidak uniq, maka dari itu flow mencari id di atas akan tidak efektif ketika melakukan fungsi hapus dibawah ini
 	for _, id := range result {
-		err := h.boqBodyService.DeleteByID(id)
+		err := h.boqBodyService.DeleteByID(id, runNum)
 		if err != nil {
 			// Jika ada kesalahan saat menghapus, tangani sesuai kebutuhan (misalnya kembalikan pesan kesalahan)
 			c.JSON(http.StatusInternalServerError, gin.H{
