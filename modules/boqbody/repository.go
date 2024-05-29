@@ -100,7 +100,18 @@ func (r *repository) Store(input domain.BoqBody) (domain.BoqBody, error) {
 }
 
 func (r *repository) Update(input domain.BoqBody) (domain.BoqBody, error) {
-	err := r.db.Table("boq_body").Where("id =?", input.Id).Where("run_num =?", input.RunNum).Save(&input).Error
+	updateFields := map[string]interface{}{
+		"item_no":            input.ItemNo,
+		"item_description":   input.ItemDescription,
+		"item_specification": input.ItemSpecification,
+		"qty":                input.Qty,
+		"unit":               input.Unit,
+		"price":              input.Price,
+		"currency":           input.Currency,
+		"note":               input.Note,
+	}
+
+	err := r.db.Table("boq_body").Where("run_num = ?", input.RunNum).Where("id = ?", input.Id).Where("parent_id = ?", input.ParentId).Updates(updateFields).Error
 	return input, err
 }
 

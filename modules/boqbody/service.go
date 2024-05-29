@@ -44,14 +44,20 @@ func (s *service) Store(input domain.BoqBody) (domain.BoqBody, error) {
 }
 
 func (s *service) Update(input domain.BoqBody, id string) (domain.BoqBody, error) {
-	boqBody, err := s.repository.FindById(id)
+	intId, err := strconv.Atoi(id)
 	if err != nil {
-		return boqBody, err
+		return domain.BoqBody{}, err
 	}
 
+	boqBodies, err := s.repository.FindByRunNum(input.RunNum)
+	if err != nil {
+		return boqBodies[0], err
+	}
+
+	boqBody := boqBodies[0]
 	finalUpdateBoqBody := domain.BoqBody{
-		Id:                boqBody.Id,
-		ParentId:          boqBody.ParentId,
+		Id:                intId,
+		ParentId:          input.ParentId,
 		RunNum:            boqBody.RunNum,
 		ItemNo:            input.ItemNo,
 		ItemLevel:         boqBody.ItemLevel,
@@ -64,8 +70,8 @@ func (s *service) Update(input domain.BoqBody, id string) (domain.BoqBody, error
 		Note:              input.Note,
 	}
 
-	boqBodies, err := s.repository.Update(finalUpdateBoqBody)
-	return boqBodies, err
+	result, err := s.repository.Update(finalUpdateBoqBody)
+	return result, err
 }
 
 func (s *service) FindByItemNo(itemNo string) (domain.BoqBody, error) {

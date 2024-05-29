@@ -269,6 +269,7 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 	updateBoqBody := domain.BoqBody{
 		ItemNo:            input.ItemNo,
 		ParentId:          input.ParentId,
+		RunNum:            input.RunNum,
 		ItemDescription:   input.ItemDescription,
 		ItemSpecification: input.ItemSpecification,
 		Qty:               input.Qty,
