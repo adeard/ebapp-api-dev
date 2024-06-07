@@ -26,6 +26,7 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 	project.POST("/draft3", handler.Store3)
 	project.POST("/draft4", handler.Store4)
 
+	project.POST("/:id", handler.UpdateSpkNRetensi)
 	project.PUT("/status", handler.UpdateStatus)
 	project.PUT("/update_planning_actual_date", handler.UpdatePlanningActualDate)
 }
@@ -318,6 +319,42 @@ func (h *listProjectHandler) UpdateStatus(c *gin.Context) {
 
 	// Panggil service untuk melakukan pembaruan status
 	updatedProject, err := h.listProjectService.UpdateStatus(updateStatus, input.PekerjaanNo)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal memperbarui status proyek",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Status proyek berhasil diperbarui",
+		"data":    updatedProject,
+	})
+}
+
+func (h *listProjectHandler) UpdateSpkNRetensi(c *gin.Context) {
+	id := c.Param("id")
+	var input domain.UpdateSpkNRetensi
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Permintaan tidak valid!",
+		})
+		return
+	}
+
+	// Buat struct untuk pembaruan status
+	updateSpkNRetensi := domain.UpdateSpkNRetensi{
+		PekerjaanNo: input.PekerjaanNo,
+		SpkNo:       input.SpkNo,
+		Retensi:     input.Retensi,
+	}
+
+	// Panggil service untuk melakukan pembaruan status
+	updatedProject, err := h.listProjectService.UpdateSpkNRetensi(updateSpkNRetensi, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,

@@ -14,7 +14,8 @@ type Service interface {
 	Store4(input domain.ListProject4) (domain.ListProject4, error)
 
 	UpdateStatus(input domain.UpdateStatus, Id string) (domain.UpdateStatus, error)
-	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) (error)
+	UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, Id string) (domain.UpdateSpkNRetensi, error)
+	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error
 }
 
 type service struct {
@@ -61,7 +62,7 @@ func (s *service) Store4(input domain.ListProject4) (domain.ListProject4, error)
 }
 
 func (s *service) UpdateStatus(input domain.UpdateStatus, Id string) (domain.UpdateStatus, error) {
-	projectList, err := s.repository.FindByPekerjaanNo(Id)
+	projectList, err := s.repository.FindByPekerjaanNo(input.PekerjaanNo)
 	if err != nil {
 		return projectList, err
 	}
@@ -75,7 +76,12 @@ func (s *service) UpdateStatus(input domain.UpdateStatus, Id string) (domain.Upd
 	return status, err
 }
 
-func (s *service) UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) (error) {
+func (s *service) UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, Id string) (domain.UpdateSpkNRetensi, error) {
+	status, err := s.repository.UpdateSpkNRetensi(input, Id)
+	return status, err
+}
+
+func (s *service) UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error {
 	err := s.repository.UpdatePlanningActualDate(input)
 	return err
 }

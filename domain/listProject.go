@@ -80,6 +80,8 @@ type ListProject struct {
 	Status          string    `json:"status"`
 	Total           float64   `json:"total"`
 	Currency        string    `json:"currency"`
+	SpkNo           string    `json:"spk_no"`
+	Retensi         string    `json:"retensi"`
 }
 
 type ListProjectRequest struct {
@@ -100,11 +102,19 @@ type ListProjectRequest struct {
 	Status          string    `json:"status"`
 	Total           float64   `json:"total"`
 	Currency        string    `json:"currency"`
+	SpkNo           string    `json:"spk_no"`
+	Retensi         string    `json:"retensi"`
 }
 
 type UpdateStatus struct {
 	PekerjaanNo string `json:"pekerjaan_no"`
 	Status      string `json:"status"`
+}
+
+type UpdateSpkNRetensi struct {
+	PekerjaanNo string `json:"pekerjaan_no"`
+	SpkNo       string `json:"spk_no"`
+	Retensi     string `json:"retensi"`
 }
 
 type UpdateStatusResponse struct {
