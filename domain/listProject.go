@@ -82,6 +82,7 @@ type ListProject struct {
 	Currency        string    `json:"currency"`
 	SpkNo           string    `json:"spk_no"`
 	Retensi         string    `json:"retensi"`
+	MasaRetensi     string    `json:"masa_retensi"`
 }
 
 type ListProjectRequest struct {
@@ -104,6 +105,7 @@ type ListProjectRequest struct {
 	Currency        string    `json:"currency"`
 	SpkNo           string    `json:"spk_no"`
 	Retensi         string    `json:"retensi"`
+	MasaRetensi     string    `json:"masa_retensi"`
 }
 
 type UpdateStatus struct {
@@ -115,6 +117,7 @@ type UpdateSpkNRetensi struct {
 	PekerjaanNo string `json:"pekerjaan_no"`
 	SpkNo       string `json:"spk_no"`
 	Retensi     string `json:"retensi"`
+	MasaRetensi string `json:"masa_retensi"`
 }
 
 type UpdateStatusResponse struct {

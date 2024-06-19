@@ -93,7 +93,7 @@ func (r *repository) UpdateStatus(input domain.UpdateStatus) (domain.UpdateStatu
 }
 
 func (r *repository) UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, id string) (domain.UpdateSpkNRetensi, error) {
-	err := r.db.Table("list_project").Where("pekerjaan_no =?", input.PekerjaanNo).Where("[id] =?", id).Updates(map[string]interface{}{"spk_no": input.SpkNo, "retensi": input.Retensi}).Error
+	err := r.db.Table("list_project").Where("pekerjaan_no =?", input.PekerjaanNo).Where("[id] =?", id).Updates(map[string]interface{}{"spk_no": input.SpkNo, "retensi": input.Retensi, "masa_retensi": input.MasaRetensi}).Error
 	return input, err
 }
 

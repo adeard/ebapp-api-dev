@@ -351,6 +351,7 @@ func (h *listProjectHandler) UpdateSpkNRetensi(c *gin.Context) {
 		PekerjaanNo: input.PekerjaanNo,
 		SpkNo:       input.SpkNo,
 		Retensi:     input.Retensi,
+		MasaRetensi: input.MasaRetensi,
 	}
 
 	// Panggil service untuk melakukan pembaruan status
