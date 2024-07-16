@@ -103,3 +103,90 @@ func GetDataFromUserManagement() (string, string, string, error) {
 
 	return urlValue, usernameValue, passwordValue, nil
 }
+
+func GetDataParEntries(column string) ([]byte, error) {
+	// POST REQUEST UNTUK LOGIN
+	loginURL := "https://api.indoagri.co.id/am/api/user/login"
+	loginData := map[string]string{"user_name": "ebapphelper", "password": "ebapphelper"}
+	jsonData, err := json.Marshal(loginData)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{}
+	loginReq, err := http.NewRequest("POST", loginURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	loginReq.Header.Set("Content-Type", "application/json")
+
+	loginResp, err := client.Do(loginReq)
+	if err != nil {
+		return nil, err
+	}
+	defer loginResp.Body.Close()
+
+	if loginResp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("login failed: %s", loginResp.Status)
+	}
+
+	var loginResponse struct {
+		Result  bool   `json:"result"`
+		Message string `json:"message"`
+		Datas   string `json:"datas"`
+	}
+
+	err = json.NewDecoder(loginResp.Body).Decode(&loginResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	if !loginResponse.Result {
+		return nil, fmt.Errorf("login failed: %s", loginResponse.Message)
+	}
+
+	firstToken := loginResponse.Datas
+
+	// Fungsi untuk melakukan GET request dan mengembalikan nilai dari objek->Value
+	getData := func(url string) ([]byte, error) {
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("authenticationToken", firstToken)
+
+		resp, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		var response struct {
+			Result bool `json:"result"`
+			Objek  []struct {
+				Id          int     `json:"Id"`
+				RootId      int     `json:"RootId"`
+				Value       string  `json:"Value"`
+				IsEncrypt   bool    `json:"IsEncrypt"`
+				AppRootId   *int    `json:"AppRootId"`
+				AppRootName *string `json:"AppRootName"`
+			} `json:"objek"`
+			Message string `json:"message"`
+		}
+
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		if err != nil {
+			return nil, err
+		}
+
+		if !response.Result {
+			return nil, fmt.Errorf("get failed: %s", response.Message)
+		}
+
+		return json.Marshal(response)
+	}
+
+	apiURL := fmt.Sprintf("https://api.indoagri.co.id/am/api/master_datas/get_list?value_table=Helper&value_column=%s&app_root_name=BAPP", column)
+	return getData(apiURL)
+}

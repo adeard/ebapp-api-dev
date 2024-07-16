@@ -50,7 +50,7 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.AllowAll())
 
-	v1 := router.Group("api/v1")
+	v1 := router.Group("ebapp-api/api/v1")
 	auth.NewAuthHandler(v1, auth.AuthRegistry(db))
 
 	// Menambahkan middleware untuk mencatat log setiap permintaan
