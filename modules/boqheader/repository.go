@@ -54,7 +54,7 @@ func (r *repository) Update(input domain.BoqHeader) (domain.BoqHeader, error) {
 // Clone body from header
 func (r *repository) Clone(oldId string, newId string) (string, error) {
 	// Lakukan query untuk meng-INSERT data baru berdasarkan data yang ada dengan menggunakan parameter oldId dan newId
-	query := `INSERT INTO eBAPP.dbo.boq_body (run_num, item_no, item_level, item_description, item_specification, qty, unit, price, currency, note, id, parent_id)
+	query := `INSERT INTO boq_body (run_num, item_no, item_level, item_description, item_specification, qty, unit, price, currency, note, id, parent_id)
                SELECT 
                    ? AS run_num,
                    item_no,
@@ -68,7 +68,7 @@ func (r *repository) Clone(oldId string, newId string) (string, error) {
                    note,
 				   id,
                    parent_id
-               FROM eBAPP.dbo.boq_body
+               FROM boq_body
                WHERE run_num = ?`
 
 	// Eksekusi query dengan parameter oldId dan newId

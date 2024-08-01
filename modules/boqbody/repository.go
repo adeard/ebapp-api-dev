@@ -100,6 +100,20 @@ func (r *repository) Store(input domain.BoqBody) (domain.BoqBody, error) {
 }
 
 func (r *repository) Update(input domain.BoqBody) (domain.BoqBody, error) {
+	var parentId *int
+	err := r.db.Table("boq_body").Select("parent_id").Where("run_num = ?", input.RunNum).Where("id = ?", input.Id).Scan(&parentId).Error
+	if err != nil {
+		return input, err
+	}
+
+	// Jika parentId di database adalah NULL, ubah menjadi 0
+	if parentId == nil {
+		err = r.db.Table("boq_body").Where("run_num = ?", input.RunNum).Where("id = ?", input.Id).Update("parent_id", 0).Error
+		if err != nil {
+			return input, err
+		}
+	}
+
 	updateFields := map[string]interface{}{
 		"item_no":            input.ItemNo,
 		"item_description":   input.ItemDescription,
@@ -111,7 +125,7 @@ func (r *repository) Update(input domain.BoqBody) (domain.BoqBody, error) {
 		"note":               input.Note,
 	}
 
-	err := r.db.Table("boq_body").Where("run_num = ?", input.RunNum).Where("id = ?", input.Id).Where("parent_id = ?", input.ParentId).Updates(updateFields).Error
+	err = r.db.Table("boq_body").Where("run_num = ?", input.RunNum).Where("id = ?", input.Id).Where("parent_id = ?", input.ParentId).Updates(updateFields).Error
 	return input, err
 }
 

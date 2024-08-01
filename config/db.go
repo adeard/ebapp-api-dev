@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -79,4 +80,7 @@ func SqlsvrDev(DbUser string, DbPassword string, DbHost string, DbName string, D
 		fmt.Println("Cannot connect to database ", Dbdriver)
 		log.Fatal("Database Connection Error")
 	}
+
+	sqlDB, _ := Db.DB()
+	sqlDB.SetConnMaxIdleTime(time.Duration(10) * time.Second)
 }

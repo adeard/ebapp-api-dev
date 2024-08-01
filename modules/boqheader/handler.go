@@ -22,7 +22,7 @@ func NewBoqHeaderHandler(v1 *gin.RouterGroup, boqHeaderService Service) {
 	boqHeader.GET("/active", handler.GetActive)
 	boqHeader.GET("/:id", handler.GetByID)
 	boqHeader.POST("", handler.Store)
-	boqHeader.PUT("/:id", handler.Update)
+	boqHeader.POST("/:id", handler.Update)
 	boqHeader.POST("/clone", handler.Clone)
 }
 
