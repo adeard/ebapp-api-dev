@@ -52,7 +52,7 @@ func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBo
 func (r *repository) CountRunNum(runNum string) (int, error) {
 	var total int
 
-	query := "SELECT COUNT(*) AS total FROM eBAPP.dbo.po_boq_body_progress WHERE run_num = ?"
+	query := "SELECT COUNT(*) AS total FROM po_boq_body_progress WHERE run_num = ?"
 
 	err := r.db.Raw(query, runNum).Scan(&total).Error
 	if err != nil {
@@ -65,7 +65,7 @@ func (r *repository) CountRunNum(runNum string) (int, error) {
 func (r *repository) SelectMaxOrder(runNum string) (int, error) {
 	var total int
 
-	query := "SELECT MAX(CAST([order] AS INT)) AS max_order	FROM eBAPP.dbo.po_boq_body_progress	WHERE run_num = ?"
+	query := "SELECT MAX(CAST([order] AS INT)) AS max_order	FROM po_boq_body_progress	WHERE run_num = ?"
 
 	err := r.db.Raw(query, runNum).Scan(&total).Error
 	if err != nil {

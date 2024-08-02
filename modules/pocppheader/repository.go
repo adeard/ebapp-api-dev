@@ -116,7 +116,7 @@ func (r *repository) CloneProgress(oldIdProgress string, newIdCpp string) error 
 				   main_id,
                    parent_id,
 				   [order]
-               FROM eBAPP.dbo.po_boq_body_progress
+               FROM po_boq_body_progress
                WHERE run_num = ?`
 
 	// Eksekusi query dengan parameter oldId dan newId
