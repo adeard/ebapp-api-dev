@@ -13,6 +13,7 @@ type Service interface {
 	Delete(id string, order string, mainId string) error
 	DeleteByOrder(id string, order string) error
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
+	CalculateByRunNumAndOrder(runNum string, order string) (int32, error)
 }
 
 type service struct {
@@ -101,4 +102,20 @@ func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 func (s *service) CheckBoqBody(id string, order string, mainId string) ([]domain.PoBoqBody, error) {
 	data, err := s.repository.FindBoq(id, order, mainId)
 	return data, err
+}
+
+func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (int32, error) {
+
+	total := int32(0)
+
+	poBoqBodyDatas, err := s.repository.GetByRunNumAndOrder(runNum, order)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, poBoqBodyData := range poBoqBodyDatas {
+		total += int32(poBoqBodyData.Qty) * int32(poBoqBodyData.Price)
+	}
+
+	return total, err
 }

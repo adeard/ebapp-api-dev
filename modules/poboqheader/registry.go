@@ -1,10 +1,15 @@
 package poboqheader
 
-import "gorm.io/gorm"
+import (
+	"ebapp-api-dev/modules/poboqbody"
+
+	"gorm.io/gorm"
+)
 
 func PoBoqHeaderRegistry(db *gorm.DB) Service {
 	poBoqHeaderRepository := NewRepository(db)
-	poBoqHeaderService := NewService(poBoqHeaderRepository)
+	poBoqBodyService := poboqbody.PoBoqBodyRegistry(db)
+	poBoqHeaderService := NewService(poBoqHeaderRepository, poBoqBodyService)
 
 	return poBoqHeaderService
 }

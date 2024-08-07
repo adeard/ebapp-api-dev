@@ -10,6 +10,7 @@ type Repository interface {
 	FindByPekerjaanNo(id string) ([]domain.PoBoqHeader, error)
 	Delete(id string, po string, order string) error
 	Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error)
+	UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, updateData map[string]interface{}) error
 }
 
 type repository struct {
@@ -42,4 +43,14 @@ func (r *repository) Delete(id string, po string, item string) error {
 func (r *repository) Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error) {
 	err := r.db.Table("po_boq_header").Create(&input).Error
 	return input, err
+}
+
+func (r *repository) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, updateData map[string]interface{}) error {
+	err := r.db.Debug().
+		Table("po_boq_header").
+		Where("pekerjaan_no = ?", pekerjaanNo).
+		Where("[order] = ?", runNum).
+		Updates(updateData).Error
+
+	return err
 }

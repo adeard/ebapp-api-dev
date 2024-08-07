@@ -19,6 +19,7 @@ func NewPoBoqHeaderHandler(v1 *gin.RouterGroup, poBoqHeaderService Service) {
 	hHeader.GET("/:id/:var1/:var2/:var3", handler.GetByPekerjaanNo)
 	hHeader.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 	hHeader.POST("", handler.Store)
+	hHeader.POST("sync/price", handler.SyncPrice)
 
 }
 
@@ -119,4 +120,29 @@ func (h *poBoqHeaderHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *poBoqHeaderHandler) SyncPrice(c *gin.Context) {
+
+	pekerjaanNo := struct {
+		PekerjaanNo string `json:"pekerjaan_no"`
+	}{}
+
+	c.ShouldBindJSON(&pekerjaanNo)
+
+	response := domain.PoBoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil sync data header",
+	}
+
+	err := h.poBoqHeaderService.SyncActualPrice(pekerjaanNo.PekerjaanNo)
+	if err != nil {
+		response = domain.PoBoqHeaderResponse{
+			Status:  http.StatusBadRequest,
+			Message: err.Error(),
+		}
+
+	}
+
+	c.JSON(response.Status, response)
 }
