@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"math"
 	"strconv"
 )
 
@@ -13,7 +14,7 @@ type Service interface {
 	Delete(id string, order string, mainId string) error
 	DeleteByOrder(id string, order string) error
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
-	CalculateByRunNumAndOrder(runNum string, order string) (int32, error)
+	CalculateByRunNumAndOrder(runNum string, order string) (float64, error)
 }
 
 type service struct {
@@ -104,9 +105,9 @@ func (s *service) CheckBoqBody(id string, order string, mainId string) ([]domain
 	return data, err
 }
 
-func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (int32, error) {
+func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (float64, error) {
 
-	total := int32(0)
+	total := float64(0)
 
 	poBoqBodyDatas, err := s.repository.GetByRunNumAndOrder(runNum, order)
 	if err != nil {
@@ -114,8 +115,8 @@ func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (int32,
 	}
 
 	for _, poBoqBodyData := range poBoqBodyDatas {
-		total += int32(poBoqBodyData.Qty) * int32(poBoqBodyData.Price)
+		total += float64(poBoqBodyData.Qty) * float64(poBoqBodyData.Price)
 	}
 
-	return total, err
+	return math.Round(total), err
 }

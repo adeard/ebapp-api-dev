@@ -83,6 +83,8 @@ type ListProject struct {
 	SpkNo           string    `json:"spk_no"`
 	Retensi         string    `json:"retensi"`
 	MasaRetensi     string    `json:"masa_retensi"`
+	CanProgress     int       `json:"can_progress"`
+	LastUpdated     string    `json:"last_updated"`
 }
 
 type ListProjectRequest struct {

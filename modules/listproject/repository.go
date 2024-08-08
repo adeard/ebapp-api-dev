@@ -20,6 +20,7 @@ type Repository interface {
 	UpdateStatus(input domain.UpdateStatus) (domain.UpdateStatus, error)
 	UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, id string) (domain.UpdateSpkNRetensi, error)
 	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error
+	UpdateByPekerjaanNo(pekerjaanNo string, updateData map[string]interface{}) error
 }
 
 type repository struct {
@@ -99,5 +100,14 @@ func (r *repository) UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, id string
 
 func (r *repository) UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error {
 	err := r.db.Table("list_project").Where("pekerjaan_no =?", input.PekerjaanNo).Updates(map[string]interface{}{"start_date": input.StartDate, "end_date": input.EndDate, "start_date_actual": input.StartDateActual, "end_date_actual": input.EndDateActual}).Error
+	return err
+}
+
+func (r *repository) UpdateByPekerjaanNo(pekerjaanNo string, updateData map[string]interface{}) error {
+	err := r.db.Debug().
+		Table("list_project").
+		Where("pekerjaan_no = ?", pekerjaanNo).
+		Updates(updateData).Error
+
 	return err
 }

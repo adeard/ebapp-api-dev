@@ -11,7 +11,7 @@ type PoBoqHeader struct {
 	Currency    string  `json:"currency"`
 	Order       string  `json:"order"`
 	IsAddendum  int     `json:"is_addendum" gorm:"column:is_addendum"`
-	ActualPrice string  `json:"actual_price"`
+	ActualPrice float64 `json:"actual_price"`
 }
 
 type PoBoqHeaderResponse struct {

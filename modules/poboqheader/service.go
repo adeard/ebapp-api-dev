@@ -2,8 +2,9 @@ package poboqheader
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/modules/listproject"
 	"ebapp-api-dev/modules/poboqbody"
-	"fmt"
+	"time"
 )
 
 type Service interface {
@@ -15,12 +16,13 @@ type Service interface {
 }
 
 type service struct {
-	repository       Repository
-	poboqbodyService poboqbody.Service
+	repository         Repository
+	poboqbodyService   poboqbody.Service
+	listProjectService listproject.Service
 }
 
-func NewService(repository Repository, poboqbodyService poboqbody.Service) *service {
-	return &service{repository, poboqbodyService}
+func NewService(repository Repository, poboqbodyService poboqbody.Service, listProjectService listproject.Service) *service {
+	return &service{repository, poboqbodyService, listProjectService}
 }
 
 func (s *service) GetByPekerjaanNo(id string) ([]domain.PoBoqHeader, error) {
@@ -43,7 +45,11 @@ func (s *service) Delete(id string, po string, order string) error {
 }
 
 func (s *service) SyncActualPrice(pekerjaanNo string) error {
+	canProgress := 1
 	headers, err := s.GetByPekerjaanNo(pekerjaanNo)
+	if err != nil {
+		return err
+	}
 
 	for _, headersData := range headers {
 		totalPrice, err := s.poboqbodyService.CalculateByRunNumAndOrder(headersData.PekerjaanNo, headersData.Order)
@@ -51,8 +57,14 @@ func (s *service) SyncActualPrice(pekerjaanNo string) error {
 			return err
 		}
 
-		s.UpdateByPekerjaanNoAndRunNum(headersData.PekerjaanNo, headersData.Order, domain.PoBoqHeader{ActualPrice: fmt.Sprintf("%d", totalPrice)})
+		s.UpdateByPekerjaanNoAndRunNum(headersData.PekerjaanNo, headersData.Order, domain.PoBoqHeader{ActualPrice: totalPrice})
+
+		if float64(headersData.Price) != totalPrice {
+			canProgress = 0
+		}
 	}
+
+	err = s.listProjectService.UpdateByPekerjaanNo(pekerjaanNo, domain.ListProject{CanProgress: canProgress})
 
 	return err
 }
@@ -60,9 +72,13 @@ func (s *service) SyncActualPrice(pekerjaanNo string) error {
 func (s *service) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, input domain.PoBoqHeader) error {
 	updateData := map[string]interface{}{}
 
-	if input.ActualPrice != "" {
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+
+	if input.ActualPrice > 0 {
 		updateData["actual_price"] = input.ActualPrice
 	}
+
+	updateData["last_updated"] = time.Now().In(loc).Format("02.01.2006 15:04:05")
 
 	err := s.repository.UpdateByPekerjaanNoAndRunNum(pekerjaanNo, runNum, updateData)
 

@@ -2,6 +2,7 @@ package listproject
 
 import (
 	"ebapp-api-dev/domain"
+	"time"
 )
 
 type Service interface {
@@ -16,6 +17,7 @@ type Service interface {
 	UpdateStatus(input domain.UpdateStatus, Id string) (domain.UpdateStatus, error)
 	UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, Id string) (domain.UpdateSpkNRetensi, error)
 	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error
+	UpdateByPekerjaanNo(pekerjaanNo string, input domain.ListProject) error
 }
 
 type service struct {
@@ -83,5 +85,21 @@ func (s *service) UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, Id string) (
 
 func (s *service) UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error {
 	err := s.repository.UpdatePlanningActualDate(input)
+	return err
+}
+
+func (s *service) UpdateByPekerjaanNo(pekerjaanNo string, input domain.ListProject) error {
+	updateData := map[string]interface{}{}
+
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+
+	if input.CanProgress >= 0 {
+		updateData["can_progress"] = input.CanProgress
+	}
+
+	updateData["last_updated"] = time.Now().In(loc).Format("02.01.2006 15:04:05")
+
+	err := s.repository.UpdateByPekerjaanNo(pekerjaanNo, updateData)
+
 	return err
 }
