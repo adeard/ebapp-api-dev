@@ -2,6 +2,7 @@ package poboqbodyprogress
 
 import (
 	"ebapp-api-dev/domain"
+	"errors"
 )
 
 type Service interface {
@@ -12,6 +13,7 @@ type Service interface {
 	Update(runNum string, order string, mainId int, parentId int, current_volume float64) (domain.PoBoqBodyProgress, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)
 	Delete(id string) error
+	CloneProgress(previousProgress string, nextProgress string) error
 }
 
 type service struct {
@@ -67,6 +69,38 @@ func (s *service) SelectMaxOrder(runNum string) (int, error) {
 
 func (s *service) Delete(id string) error {
 	err := s.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *service) CloneProgress(previousProgress string, nextProgress string) error {
+	getExistProgress, err := s.repository.GetByRunNum(previousProgress)
+	if err != nil {
+		return err
+	}
+
+	if len(getExistProgress) < 1 {
+		return errors.New("Run num " + previousProgress + " not found")
+	}
+
+	newProgress := []domain.PoBoqBodyProgress{}
+
+	for _, bodyProgressData := range getExistProgress {
+		tempProgress := bodyProgressData
+		tempProgress.RunNum = nextProgress
+		tempProgress.PreviousVolume = bodyProgressData.CurrentVolume + bodyProgressData.PreviousVolume
+
+		if bodyProgressData.CurrentVolume != 0 {
+			tempProgress.CurrentVolume = 0
+		}
+
+		newProgress = append(newProgress, tempProgress)
+	}
+
+	err = s.repository.InsertBatch(newProgress)
 	if err != nil {
 		return err
 	}

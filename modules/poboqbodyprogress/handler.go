@@ -22,6 +22,7 @@ func NewPoBoqBodyProgressHandler(v1 *gin.RouterGroup, poBoqBodyProgressService S
 	poboqbodyprogress.PUT("/:id/:var1/:var2/:var3/:var4", handler.Update)
 	poboqbodyprogress.GET("/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyByID)
 	poboqbodyprogress.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
+	poboqbodyprogress.POST("/clone", handler.CloneProgress)
 }
 
 func groupItemsByParent(items []domain.PoBoqBodyProgressResponse, parentId int) []domain.PoBoqBodyProgressResponse {
@@ -254,4 +255,30 @@ func (h *poBoqBodyProgressHandler) Delete(c *gin.Context) {
 		"message": "Data berhasil dihapus",
 		"data":    nil,
 	})
+}
+
+func (h *poBoqBodyProgressHandler) CloneProgress(c *gin.Context) {
+
+	pekerjaanNo := struct {
+		PreviousRunNum string `json:"previous_run_num"`
+		NextRunNum     string `json:"next_run_num"`
+	}{}
+
+	c.ShouldBindJSON(&pekerjaanNo)
+
+	response := domain.PoBoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil clone data body",
+	}
+
+	err := h.poBoqBodyProgressService.CloneProgress(pekerjaanNo.PreviousRunNum, pekerjaanNo.NextRunNum)
+	if err != nil {
+		response = domain.PoBoqHeaderResponse{
+			Status:  http.StatusBadRequest,
+			Message: err.Error(),
+		}
+
+	}
+
+	c.JSON(response.Status, response)
 }

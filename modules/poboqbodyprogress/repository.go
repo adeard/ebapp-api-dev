@@ -14,6 +14,8 @@ type Repository interface {
 	CountRunNum(runNum string) (int, error)
 	SelectMaxOrder(runNum string) (int, error)
 	Delete(id string) error
+	InsertBatch(input []domain.PoBoqBodyProgress) error
+	GetByRunNum(runNum string) ([]domain.PoBoqBodyProgress, error)
 }
 
 type repository struct {
@@ -105,4 +107,18 @@ func (r *repository) Update(runNum string, order string, mainId int, parentId in
 	}
 
 	return updatedProgress, nil
+}
+
+func (r *repository) InsertBatch(input []domain.PoBoqBodyProgress) error {
+	err := r.db.Table("po_boq_body_progress").CreateInBatches(input, 50).Error
+
+	return err
+}
+
+func (r *repository) GetByRunNum(runNum string) ([]domain.PoBoqBodyProgress, error) {
+	result := []domain.PoBoqBodyProgress{}
+
+	err := r.db.Table("po_boq_body_progress").Where("run_num = ?", runNum).Find(&result).Error
+
+	return result, err
 }
