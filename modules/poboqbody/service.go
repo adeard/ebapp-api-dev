@@ -15,6 +15,7 @@ type Service interface {
 	DeleteByOrder(id string, order string) error
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	CalculateByRunNumAndOrder(runNum string, order string) (float64, error)
+	GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse
 }
 
 type service struct {
@@ -119,4 +120,18 @@ func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (float6
 	}
 
 	return math.Round(total), err
+}
+
+func (s *service) GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse {
+	var result []domain.PoBoqBodyResponse
+
+	for _, item := range items {
+		if item.ParentId == parentId {
+			children := s.GroupItemsByParent(items, item.Id)
+			item.Children = children
+			result = append(result, item)
+		}
+	}
+
+	return result
 }

@@ -13,6 +13,7 @@ type Service interface {
 	Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error)
 	SyncActualPrice(pekerjaanNo string) error
 	UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, input domain.PoBoqHeader) error
+	GetByPekerjaanNoWithBody(id string, page int, pageSize int) ([]domain.PoBoqHeaderWithBody, error)
 }
 
 type service struct {
@@ -83,4 +84,59 @@ func (s *service) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string
 	err := s.repository.UpdateByPekerjaanNoAndRunNum(pekerjaanNo, runNum, updateData)
 
 	return err
+}
+
+// Raffi -- Pagination BOQ Header with body
+
+func (s *service) GetByPekerjaanNoWithBody(id string, page int, pageSize int) ([]domain.PoBoqHeaderWithBody, error) {
+	if page <= 0 {
+		page = 1
+	}
+
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	headers, err := s.repository.FindByPekerjaanNoWithPaging(id, page, pageSize)
+
+	result := []domain.PoBoqHeaderWithBody{}
+
+	for _, headersData := range headers {
+		poBoqBody, err := s.poboqbodyService.GetByRunNum(headersData.PekerjaanNo, headersData.Order)
+
+		if err != nil {
+			return nil, err
+		}
+
+		var poBoqBodyResponse []domain.PoBoqBodyResponse
+		for _, body := range poBoqBody {
+			poBoqBodyResponse = append(poBoqBodyResponse, domain.PoBoqBodyResponse{
+				Id:                body.Id,
+				ParentId:          body.ParentId,
+				RunNum:            body.RunNum,
+				Order:             body.Order,
+				ItemNo:            body.ItemNo,
+				ItemLevel:         body.ItemLevel,
+				ItemDescription:   body.ItemDescription,
+				ItemSpecification: body.ItemSpecification,
+				Qty:               body.Qty,
+				Unit:              body.Unit,
+				Price:             body.Price,
+				Currency:          body.Currency,
+				Note:              body.Note,
+				StartDate:         body.StartDate,
+				EndDate:           body.EndDate,
+				StartDateActual:   body.StartDateActual,
+				EndDateActual:     body.EndDateActual,
+			})
+		}
+
+		result = append(result, domain.PoBoqHeaderWithBody{
+			PoBoqHeader: headersData,
+			BoqBody:     s.poboqbodyService.GroupItemsByParent(poBoqBodyResponse, 0),
+		})
+
+	}
+
+	return result, err
 }

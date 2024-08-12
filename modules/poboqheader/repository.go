@@ -11,6 +11,7 @@ type Repository interface {
 	Delete(id string, po string, order string) error
 	Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error)
 	UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, updateData map[string]interface{}) error
+	FindByPekerjaanNoWithPaging(id string, page int, pageSize int) ([]domain.PoBoqHeader, error)
 }
 
 type repository struct {
@@ -53,4 +54,23 @@ func (r *repository) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum str
 		Updates(updateData).Error
 
 	return err
+}
+
+func (r *repository) FindByPekerjaanNoWithPaging(id string, page int, pageSize int) ([]domain.PoBoqHeader, error) {
+	var headers []domain.PoBoqHeader
+
+	q := r.db.Table("po_boq_header")
+
+	if id != "" {
+		q = q.Where("pekerjaan_no = ?", id)
+	}
+
+	err := q.
+		Order("'order' asc").
+		Limit(pageSize).
+		Offset(pageSize * (page - 1)).
+		Find(&headers).
+		Error
+
+	return headers, err
 }

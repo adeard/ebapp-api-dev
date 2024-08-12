@@ -20,6 +20,7 @@ func NewPoBoqHeaderHandler(v1 *gin.RouterGroup, poBoqHeaderService Service) {
 	hHeader.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 	hHeader.POST("", handler.Store)
 	hHeader.POST("sync/price", handler.SyncPrice)
+	hHeader.GET("get/:id/:var1/:var2/:var3", handler.GetByPekerjaanNoWithBody)
 
 }
 
@@ -145,4 +146,36 @@ func (h *poBoqHeaderHandler) SyncPrice(c *gin.Context) {
 	}
 
 	c.JSON(response.Status, response)
+}
+
+func (h *poBoqHeaderHandler) GetByPekerjaanNoWithBody(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3
+
+	var filter domain.PoBoqHeaderFilterRequest
+	c.ShouldBindQuery(&filter)
+
+	headers, err := h.poBoqHeaderService.GetByPekerjaanNoWithBody(FinalId, filter.Page, filter.PageSize)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Header",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, headers)
 }

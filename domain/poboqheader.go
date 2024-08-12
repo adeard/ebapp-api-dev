@@ -19,3 +19,13 @@ type PoBoqHeaderResponse struct {
 	Status  int           `json:"status"`
 	Data    []PoBoqHeader `json:"data"`
 }
+
+type PoBoqHeaderWithBody struct {
+	PoBoqHeader
+	BoqBody []PoBoqBodyResponse `json:"boq_body"`
+}
+
+type PoBoqHeaderFilterRequest struct {
+	Page     int `form:"page"`
+	PageSize int `form:"page_size"`
+}
