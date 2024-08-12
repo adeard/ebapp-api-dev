@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"math"
 	"strconv"
 )
 
@@ -13,6 +14,8 @@ type Service interface {
 	Delete(id string, order string, mainId string) error
 	DeleteByOrder(id string, order string) error
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
+	CalculateByRunNumAndOrder(runNum string, order string) (float64, error)
+	GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse
 }
 
 type service struct {
@@ -101,4 +104,34 @@ func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 func (s *service) CheckBoqBody(id string, order string, mainId string) ([]domain.PoBoqBody, error) {
 	data, err := s.repository.FindBoq(id, order, mainId)
 	return data, err
+}
+
+func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (float64, error) {
+
+	total := float64(0)
+
+	poBoqBodyDatas, err := s.repository.GetByRunNumAndOrder(runNum, order)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, poBoqBodyData := range poBoqBodyDatas {
+		total += float64(poBoqBodyData.Qty) * float64(poBoqBodyData.Price)
+	}
+
+	return math.Round(total), err
+}
+
+func (s *service) GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse {
+	var result []domain.PoBoqBodyResponse
+
+	for _, item := range items {
+		if item.ParentId == parentId {
+			children := s.GroupItemsByParent(items, item.Id)
+			item.Children = children
+			result = append(result, item)
+		}
+	}
+
+	return result
 }

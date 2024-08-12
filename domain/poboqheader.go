@@ -11,10 +11,21 @@ type PoBoqHeader struct {
 	Currency    string  `json:"currency"`
 	Order       string  `json:"order"`
 	IsAddendum  int     `json:"is_addendum" gorm:"column:is_addendum"`
+	ActualPrice float64 `json:"actual_price"`
 }
 
 type PoBoqHeaderResponse struct {
 	Message string        `json:"message"`
 	Status  int           `json:"status"`
 	Data    []PoBoqHeader `json:"data"`
+}
+
+type PoBoqHeaderWithBody struct {
+	PoBoqHeader
+	BoqBody []PoBoqBodyResponse `json:"boq_body"`
+}
+
+type PoBoqHeaderFilterRequest struct {
+	Page     int `form:"page"`
+	PageSize int `form:"page_size"`
 }

@@ -14,6 +14,7 @@ type Repository interface {
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	Delete(id string, orderId string, mainId string) error
 	DeleteByOrder(id string, orderId string) error
+	GetByRunNumAndOrder(runNum string, order string) ([]domain.PoBoqBody, error)
 }
 
 type repository struct {
@@ -112,4 +113,11 @@ func (r *repository) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 	}
 
 	return input, err
+}
+
+func (r *repository) GetByRunNumAndOrder(runNum string, order string) ([]domain.PoBoqBody, error) {
+	result := []domain.PoBoqBody{}
+
+	err := r.db.Table("po_boq_body").Where("run_num =?", runNum).Where("[order] =?", order).Find(&result).Error
+	return result, err
 }
