@@ -21,6 +21,7 @@ type Repository interface {
 	UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, id string) (domain.UpdateSpkNRetensi, error)
 	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error
 	UpdateByPekerjaanNo(pekerjaanNo string, updateData map[string]interface{}) error
+	SyncCanProgressFalse(pekerjaanNo string) error
 }
 
 type repository struct {
@@ -109,5 +110,12 @@ func (r *repository) UpdateByPekerjaanNo(pekerjaanNo string, updateData map[stri
 		Where("pekerjaan_no = ?", pekerjaanNo).
 		Updates(updateData).Error
 
+	return err
+}
+
+func (r *repository) SyncCanProgressFalse(pekerjaanNo string) error {
+	err := r.db.Table("list_project").
+		Where("pekerjaan_no = ?", pekerjaanNo).
+		Update("can_progress", 0).Error
 	return err
 }

@@ -33,11 +33,27 @@ func (s *service) GetByPekerjaanNo(id string) ([]domain.PoBoqHeader, error) {
 
 func (s *service) Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error) {
 	headers, err := s.repository.Store(input)
+	if err != nil {
+		return headers, err
+	}
+
+	// Panggil SyncCanProgressFalseService dengan pekerjaanNo dari input
+	err = s.listProjectService.SyncCanProgressFalseService(input.PekerjaanNo)
+	if err != nil {
+		return headers, err
+	}
+
 	return headers, err
 }
 
 func (s *service) Delete(id string, po string, order string) error {
 	err := s.repository.Delete(id, po, order)
+	if err != nil {
+		return err
+	}
+
+	// Panggil SyncCanProgressFalseService dengan id (PekerjaanNo)
+	err = s.listProjectService.SyncCanProgressFalseService(id)
 	if err != nil {
 		return err
 	}
