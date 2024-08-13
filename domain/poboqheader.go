@@ -22,7 +22,7 @@ type PoBoqHeaderResponse struct {
 
 type PoBoqHeaderWithBody struct {
 	PoBoqHeader
-	BoqBody []PoBoqBodyResponse `json:"boq_body"`
+	BoqBody []PoBoqBodyResponse `json:"children"`
 }
 
 type PoBoqHeaderFilterRequest struct {

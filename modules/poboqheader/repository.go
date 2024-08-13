@@ -66,7 +66,7 @@ func (r *repository) FindByPekerjaanNoWithPaging(id string, page int, pageSize i
 	}
 
 	err := q.
-		Order("'order' asc").
+		Order("CAST([order] AS INT) ASC").
 		Limit(pageSize).
 		Offset(pageSize * (page - 1)).
 		Find(&headers).
