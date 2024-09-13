@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"fmt"
 	"math"
 	"strconv"
 )
@@ -16,6 +17,7 @@ type Service interface {
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	CalculateByRunNumAndOrder(runNum string, order string) (float64, error)
 	GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse
+	FindLastId(runNum string, order string) (int, error)
 }
 
 type service struct {
@@ -41,8 +43,12 @@ func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBody, error) {
 	return boqBody, err
 }
 
+func (s *service) FindLastId(runNum string, order string) (int, error) {
+	value, err := s.repository.GenerateMainId(runNum, order)
+	return value, err
+}
+
 func (s *service) Delete(id string, order string, mainId string) error {
-	// Cek terlebih dahulu apakah data dengan ID tersebut ada atau tidak
 	_, err := s.repository.FindBoq(id, order, mainId)
 	if err != nil {
 		return err
@@ -66,6 +72,25 @@ func (s *service) DeleteByOrder(id string, order string) error {
 }
 
 func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
+	// Cek apakah item_no sudah ada
+	isUnique, err := s.repository.CheckItemNo(input.RunNum, input.Order, input.ItemNo)
+	if err != nil {
+		return domain.PoBoqBody{}, err
+	}
+
+	// Jika item_no tidak unik, periksa apakah main_id yang sama
+	if !isUnique {
+		existingMainId, err := s.repository.SelectMainId(input.RunNum, input.Order, input.ItemNo)
+		if err != nil {
+			return domain.PoBoqBody{}, err
+		}
+
+		if existingMainId != input.Id {
+			return domain.PoBoqBody{}, fmt.Errorf("ItemNo '%s' sudah digunakan oleh item lain", input.ItemNo)
+		}
+	}
+
+	// Ambil data berdasarkan RunNum, Order, dan MainId
 	result, err := s.repository.FindBoq(input.RunNum, input.Order, strconv.Itoa(input.Id))
 	if err != nil {
 		return domain.PoBoqBody{}, err

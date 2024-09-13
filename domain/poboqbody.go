@@ -61,6 +61,11 @@ type PoBoqBodyResponse struct {
 	Children          []PoBoqBodyResponse `json:"children"`
 }
 
+type GenerateMainId struct {
+	RunNum string `json:"run_num"`
+	Order  string `json:"order"`
+}
+
 type PoBoqBodyResponseFinal struct {
 	Status  int         `json:"status"`
 	Message string      `json:"message"`
