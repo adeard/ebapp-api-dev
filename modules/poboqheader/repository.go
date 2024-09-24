@@ -12,6 +12,7 @@ type Repository interface {
 	Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error)
 	UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, updateData map[string]interface{}) error
 	FindByPekerjaanNoWithPaging(id string, page int, pageSize int) ([]domain.PoBoqHeader, error)
+	FindByPekerjaanNoWithOrder(id string, order int) ([]domain.PoBoqHeader, error)
 }
 
 type repository struct {
@@ -71,6 +72,20 @@ func (r *repository) FindByPekerjaanNoWithPaging(id string, page int, pageSize i
 		Offset(pageSize * (page - 1)).
 		Find(&headers).
 		Error
+
+	return headers, err
+}
+
+func (r *repository) FindByPekerjaanNoWithOrder(id string, order int) ([]domain.PoBoqHeader, error) {
+	var headers []domain.PoBoqHeader
+
+	q := r.db.Table("po_boq_header")
+
+	if id != "" {
+		q = q.Where("pekerjaan_no = ?", id).Where("[order] = ?", order)
+	}
+
+	err := q.Find(&headers).Error
 
 	return headers, err
 }

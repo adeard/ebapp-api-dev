@@ -35,9 +35,9 @@ func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error
 	}
 
 	// Print untuk debugging
-	// fmt.Println("URL:", urlV)
-	// fmt.Println("Username:", usernameV)
-	// fmt.Println("Password:", passwordV)
+	fmt.Println("URL:", urlV)
+	fmt.Println("Username:", usernameV)
+	fmt.Println("Password:", passwordV)
 
 	username := usernameV
 	password := passwordV

@@ -9,7 +9,8 @@ import (
 
 func GetDataFromUserManagement() (string, string, string, error) {
 	// POST REQUEST UNTUK LOGIN
-	loginURL := "http://10.126.20.217:9087/api/user/login"
+	mainUrl := "http://10.126.20.217:9087"
+	loginURL := mainUrl + "/api/user/login"
 	loginData := map[string]string{"user_name": "ebapphelper", "password": "ebapphelper"}
 	jsonData, err := json.Marshal(loginData)
 	if err != nil {
@@ -86,17 +87,17 @@ func GetDataFromUserManagement() (string, string, string, error) {
 	}
 
 	// Get data URL, Username, and Password
-	urlValue, err := getValue("http://10.126.20.217:9087/api/master_datas/get?value_table=SAPHelper&value_column=Url&app_root_name=BAPP")
+	urlValue, err := getValue(mainUrl + "/api/master_datas/get?value_table=SAPHelper&value_column=Url&app_root_name=BAPP")
 	if err != nil {
 		return "", "", "", err
 	}
 
-	usernameValue, err := getValue("http://10.126.20.217:9087/api/master_datas/get?value_table=SAPHelper&value_column=Username&app_root_name=BAPP")
+	usernameValue, err := getValue(mainUrl + "/api/master_datas/get?value_table=SAPHelper&value_column=Username&app_root_name=BAPP")
 	if err != nil {
 		return "", "", "", err
 	}
 
-	passwordValue, err := getValue("http://10.126.20.217:9087/api/master_datas/get?value_table=SAPHelper&value_column=Password&app_root_name=BAPP")
+	passwordValue, err := getValue(mainUrl + "/api/master_datas/get?value_table=SAPHelper&value_column=Password&app_root_name=BAPP")
 	if err != nil {
 		return "", "", "", err
 	}

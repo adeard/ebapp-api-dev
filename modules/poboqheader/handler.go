@@ -3,6 +3,7 @@ package poboqheader
 import (
 	"ebapp-api-dev/domain"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,6 +22,7 @@ func NewPoBoqHeaderHandler(v1 *gin.RouterGroup, poBoqHeaderService Service) {
 	hHeader.POST("", handler.Store)
 	hHeader.POST("sync/price", handler.SyncPrice)
 	hHeader.GET("get/:id/:var1/:var2/:var3", handler.GetByPekerjaanNoWithBody)
+	hHeader.GET("get/:id/:var1/:var2/:var3/:var4", handler.GetByPekerjaanNoWithBodyByOrder)
 
 }
 
@@ -177,5 +179,48 @@ func (h *poBoqHeaderHandler) GetByPekerjaanNoWithBody(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, headers)
+}
+
+func (h *poBoqHeaderHandler) GetByPekerjaanNoWithBodyByOrder(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4") // Order dari parameter URL
+
+	// Gabungkan id menjadi FinalId
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3
+
+	// Konversi var4 (order) menjadi integer
+	order, err := strconv.Atoi(var4)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Order harus berupa angka",
+		})
+		return
+	}
+
+	// Panggil service GetByPekerjaanNoWithBodyByOrder
+	headers, err := h.poBoqHeaderService.GetByPekerjaanNoWithBodyByOrder(FinalId, order)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Header",
+		})
+		return
+	}
+
+	// Berikan respon dengan data headers
 	c.JSON(http.StatusOK, headers)
 }
