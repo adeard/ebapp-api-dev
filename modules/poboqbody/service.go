@@ -146,6 +146,10 @@ func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (float6
 		return 0, err
 	}
 
+	if len(poBoqBodyDatas) == 0 {
+		return total, nil
+	}
+
 	for _, poBoqBodyData := range poBoqBodyDatas {
 		total += float64(poBoqBodyData.Qty) * float64(poBoqBodyData.Price)
 	}

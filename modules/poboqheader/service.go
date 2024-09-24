@@ -92,9 +92,11 @@ func (s *service) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string
 
 	loc, _ := time.LoadLocation("Asia/Jakarta")
 
-	if input.ActualPrice > 0 {
-		updateData["actual_price"] = input.ActualPrice
-	}
+	// if input.ActualPrice > 0 {
+	// 	updateData["actual_price"] = input.ActualPrice
+	// }
+
+	updateData["actual_price"] = input.ActualPrice
 
 	updateData["last_updated"] = time.Now().In(loc).Format("2006-01-02 15:04:05")
 
