@@ -18,6 +18,7 @@ type Repository interface {
 	GenerateMainId(runNum string, order string) (int, error)
 	CheckItemNo(runNum string, order string, itemNo string) (bool, error)
 	SelectMainId(runNum string, order string, itemNo string) (int, error)
+	CopyBoqBodyToPoBoqBody(oldRunNum string, newRunNum string, newOrder string) error
 }
 
 type repository struct {
@@ -45,6 +46,42 @@ func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBo
 func (r *repository) Store(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 	err := r.db.Table("po_boq_body").Create(&input).Error
 	return input, err
+}
+
+func (r *repository) CopyBoqBodyToPoBoqBody(oldRunNum string, newRunNum string, newOrder string) error {
+	// Step 1: Select all data from boq_body with the given oldRunNum
+	var boqBodies []domain.BoqBody
+	err := r.db.Table("boq_body").Where("run_num = ?", oldRunNum).Find(&boqBodies).Error
+	if err != nil {
+		return err
+	}
+
+	// Step 2: Iterate over the selected data and insert into po_boq_body with new run_num and new order
+	for _, boq := range boqBodies {
+		newPoBoqBody := domain.PoBoqBody{
+			RunNum:            newRunNum,
+			ItemNo:            boq.ItemNo,
+			ItemLevel:         boq.ItemLevel,
+			ItemDescription:   boq.ItemDescription,
+			ItemSpecification: boq.ItemSpecification,
+			Qty:               boq.Qty,
+			Unit:              boq.Unit,
+			Price:             boq.Price,
+			Currency:          boq.Currency,
+			Note:              boq.Note,
+			Id:                boq.Id,
+			ParentId:          boq.ParentId,
+			Order:             newOrder,
+		}
+
+		// Step 3: Insert into po_boq_body
+		err := r.db.Table("po_boq_body").Create(&newPoBoqBody).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *repository) FindByItemNo(itemNo string) (domain.PoBoqBody, error) {

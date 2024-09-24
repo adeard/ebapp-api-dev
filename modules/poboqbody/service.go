@@ -18,6 +18,7 @@ type Service interface {
 	CalculateByRunNumAndOrder(runNum string, order string) (float64, error)
 	GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse
 	FindLastId(runNum string, order string) (int, error)
+	Adopth(oldRunNum string, newRunNum string, newOrder string) error
 }
 
 type service struct {
@@ -36,6 +37,11 @@ func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, 
 func (s *service) Store(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 	poBoqBody, err := s.repository.Store(input)
 	return poBoqBody, err
+}
+
+func (s *service) Adopth(oldRunNum string, newRunNum string, newOrder string) error {
+	err := s.repository.CopyBoqBodyToPoBoqBody(oldRunNum, newRunNum, newOrder)
+	return err
 }
 
 func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBody, error) {

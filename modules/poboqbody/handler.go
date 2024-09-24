@@ -23,6 +23,7 @@ func NewPoBoqBodyHandler(v1 *gin.RouterGroup, poBoqService Service) {
 	poboqbody.POST("/getlastid", handler.GetLatestId)
 
 	poboqbody.POST("", handler.Store)
+	poboqbody.POST("/adopth", handler.AdoptBOQ)
 	poboqbody.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 	poboqbody.DELETE("/:id/:var1/:var2/:var3/:var4", handler.DeleteByOrder)
 	poboqbody.PUT("", handler.Update)
@@ -172,6 +173,35 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *poBoqBodyHandler) AdoptBOQ(c *gin.Context) {
+	var input domain.PoAdopthBoq
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	err := h.poBoqBodyService.Adopth(input.RunNum, input.NewRunNum, input.NewOrder)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	response := domain.PoBoqBodyResponseFinal{
+		Status:  http.StatusOK,
+		Message: "Data berhasil di Adopth!",
+		Data:    nil,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *poBoqBodyHandler) Update(c *gin.Context) {
