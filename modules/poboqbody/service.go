@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/modules/listproject"
 	"fmt"
 	"math"
 	"strconv"
@@ -22,11 +23,12 @@ type Service interface {
 }
 
 type service struct {
-	repository Repository
+	repository         Repository
+	listProjectService listproject.Service
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewService(repository Repository, listProjectService listproject.Service) *service {
+	return &service{repository, listProjectService}
 }
 
 func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, error) {
@@ -36,11 +38,20 @@ func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, 
 
 func (s *service) Store(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 	poBoqBody, err := s.repository.Store(input)
+	if err != nil {
+		return poBoqBody, err
+	}
+
+	s.listProjectService.SyncCanProgressFalseService(poBoqBody.RunNum)
 	return poBoqBody, err
 }
 
 func (s *service) Adopth(oldRunNum string, newRunNum string, newOrder string) error {
 	err := s.repository.CopyBoqBodyToPoBoqBody(oldRunNum, newRunNum, newOrder)
+	if err != nil {
+		return err
+	}
+	s.listProjectService.SyncCanProgressFalseService(newRunNum)
 	return err
 }
 
@@ -65,6 +76,8 @@ func (s *service) Delete(id string, order string, mainId string) error {
 		return err
 	}
 
+	s.listProjectService.SyncCanProgressFalseService(id)
+
 	return nil
 }
 
@@ -73,6 +86,8 @@ func (s *service) DeleteByOrder(id string, order string) error {
 	if err != nil {
 		return err
 	}
+
+	s.listProjectService.SyncCanProgressFalseService(id)
 
 	return nil
 }
@@ -129,6 +144,12 @@ func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 	}
 
 	poBoqBodies, err := s.repository.Update(dataForUpdate)
+
+	if err != nil {
+		return poBoqBodies, err
+	}
+	s.listProjectService.SyncCanProgressFalseService(poBoqBodies.RunNum)
+
 	return poBoqBodies, err
 }
 
