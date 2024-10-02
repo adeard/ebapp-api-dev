@@ -14,6 +14,7 @@ type Service interface {
 	SyncActualPrice(pekerjaanNo string) error
 	UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, input domain.PoBoqHeader) error
 	GetByPekerjaanNoWithBody(id string, page int, pageSize int) ([]domain.PoBoqHeaderWithBody, error)
+	GetByPekerjaanNoWithBodyByOrder(id string, order int) ([]domain.PoBoqHeaderWithBody, error)
 }
 
 type service struct {
@@ -33,11 +34,27 @@ func (s *service) GetByPekerjaanNo(id string) ([]domain.PoBoqHeader, error) {
 
 func (s *service) Store(input domain.PoBoqHeader) (domain.PoBoqHeader, error) {
 	headers, err := s.repository.Store(input)
+	if err != nil {
+		return headers, err
+	}
+
+	// Panggil SyncCanProgressFalseService dengan pekerjaanNo dari input
+	err = s.listProjectService.SyncCanProgressFalseService(input.PekerjaanNo)
+	if err != nil {
+		return headers, err
+	}
+
 	return headers, err
 }
 
 func (s *service) Delete(id string, po string, order string) error {
 	err := s.repository.Delete(id, po, order)
+	if err != nil {
+		return err
+	}
+
+	// Panggil SyncCanProgressFalseService dengan id (PekerjaanNo)
+	err = s.listProjectService.SyncCanProgressFalseService(id)
 	if err != nil {
 		return err
 	}
@@ -75,11 +92,13 @@ func (s *service) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string
 
 	loc, _ := time.LoadLocation("Asia/Jakarta")
 
-	if input.ActualPrice > 0 {
-		updateData["actual_price"] = input.ActualPrice
-	}
+	// if input.ActualPrice > 0 {
+	// 	updateData["actual_price"] = input.ActualPrice
+	// }
 
-	updateData["last_updated"] = time.Now().In(loc).Format("02.01.2006 15:04:05")
+	updateData["actual_price"] = input.ActualPrice
+
+	updateData["last_updated"] = time.Now().In(loc).Format("2006-01-02 15:04:05")
 
 	err := s.repository.UpdateByPekerjaanNoAndRunNum(pekerjaanNo, runNum, updateData)
 
@@ -139,4 +158,57 @@ func (s *service) GetByPekerjaanNoWithBody(id string, page int, pageSize int) ([
 	}
 
 	return result, err
+}
+
+func (s *service) GetByPekerjaanNoWithBodyByOrder(id string, order int) ([]domain.PoBoqHeaderWithBody, error) {
+	// Ambil data PoBoqHeader berdasarkan pekerjaan_no dan order
+	headers, err := s.repository.FindByPekerjaanNoWithOrder(id, order)
+	if err != nil {
+		return nil, err
+	}
+
+	// Array untuk menyimpan hasil
+	result := []domain.PoBoqHeaderWithBody{}
+
+	// Iterasi setiap header
+	for _, headersData := range headers {
+		// Ambil data BoqBody berdasarkan pekerjaan_no dan order
+		poBoqBody, err := s.poboqbodyService.GetByRunNum(headersData.PekerjaanNo, headersData.Order)
+		if err != nil {
+			return nil, err
+		}
+
+		// Konversi ke response BoqBody
+		var poBoqBodyResponse []domain.PoBoqBodyResponse
+		for _, body := range poBoqBody {
+			poBoqBodyResponse = append(poBoqBodyResponse, domain.PoBoqBodyResponse{
+				Id:                body.Id,
+				ParentId:          body.ParentId,
+				RunNum:            body.RunNum,
+				Order:             body.Order,
+				ItemNo:            body.ItemNo,
+				ItemLevel:         body.ItemLevel,
+				ItemDescription:   body.ItemDescription,
+				ItemSpecification: body.ItemSpecification,
+				Qty:               body.Qty,
+				Unit:              body.Unit,
+				Price:             body.Price,
+				Currency:          body.Currency,
+				Note:              body.Note,
+				StartDate:         body.StartDate,
+				EndDate:           body.EndDate,
+				StartDateActual:   body.StartDateActual,
+				EndDateActual:     body.EndDateActual,
+			})
+		}
+
+		// Masukkan header dan BoqBody yang telah dikelompokkan ke dalam hasil
+		result = append(result, domain.PoBoqHeaderWithBody{
+			PoBoqHeader: headersData,
+			BoqBody:     s.poboqbodyService.GroupItemsByParent(poBoqBodyResponse, 0),
+		})
+	}
+
+	// Kembalikan hasil akhir
+	return result, nil
 }

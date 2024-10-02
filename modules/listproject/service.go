@@ -18,6 +18,7 @@ type Service interface {
 	UpdateSpkNRetensi(input domain.UpdateSpkNRetensi, Id string) (domain.UpdateSpkNRetensi, error)
 	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error
 	UpdateByPekerjaanNo(pekerjaanNo string, input domain.ListProject) error
+	SyncCanProgressFalseService(pekerjaanNo string) error
 }
 
 type service struct {
@@ -97,9 +98,15 @@ func (s *service) UpdateByPekerjaanNo(pekerjaanNo string, input domain.ListProje
 		updateData["can_progress"] = input.CanProgress
 	}
 
-	updateData["last_updated"] = time.Now().In(loc).Format("02.01.2006 15:04:05")
+	updateData["last_updated"] = time.Now().In(loc).Format("2006-01-02 15:04:05")
 
 	err := s.repository.UpdateByPekerjaanNo(pekerjaanNo, updateData)
+
+	return err
+}
+
+func (s *service) SyncCanProgressFalseService(pekerjaanNo string) error {
+	err := s.repository.SyncCanProgressFalse(pekerjaanNo)
 
 	return err
 }

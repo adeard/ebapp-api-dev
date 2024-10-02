@@ -4,6 +4,7 @@ import (
 	"ebapp-api-dev/domain"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +20,10 @@ func NewPoBoqBodyHandler(v1 *gin.RouterGroup, poBoqService Service) {
 	poboqbody := v1.Group("po_boq_body")
 
 	poboqbody.GET("/:id/:var1/:var2/:var3/:var4", handler.GetPoBoqBodyByRunNum)
+	poboqbody.POST("/getlastid", handler.GetLatestId)
+
 	poboqbody.POST("", handler.Store)
+	poboqbody.POST("/adopth", handler.AdoptBOQ)
 	poboqbody.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
 	poboqbody.DELETE("/:id/:var1/:var2/:var3/:var4", handler.DeleteByOrder)
 	poboqbody.PUT("", handler.Update)
@@ -98,6 +102,34 @@ func (h *poBoqBodyHandler) GetPoBoqBodyByRunNum(c *gin.Context) {
 	})
 }
 
+func (h *poBoqBodyHandler) GetLatestId(c *gin.Context) {
+	var input domain.GenerateMainId
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	result, err := h.poBoqBodyService.FindLastId(input.RunNum, input.Order)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mendapatkan ID terbaru",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Berhasil mendapatkan ID terbaru",
+		"data":    result,
+	})
+}
+
 func (h *poBoqBodyHandler) Store(c *gin.Context) {
 	var input []domain.PoBoqBodyRequest
 
@@ -143,6 +175,35 @@ func (h *poBoqBodyHandler) Store(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+func (h *poBoqBodyHandler) AdoptBOQ(c *gin.Context) {
+	var input domain.PoAdopthBoq
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	err := h.poBoqBodyService.Adopth(input.RunNum, input.NewRunNum, input.NewOrder)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	response := domain.PoBoqBodyResponseFinal{
+		Status:  http.StatusOK,
+		Message: "Data berhasil di Adopth!",
+		Data:    nil,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *poBoqBodyHandler) Update(c *gin.Context) {
 	var input domain.PoBoqBody
 
@@ -176,8 +237,8 @@ func (h *poBoqBodyHandler) Update(c *gin.Context) {
 	_, updateErr := h.poBoqBodyService.Update(input)
 	if updateErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Gagal mengupdate data PoBoqBody",
+			"status":  http.StatusBadRequest,
+			"message": updateErr.Error(),
 		})
 		return
 	}
@@ -192,30 +253,17 @@ func (h *poBoqBodyHandler) Update(c *gin.Context) {
 }
 
 func (h *poBoqBodyHandler) Delete(c *gin.Context) {
-	runNum := c.Param("id")
-	var1 := c.Param("var1")
-	var2 := c.Param("var2")
-	var3 := c.Param("var3")
-	var4 := c.Param("var4")
-	var5 := c.Param("var5")
+	params := []string{c.Param("id"), c.Param("var1"), c.Param("var2"), c.Param("var3")}
 	addons := "/"
+	path := strings.Join(params, addons)
+	orderId := c.Param("var4")
+	mainId := c.Param("var5")
 
-	_, err := h.poBoqBodyService.GetByRunNum(runNum+addons+var1+addons+var2+addons+var3, var4)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Gagal mengambil data",
-			"data":    nil,
-		})
-		return
-	}
-
-	err = h.poBoqBodyService.Delete(runNum+addons+var1+addons+var2+addons+var3, var4, var5)
+	err := h.poBoqBodyService.Delete(path, orderId, mainId)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Gagal menghapus data",
-			"data":    nil,
 		})
 		return
 	}
@@ -223,7 +271,6 @@ func (h *poBoqBodyHandler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "Data berhasil dihapus",
-		"data":    nil,
 	})
 }
 

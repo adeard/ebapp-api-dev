@@ -2,6 +2,8 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/modules/listproject"
+	"fmt"
 	"math"
 	"strconv"
 )
@@ -16,14 +18,17 @@ type Service interface {
 	Update(input domain.PoBoqBody) (domain.PoBoqBody, error)
 	CalculateByRunNumAndOrder(runNum string, order string) (float64, error)
 	GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse
+	FindLastId(runNum string, order string) (int, error)
+	Adopth(oldRunNum string, newRunNum string, newOrder string) error
 }
 
 type service struct {
-	repository Repository
+	repository         Repository
+	listProjectService listproject.Service
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewService(repository Repository, listProjectService listproject.Service) *service {
+	return &service{repository, listProjectService}
 }
 
 func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, error) {
@@ -33,7 +38,21 @@ func (s *service) GetByRunNum(runNum string, order string) ([]domain.PoBoqBody, 
 
 func (s *service) Store(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 	poBoqBody, err := s.repository.Store(input)
+	if err != nil {
+		return poBoqBody, err
+	}
+
+	s.listProjectService.SyncCanProgressFalseService(poBoqBody.RunNum)
 	return poBoqBody, err
+}
+
+func (s *service) Adopth(oldRunNum string, newRunNum string, newOrder string) error {
+	err := s.repository.CopyBoqBodyToPoBoqBody(oldRunNum, newRunNum, newOrder)
+	if err != nil {
+		return err
+	}
+	s.listProjectService.SyncCanProgressFalseService(newRunNum)
+	return err
 }
 
 func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBody, error) {
@@ -41,8 +60,12 @@ func (s *service) FindByItemNo(itemNo string) (domain.PoBoqBody, error) {
 	return boqBody, err
 }
 
+func (s *service) FindLastId(runNum string, order string) (int, error) {
+	value, err := s.repository.GenerateMainId(runNum, order)
+	return value, err
+}
+
 func (s *service) Delete(id string, order string, mainId string) error {
-	// Cek terlebih dahulu apakah data dengan ID tersebut ada atau tidak
 	_, err := s.repository.FindBoq(id, order, mainId)
 	if err != nil {
 		return err
@@ -53,6 +76,8 @@ func (s *service) Delete(id string, order string, mainId string) error {
 		return err
 	}
 
+	s.listProjectService.SyncCanProgressFalseService(id)
+
 	return nil
 }
 
@@ -62,10 +87,31 @@ func (s *service) DeleteByOrder(id string, order string) error {
 		return err
 	}
 
+	s.listProjectService.SyncCanProgressFalseService(id)
+
 	return nil
 }
 
 func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
+	// Cek apakah item_no sudah ada
+	isUnique, err := s.repository.CheckItemNo(input.RunNum, input.Order, input.ItemNo)
+	if err != nil {
+		return domain.PoBoqBody{}, err
+	}
+
+	// Jika item_no tidak unik, periksa apakah main_id yang sama
+	if !isUnique {
+		existingMainId, err := s.repository.SelectMainId(input.RunNum, input.Order, input.ItemNo)
+		if err != nil {
+			return domain.PoBoqBody{}, err
+		}
+
+		if existingMainId != input.Id {
+			return domain.PoBoqBody{}, fmt.Errorf("ItemNo '%s' sudah digunakan oleh item lain", input.ItemNo)
+		}
+	}
+
+	// Ambil data berdasarkan RunNum, Order, dan MainId
 	result, err := s.repository.FindBoq(input.RunNum, input.Order, strconv.Itoa(input.Id))
 	if err != nil {
 		return domain.PoBoqBody{}, err
@@ -98,6 +144,12 @@ func (s *service) Update(input domain.PoBoqBody) (domain.PoBoqBody, error) {
 	}
 
 	poBoqBodies, err := s.repository.Update(dataForUpdate)
+
+	if err != nil {
+		return poBoqBodies, err
+	}
+	s.listProjectService.SyncCanProgressFalseService(poBoqBodies.RunNum)
+
 	return poBoqBodies, err
 }
 
@@ -113,6 +165,10 @@ func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (float6
 	poBoqBodyDatas, err := s.repository.GetByRunNumAndOrder(runNum, order)
 	if err != nil {
 		return 0, err
+	}
+
+	if len(poBoqBodyDatas) == 0 {
+		return total, nil
 	}
 
 	for _, poBoqBodyData := range poBoqBodyDatas {

@@ -1,10 +1,15 @@
 package poboqbody
 
-import "gorm.io/gorm"
+import (
+	"ebapp-api-dev/modules/listproject"
+
+	"gorm.io/gorm"
+)
 
 func PoBoqBodyRegistry(db *gorm.DB) Service {
 	poBoqBodyRepository := NewRepository(db)
-	poBoqBodyService := NewService(poBoqBodyRepository)
+	listProjectService := listproject.ListProjectRegistry(db)
+	poBoqBodyService := NewService(poBoqBodyRepository, listProjectService)
 
 	return poBoqBodyService
 }
