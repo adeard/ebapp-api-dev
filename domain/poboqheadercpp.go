@@ -14,3 +14,8 @@ type PoBoqHeaderCppResponse struct {
 	Status  int              `json:"status"`
 	Data    []PoBoqHeaderCpp `json:"data"`
 }
+
+type PoBoqHeaderCppWithBodyServerSide struct {
+	PoBoqHeaderCpp
+	BoqBodyCpp []PoBoqBodyCppResponse `json:"children"`
+}

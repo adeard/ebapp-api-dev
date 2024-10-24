@@ -15,6 +15,9 @@ type Service interface {
 	UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, input domain.PoBoqHeader) error
 	GetByPekerjaanNoWithBody(id string, page int, pageSize int) ([]domain.PoBoqHeaderWithBody, error)
 	GetByPekerjaanNoWithBodyByOrder(id string, order int) ([]domain.PoBoqHeaderWithBody, error)
+
+	GetByPekerjaanNoWithBodyServerSide(id string, page int, pageSize int, item string, desc string) ([]domain.PoBoqHeaderWithBodyServerSide, error)
+	GetByPekerjaanNoWithBodyServerSideCount(id string, item string, desc string) (int64, error)
 }
 
 type service struct {
@@ -75,9 +78,13 @@ func (s *service) SyncActualPrice(pekerjaanNo string) error {
 			return err
 		}
 
-		s.UpdateByPekerjaanNoAndRunNum(headersData.PekerjaanNo, headersData.Order, domain.PoBoqHeader{ActualPrice: totalPrice})
+		err = s.UpdateByPekerjaanNoAndRunNum(headersData.PekerjaanNo, headersData.Order, domain.PoBoqHeader{ActualPrice: totalPrice})
 
-		if float64(headersData.Price) != totalPrice {
+		if err != nil {
+			return err
+		}
+
+		if float64(headersData.Qty)*float64(headersData.Price) != totalPrice {
 			canProgress = 0
 		}
 	}
@@ -90,7 +97,7 @@ func (s *service) SyncActualPrice(pekerjaanNo string) error {
 func (s *service) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, input domain.PoBoqHeader) error {
 	updateData := map[string]interface{}{}
 
-	loc, _ := time.LoadLocation("Asia/Jakarta")
+	//loc, _ := time.LoadLocation("Asia/Jakarta")
 
 	// if input.ActualPrice > 0 {
 	// 	updateData["actual_price"] = input.ActualPrice
@@ -98,7 +105,7 @@ func (s *service) UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string
 
 	updateData["actual_price"] = input.ActualPrice
 
-	updateData["last_updated"] = time.Now().In(loc).Format("2006-01-02 15:04:05")
+	updateData["last_updated"] = time.Now().UTC()
 
 	err := s.repository.UpdateByPekerjaanNoAndRunNum(pekerjaanNo, runNum, updateData)
 
@@ -157,6 +164,65 @@ func (s *service) GetByPekerjaanNoWithBody(id string, page int, pageSize int) ([
 
 	}
 
+	return result, err
+}
+
+func (s *service) GetByPekerjaanNoWithBodyServerSide(id string, page int, pageSize int, item string, desc string) ([]domain.PoBoqHeaderWithBodyServerSide, error) {
+	if page <= 0 {
+		page = 1
+	}
+
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	headers, err := s.repository.FindByPekerjaanNoWithPagingServerSide(id, page, pageSize, item, desc)
+
+	result := []domain.PoBoqHeaderWithBodyServerSide{}
+
+	for _, headersData := range headers {
+		poBoqBody, err := s.poboqbodyService.GetByRunNum(headersData.PekerjaanNo, headersData.Order)
+
+		if err != nil {
+			return nil, err
+		}
+
+		var poBoqBodyResponse []domain.PoBoqBodyServerSideResponse
+		for _, body := range poBoqBody {
+			//concatenatedOrder := body.Order + "-" + fmt.Sprint(body.Id)
+			poBoqBodyResponse = append(poBoqBodyResponse, domain.PoBoqBodyServerSideResponse{
+				Id:                body.Id,
+				ParentId:          body.ParentId,
+				RunNum:            body.RunNum,
+				Order:             body.Order,
+				ItemNo:            body.ItemNo,
+				ItemLevel:         body.ItemLevel,
+				ItemDescription:   body.ItemDescription,
+				ItemSpecification: body.ItemSpecification,
+				Qty:               body.Qty,
+				Unit:              body.Unit,
+				Price:             body.Price,
+				Currency:          body.Currency,
+				Note:              body.Note,
+				StartDate:         body.StartDate,
+				EndDate:           body.EndDate,
+				StartDateActual:   body.StartDateActual,
+				EndDateActual:     body.EndDateActual,
+			})
+		}
+
+		result = append(result, domain.PoBoqHeaderWithBodyServerSide{
+			PoBoqHeader: headersData,
+			BoqBody:     s.poboqbodyService.GroupItemsByParentServerSide(poBoqBodyResponse, 0),
+		})
+
+	}
+
+	return result, err
+}
+
+func (s *service) GetByPekerjaanNoWithBodyServerSideCount(id string, item string, desc string) (int64, error) {
+	result, err := s.repository.FindByPekerjaanNoWithPagingServerSideCount(id, item, desc)
 	return result, err
 }
 

@@ -2,6 +2,7 @@ package boqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"fmt"
 	"strconv"
 )
 
@@ -13,6 +14,12 @@ type Service interface {
 	Store(input domain.BoqBody) (domain.BoqBody, error)
 	Update(input domain.BoqBody, id string) (domain.BoqBody, error)
 	DeleteByID(id int, runNum string) error
+
+	GetByRunNumServerSide(runNum string, page int, pageSize int, item_no string, item_desc string) ([]domain.BoqBody, error)
+	GetByRunNumServerSideCount(runNum string, item_no string, item_desc string) (int64, error)
+	GetByParentIdServerSide(parentId string) ([]domain.BoqBody, error)
+
+	groupItemsByParentServerSide(items []domain.BoqBodyServerSide, parentId int) []domain.BoqBodyServerSide
 }
 
 type service struct {
@@ -30,6 +37,21 @@ func (s *service) GetAll(input domain.BoqBodyRequest) ([]domain.BoqBody, error) 
 
 func (s *service) GetByRunNum(runNum string) ([]domain.BoqBody, error) {
 	boqBody, err := s.repository.FindByRunNum(runNum)
+	return boqBody, err
+}
+
+func (s *service) GetByRunNumServerSide(runNum string, page int, pageSize int, item_no string, item_desc string) ([]domain.BoqBody, error) {
+	boqBody, err := s.repository.FindByRunNumServerSide(runNum, page, pageSize, item_no, item_desc)
+	return boqBody, err
+}
+
+func (s *service) GetByRunNumServerSideCount(runNum string, item_no string, item_desc string) (int64, error) {
+	result, err := s.repository.FindByRunNumServerSideCount(runNum, item_no, item_desc)
+	return result, err
+}
+
+func (s *service) GetByParentIdServerSide(parentId string) ([]domain.BoqBody, error) {
+	boqBody, err := s.repository.FindByParentIDServerSide(parentId)
 	return boqBody, err
 }
 
@@ -95,4 +117,56 @@ func (s *service) DeleteByID(id int, runNum string) error {
 	}
 
 	return nil
+}
+
+func (s *service) groupItemsByParentServerSide(items []domain.BoqBodyServerSide, parentId int) []domain.BoqBodyServerSide {
+	var result []domain.BoqBodyServerSide
+
+	for _, item := range items {
+		// if item.ParentId == parentId {
+		_boqBody, _ := s.repository.FindByParentIDServerSide(strconv.Itoa(item.Id))
+		//item.Children = boqBody
+		var _boqBodyServerSide []domain.BoqBodyServerSide
+		for _, body := range _boqBody {
+			_boqBodyServerSide = append(_boqBodyServerSide, domain.BoqBodyServerSide{
+				Id:                body.Id,
+				ParentId:          body.ParentId,
+				RunNum:            body.RunNum,
+				ItemNo:            body.ItemNo,
+				ItemLevel:         body.ItemLevel,
+				ItemDescription:   body.ItemDescription,
+				ItemSpecification: body.ItemSpecification,
+				Qty:               body.Qty,
+				Unit:              body.Unit,
+				Price:             body.Price,
+				Currency:          body.Currency,
+				Note:              body.Note,
+				Order:             fmt.Sprint(item.Id) + "-" + strconv.Itoa(body.Id),
+			})
+		}
+		children := s.groupItemsByParentServerSide(_boqBodyServerSide, 0)
+		//var _boqBody []domain.BoqBody
+		// for _, body := range children {
+		// 	_boqBody = append(_boqBody, domain.BoqBody{
+		// 		Id:                body.Id,
+		// 		ParentId:          body.ParentId,
+		// 		RunNum:            body.RunNum,
+		// 		ItemNo:            body.ItemNo,
+		// 		ItemLevel:         body.ItemLevel,
+		// 		ItemDescription:   body.ItemDescription,
+		// 		ItemSpecification: body.ItemSpecification,
+		// 		Qty:               body.Qty,
+		// 		Unit:              body.Unit,
+		// 		Price:             body.Price,
+		// 		Currency:          body.Currency,
+		// 		Note:              body.Note,
+		// 		Order:             strconv.Itoa(body.Id) + "-" + fmt.Sprint(item.Id),
+		// 	})
+		// }
+		item.Children = children
+		result = append(result, item)
+		//}
+	}
+
+	return result
 }

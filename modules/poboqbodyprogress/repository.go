@@ -16,6 +16,7 @@ type Repository interface {
 	Delete(id string) error
 	InsertBatch(input []domain.PoBoqBodyProgress) error
 	GetByRunNum(runNum string) ([]domain.PoBoqBodyProgress, error)
+	GetByRunNumBoqBody(runNum string) ([]domain.PoBoqBodyProgress, error)
 }
 
 type repository struct {
@@ -119,6 +120,14 @@ func (r *repository) GetByRunNum(runNum string) ([]domain.PoBoqBodyProgress, err
 	result := []domain.PoBoqBodyProgress{}
 
 	err := r.db.Table("po_boq_body_progress").Where("run_num = ?", runNum).Find(&result).Error
+
+	return result, err
+}
+
+func (r *repository) GetByRunNumBoqBody(runNum string) ([]domain.PoBoqBodyProgress, error) {
+	result := []domain.PoBoqBodyProgress{}
+
+	err := r.db.Table("po_boq_body").Where("run_num = ?", runNum).Find(&result).Error
 
 	return result, err
 }

@@ -19,6 +19,10 @@ func NewPoBoqHeaderProgressHandler(v1 *gin.RouterGroup, poBoqHeaderProgressServi
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetProgress)
 	header.POST("", handler.Store)
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
+
+	header.GET("getss/:id/:var1/:var2/:var3/:var4", handler.GetBodyServerSide)
+	header.GET("getsscount/:id/:var1/:var2/:var3/:var4", handler.GetBodyServerSideCount)
+	header.GET("sync/:id/:var1/:var2/:var3/:var4", handler.SyncProgress)
 }
 
 func (h *poBoqHeaderProgressHandler) GetProgress(c *gin.Context) {
@@ -113,6 +117,96 @@ func (h *poBoqHeaderProgressHandler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "Data berhasil dihapus",
+		"data":    nil,
+	})
+}
+
+func (h *poBoqHeaderProgressHandler) GetBodyServerSide(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3 + "/" + var4
+
+	var filter domain.PoBoqHeaderFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	headers, err := h.poBoqHeaderProgressService.GetBodyServerSide(FinalId, filter.Page, filter.PageSize, filter.Item, filter.Desc)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Header",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, headers)
+}
+
+func (h *poBoqHeaderProgressHandler) GetBodyServerSideCount(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3 + "/" + var4
+	var filter domain.PoBoqHeaderFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	datas, err := h.poBoqHeaderProgressService.GetBodyServerSideCount(FinalId, filter.Item, filter.Desc)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, datas)
+}
+
+func (h *poBoqHeaderProgressHandler) SyncProgress(c *gin.Context) {
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+	addon := "/"
+
+	err := h.poBoqHeaderProgressService.SyncProgress(id + addon + var1 + addon + var2 + addon + var3 + addon + var4)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal Sync data Progress " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4,
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Berhasil Sync data Progress " + id + addon + var1 + addon + var2 + addon + var3 + addon + var4,
 		"data":    nil,
 	})
 }

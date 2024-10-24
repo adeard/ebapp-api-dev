@@ -2,7 +2,8 @@ package poboqbodyprogress
 
 import (
 	"ebapp-api-dev/domain"
-	"errors"
+	"fmt"
+	"strings"
 )
 
 type Service interface {
@@ -14,6 +15,7 @@ type Service interface {
 	FindByItemNo(itemNo string) (domain.PoBoqBodyProgress, error)
 	Delete(id string) error
 	CloneProgress(previousProgress string, nextProgress string) error
+	GroupItemsByParentServerSide(items []domain.PoBoqBodyProgressResponse, parentId int) []domain.PoBoqBodyProgressResponse
 }
 
 type service struct {
@@ -77,13 +79,16 @@ func (s *service) Delete(id string) error {
 }
 
 func (s *service) CloneProgress(previousProgress string, nextProgress string) error {
-	getExistProgress, err := s.repository.GetByRunNum(previousProgress)
+	var getExistProgress, err = s.repository.GetByRunNum(previousProgress)
 	if err != nil {
 		return err
 	}
 
 	if len(getExistProgress) < 1 {
-		return errors.New("Run num " + previousProgress + " not found")
+		parts := strings.Split(previousProgress, "/")
+		newStr := strings.Join(parts[:len(parts)-1], "/")
+		getExistProgress, err = s.repository.GetByRunNumBoqBody(newStr)
+		//return errors.New("Run num " + previousProgress + " not found")
 	}
 
 	newProgress := []domain.PoBoqBodyProgress{}
@@ -106,4 +111,20 @@ func (s *service) CloneProgress(previousProgress string, nextProgress string) er
 	}
 
 	return nil
+}
+
+func (s *service) GroupItemsByParentServerSide(items []domain.PoBoqBodyProgressResponse, parentId int) []domain.PoBoqBodyProgressResponse {
+	var result []domain.PoBoqBodyProgressResponse
+
+	for _, item := range items {
+		if item.ParentId == parentId {
+			concatenatedOrder := item.Order + "-" + fmt.Sprint(item.Id)
+			item.Order = concatenatedOrder
+			children := s.GroupItemsByParentServerSide(items, item.Id)
+			item.Children = children
+			result = append(result, item)
+		}
+	}
+
+	return result
 }

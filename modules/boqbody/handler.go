@@ -24,6 +24,10 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	boqBody.POST("", handler.Store)
 	boqBody.PUT("/:id", handler.Update)
 	boqBody.DELETE("/:id/:run_num", handler.Delete)
+
+	boqBody.GET("getss/:id", handler.GetBoqByRunNumServerSide)
+	boqBody.GET("getsscount/:id", handler.GetBoqByRunNumServerSideCount)
+	boqBody.GET("getssbyparentid/:id/:order", handler.GetBoqByParentIdServerSide)
 }
 
 func groupItemsByParent(items []domain.BoqBodyResponse, parentId int) []domain.BoqBodyResponse {
@@ -185,6 +189,138 @@ func (h *boqBodyHandler) GetBoqByRunNum(c *gin.Context) {
 		"message": "Berhasil mengambil data BoQ Body",
 		"data":    result,
 	})
+}
+
+func (h *boqBodyHandler) GetBoqByRunNumServerSide(c *gin.Context) {
+	runNum := c.Param("id")
+
+	var filter domain.BoqBodyFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	boqBody, err := h.boqBodyService.GetByRunNumServerSide(runNum, filter.Page, filter.PageSize, filter.ItemNo, filter.ItemDesc)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Body",
+			"data":    nil,
+		})
+		return
+	}
+
+	if len(boqBody) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Data BoQ Body tidak ditemukan",
+			"data":    nil,
+		})
+		return
+	}
+
+	//Konversi tipe data []domain.BoqBody menjadi []domain.BoqBodyServerSide
+	var boqBodyServerSide []domain.BoqBodyServerSide
+	for _, body := range boqBody {
+		boqBodyServerSide = append(boqBodyServerSide, domain.BoqBodyServerSide{
+			Id:                body.Id,
+			ParentId:          body.ParentId,
+			RunNum:            body.RunNum,
+			ItemNo:            body.ItemNo,
+			ItemLevel:         body.ItemLevel,
+			ItemDescription:   body.ItemDescription,
+			ItemSpecification: body.ItemSpecification,
+			Qty:               body.Qty,
+			Unit:              body.Unit,
+			Price:             body.Price,
+			Currency:          body.Currency,
+			Note:              body.Note,
+			Order:             strconv.Itoa(body.Id),
+		})
+	}
+
+	result := h.boqBodyService.groupItemsByParentServerSide(boqBodyServerSide, 0)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Berhasil mengambil data BoQ Body",
+		"data":    result,
+	})
+}
+
+func (h *boqBodyHandler) GetBoqByParentIdServerSide(c *gin.Context) {
+	parentID := c.Param("id")
+	order := c.Param("order")
+
+	boqBody, err := h.boqBodyService.GetByParentIdServerSide(parentID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data BoQ Body",
+			"data":    nil,
+		})
+		return
+	}
+
+	if len(boqBody) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Data BoQ Body tidak ditemukan",
+			"data":    nil,
+		})
+		return
+	}
+
+	//Konversi tipe data []domain.BoqBody menjadi []domain.BoqBodyServerSide
+	var boqBodyServerSide []domain.BoqBodyServerSide
+	for _, body := range boqBody {
+		boqBodyServerSide = append(boqBodyServerSide, domain.BoqBodyServerSide{
+			Id:                body.Id,
+			ParentId:          body.ParentId,
+			RunNum:            body.RunNum,
+			ItemNo:            body.ItemNo,
+			ItemLevel:         body.ItemLevel,
+			ItemDescription:   body.ItemDescription,
+			ItemSpecification: body.ItemSpecification,
+			Qty:               body.Qty,
+			Unit:              body.Unit,
+			Price:             body.Price,
+			Currency:          body.Currency,
+			Note:              body.Note,
+			Order:             order + "-" + strconv.Itoa(body.Id),
+		})
+	}
+
+	// result := h.boqBodyService.groupItemsByParentServerSide(boqBodyServerSide, 0)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Berhasil mengambil data BoQ Body",
+		"data":    boqBodyServerSide,
+	})
+}
+
+func (h *boqBodyHandler) GetBoqByRunNumServerSideCount(c *gin.Context) {
+	runNum := c.Param("id")
+
+	var filter domain.BoqBodyFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	datas, err := h.boqBodyService.GetByRunNumServerSideCount(runNum, filter.ItemNo, filter.ItemDesc)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, datas)
 }
 
 func (h *boqBodyHandler) Store(c *gin.Context) {

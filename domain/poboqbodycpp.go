@@ -40,6 +40,11 @@ type PoBoqBodyCppResponse struct {
 	Qty               float32                `json:"qty"`
 	Status            bool                   `json:"status"`
 	Note              string                 `json:"note"`
+	Unit              string                 `json:"unit" gorm:"column:unit"`
+	Price             float64                `json:"price" gorm:"column:price"`
+	Currency          string                 `json:"currency" gorm:"column:currency"`
+	PreviousVolume    float64                `json:"prev_volume" gorm:"column:previous_volume;default:NULL"`
+	CurrentVolume     float64                `json:"current_volume" gorm:"column:current_volume;default:NULL"`
 	Children          []PoBoqBodyCppResponse `json:"children"`
 }
 
@@ -47,6 +52,12 @@ type PoBoqBodyCppResponseFinal struct {
 	Status  int            `json:"status"`
 	Message string         `json:"message"`
 	Data    []PoBoqBodyCpp `json:"data"`
+}
+
+type PoBoqBodyCppResponseUpdate struct {
+	Status  int                    `json:"status"`
+	Message string                 `json:"message"`
+	Data    []PoBoqBodyCppProgress `json:"data"`
 }
 
 type PoBoqBodyCppProgress struct {

@@ -61,6 +61,28 @@ type PoBoqBodyResponse struct {
 	Children          []PoBoqBodyResponse `json:"children"`
 }
 
+type PoBoqBodyServerSideResponse struct {
+	Id                int                           `json:"id"`
+	ParentId          int                           `json:"parent_id"`
+	RunNum            string                        `json:"run_num"`
+	Order             string                        `json:"order"`
+	ItemNo            string                        `json:"item_no"`
+	ItemLevel         int                           `json:"item_level"`
+	ItemDescription   string                        `json:"item_description"`
+	ItemSpecification string                        `json:"item_specification"`
+	Qty               float32                       `json:"qty"`
+	Unit              string                        `json:"unit"`
+	Price             float64                       `json:"price"`
+	Currency          string                        `json:"currency"`
+	Note              string                        `json:"note"`
+	StartDate         string                        `json:"start_date"`
+	EndDate           string                        `json:"end_date"`
+	StartDateActual   string                        `json:"start_date_actual"`
+	EndDateActual     string                        `json:"end_date_actual"`
+	Children          []PoBoqBodyServerSideResponse `json:"children"`
+	Key               string                        `json:"key"`
+}
+
 type PoAdopthBoq struct {
 	RunNum    string `json:"run_num"`
 	NewRunNum string `json:"new_run_num"`

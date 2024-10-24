@@ -22,6 +22,7 @@ func NewPoBoqBodyCppHandler(v1 *gin.RouterGroup, poBoqBodyCppService Service) {
 	poboqbodyCpp.PUT("/:id/:var1/:var2/:var3/:var4/:var5", handler.Update)
 	poboqbodyCpp.GET("/:id/:var1/:var2/:var3/:var4/:var5/:var6", handler.GetBodyByID)
 	poboqbodyCpp.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)
+	poboqbodyCpp.POST("/clone", handler.CloneCpp)
 }
 
 func groupItemsByParent(items []domain.PoBoqBodyCppProgressResponse, parentId int) []domain.PoBoqBodyCppProgressResponse {
@@ -227,10 +228,10 @@ func (h *poBoqBodyCppHandler) Update(c *gin.Context) {
 	}
 
 	// Mengirimkan respons dengan data yang telah diperbarui
-	response := domain.PoBoqBodyCppResponseFinal{
+	response := domain.PoBoqBodyCppResponseUpdate{
 		Status:  http.StatusOK,
 		Message: "Berhasil memperbarui data BoQ Body",
-		Data:    []domain.PoBoqBodyCpp{updatedCpp},
+		Data:    []domain.PoBoqBodyCppProgress{updatedCpp},
 	}
 	c.JSON(http.StatusOK, response)
 }
@@ -259,4 +260,30 @@ func (h *poBoqBodyCppHandler) Delete(c *gin.Context) {
 		"message": "Data berhasil dihapus",
 		"data":    nil,
 	})
+}
+
+func (h *poBoqBodyCppHandler) CloneCpp(c *gin.Context) {
+
+	pekerjaanNo := struct {
+		PreviousRunNum string `json:"previous_run_num"`
+		NextRunNum     string `json:"next_run_num"`
+	}{}
+
+	c.ShouldBindJSON(&pekerjaanNo)
+
+	response := domain.PoBoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil clone data body",
+	}
+
+	err := h.poBoqBodyCppService.CloneCpp(pekerjaanNo.PreviousRunNum, pekerjaanNo.NextRunNum)
+	if err != nil {
+		response = domain.PoBoqHeaderResponse{
+			Status:  http.StatusBadRequest,
+			Message: err.Error(),
+		}
+
+	}
+
+	c.JSON(response.Status, response)
 }

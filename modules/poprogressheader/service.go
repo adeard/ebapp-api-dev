@@ -12,6 +12,7 @@ type Service interface {
 	EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error)
 	EbappUpdate2(id string, status string) (domain.PoProgressHeader, error)
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
+	SyncProgress(run_num string) error
 }
 
 type service struct {
@@ -55,4 +56,9 @@ func (s *service) EbappUpdate2(id string, status string) (domain.PoProgressHeade
 func (s *service) Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error) {
 	data, err := s.repository.Store(input)
 	return data, err
+}
+
+func (s *service) SyncProgress(run_num string) error {
+	err := s.repository.SyncProgress(run_num)
+	return err
 }

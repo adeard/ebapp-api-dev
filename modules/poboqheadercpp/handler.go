@@ -19,6 +19,8 @@ func NewPoBoqHeaderCppHandler(v1 *gin.RouterGroup, poBoqHeaderCppService Service
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetCpp)
 	header.POST("", handler.Store)
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)
+	header.GET("getss/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyServerSide)
+	header.GET("getsscount/:id/:var1/:var2/:var3/:var4/:var5", handler.GetBodyServerSideCount)
 }
 
 func (h *poBoqHeaderCppHandler) GetCpp(c *gin.Context) {
@@ -109,4 +111,71 @@ func (h *poBoqHeaderCppHandler) Delete(c *gin.Context) {
 		"message": "Data berhasil dihapus",
 		"data":    nil,
 	})
+}
+
+func (h *poBoqHeaderCppHandler) GetBodyServerSide(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+	var5 := c.Param("var5")
+
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3 + "/" + var4 + "/" + var5
+
+	var filter domain.PoBoqHeaderFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	headers, err := h.poBoqHeaderCppService.GetBodyServerSide(FinalId, filter.Page, filter.PageSize, filter.Item, filter.Desc)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Header",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, headers)
+}
+
+func (h *poBoqHeaderCppHandler) GetBodyServerSideCount(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+	var4 := c.Param("var4")
+	var5 := c.Param("var5")
+
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3 + "/" + var4 + "/" + var5
+	var filter domain.PoBoqHeaderFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	datas, err := h.poBoqHeaderCppService.GetBodyServerSideCount(FinalId, filter.Item, filter.Desc)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, datas)
 }

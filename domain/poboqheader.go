@@ -7,7 +7,7 @@ type PoBoqHeader struct {
 	Description string  `json:"description"`
 	Qty         float32 `json:"sum" gorm:"column:qty"`
 	Unit        string  `json:"pounit" gorm:"column:unit"`
-	Price       float32 `json:"price"`
+	Price       float64 `json:"price"`
 	Currency    string  `json:"currency"`
 	Order       string  `json:"order"`
 	IsAddendum  int     `json:"is_addendum" gorm:"column:is_addendum"`
@@ -25,7 +25,19 @@ type PoBoqHeaderWithBody struct {
 	BoqBody []PoBoqBodyResponse `json:"children"`
 }
 
+type PoBoqHeaderWithBodyServerSide struct {
+	PoBoqHeader
+	BoqBody []PoBoqBodyServerSideResponse `json:"children"`
+}
+
 type PoBoqHeaderFilterRequest struct {
 	Page     int `form:"page"`
 	PageSize int `form:"page_size"`
+}
+
+type PoBoqHeaderFilterRequestServerSide struct {
+	Page     int    `form:"page"`
+	PageSize int    `form:"pageSize"`
+	Item     string `form:"item"`
+	Desc     string `form:"desc"`
 }

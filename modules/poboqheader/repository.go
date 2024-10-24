@@ -13,6 +13,9 @@ type Repository interface {
 	UpdateByPekerjaanNoAndRunNum(pekerjaanNo string, runNum string, updateData map[string]interface{}) error
 	FindByPekerjaanNoWithPaging(id string, page int, pageSize int) ([]domain.PoBoqHeader, error)
 	FindByPekerjaanNoWithOrder(id string, order int) ([]domain.PoBoqHeader, error)
+
+	FindByPekerjaanNoWithPagingServerSide(id string, page int, pageSize int, item string, desc string) ([]domain.PoBoqHeader, error)
+	FindByPekerjaanNoWithPagingServerSideCount(id string, item string, desc string) (int64, error)
 }
 
 type repository struct {
@@ -74,6 +77,57 @@ func (r *repository) FindByPekerjaanNoWithPaging(id string, page int, pageSize i
 		Error
 
 	return headers, err
+}
+
+func (r *repository) FindByPekerjaanNoWithPagingServerSide(id string, page int, pageSize int, item string, desc string) ([]domain.PoBoqHeader, error) {
+	var headers []domain.PoBoqHeader
+
+	q := r.db.Table("po_boq_header")
+
+	if item == "" && desc == "" {
+		query := `pekerjaan_no = ?`
+		q = q.Where(query, id)
+	} else if item != "" && desc == "" {
+		query := `pekerjaan_no = ? and item = ?`
+		q = q.Where(query, id, item)
+	} else if item == "" && desc != "" {
+		query := `pekerjaan_no = ? and description LIKE ?`
+		q = q.Where(query, id, "%"+desc+"%")
+	} else {
+		query := `pekerjaan_no = ? and item = ? and description LIKE ?`
+		q = q.Where(query, id, item, "%"+desc+"%")
+	}
+
+	err := q.
+		Order("CAST([order] AS INT) ASC").
+		Limit(pageSize).
+		Offset(pageSize * (page - 1)).
+		Find(&headers).
+		Error
+
+	return headers, err
+}
+
+func (r *repository) FindByPekerjaanNoWithPagingServerSideCount(id string, item string, desc string) (int64, error) {
+	var count int64
+	q := r.db.Table("po_boq_header")
+
+	if item == "" && desc == "" {
+		query := `pekerjaan_no = ?`
+		q = q.Where(query, id)
+	} else if item != "" && desc == "" {
+		query := `pekerjaan_no = ? and item = ?`
+		q = q.Where(query, id, item)
+	} else if item == "" && desc != "" {
+		query := `pekerjaan_no = ? and description LIKE ?`
+		q = q.Where(query, id, "%"+desc+"%")
+	} else {
+		query := `pekerjaan_no = ? and item = ? and description LIKE ?`
+		q = q.Where(query, id, item, "%"+desc+"%")
+	}
+
+	err := q.Count(&count).Error
+	return count, err
 }
 
 func (r *repository) FindByPekerjaanNoWithOrder(id string, order int) ([]domain.PoBoqHeader, error) {

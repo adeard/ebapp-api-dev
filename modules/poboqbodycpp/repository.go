@@ -3,17 +3,25 @@ package poboqbodycpp
 import (
 	"ebapp-api-dev/domain"
 
+	"strings"
+
 	"gorm.io/gorm"
 )
 
 type Repository interface {
 	Store(input domain.PoBoqBodyCpp) (domain.PoBoqBodyCpp, error)
-	Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCpp, error)
+	Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCppProgress, error)
 	FindByItemNo(itemNo string) (domain.PoBoqBodyCpp, error)
 	FindByRunNum(runNum string, runNumProgress string, order string) ([]domain.PoBoqBodyCppProgress, error)
 	CountRunNum(runNum string) (int, error)
 	SelectMaxOrder(runNum string) (int, error)
 	Delete(id string) error
+	InsertBatch(input []domain.PoBoqBodyCpp) error
+	GetByRunNum(runNum string) ([]domain.PoBoqBodyCpp, error)
+	GetByRunNumBoqBody(runNum string) ([]domain.PoBoqBodyCpp, error)
+	InsertBatchHeader(input []domain.PoBoqHeaderCpp) error
+	GetByRunNumHeader(pekerjaanNo string) ([]domain.PoBoqHeaderCpp, error)
+	GetByRunNumBoqHeader(pekerjaanNo string) ([]domain.PoBoqHeaderCpp, error)
 }
 
 type repository struct {
@@ -83,28 +91,64 @@ func (r *repository) Delete(id string) error {
 	return err
 }
 
-func (r *repository) Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCpp, error) {
-	// Membuat variabel untuk menampung hasil pembaruan
-	var updatedCpp domain.PoBoqBodyCpp
-
-	// Menggunakan fungsi Update dari GORM untuk memperbarui data di database
+func (r *repository) Update(runNum string, order string, mainId int, parentId int, status bool, note string) (domain.PoBoqBodyCppProgress, error) {
+	var updatedCpp domain.PoBoqBodyCppProgress
 	err := r.db.Table("po_boq_body_cpp").
 		Where("run_num = ? AND [order] = ? AND main_id = ? AND parent_id = ?", runNum, order, mainId, parentId).
 		Updates(map[string]interface{}{"status": status, "note": note}).
 		Error
 
-	if err != nil {
-		// Mengembalikan error jika terjadi kesalahan saat pembaruan
-		return updatedCpp, err
-	}
+	if err == nil {
+		parts := strings.Split(runNum, "/")
+		newStr := strings.Join(parts[:len(parts)-1], "/")
 
-	// Mengembalikan data yang telah diperbarui
-	updatedCpp = domain.PoBoqBodyCpp{
-		RunNum:   runNum,
-		Order:    order,
-		Id:       mainId,
-		ParentId: parentId,
+		query := `SELECT DISTINCT a.*, b.status as status_cpp, b.note as note_cpp, b.run_num as run_num_cpp FROM po_boq_body_progress a right join po_boq_body_cpp b on a.item_no = b.item_no and a.item_level = b.item_level and a.main_id = b.main_id and a.parent_id = b.parent_id and a.[order]  = b.[order] and a.item_no = b.item_no and a.item_level = b.item_level and a.item_description = b.item_description and a.item_specification = b.item_specification where  b.run_num = ? and a.run_num = ? and a.[order] = ? and b.main_id = ? and b.parent_id = ? order by a.main_id asc`
+		err = r.db.Raw(query, runNum, newStr, order, mainId, parentId).First(&updatedCpp).Error
 	}
 
 	return updatedCpp, nil
+}
+
+func (r *repository) InsertBatch(input []domain.PoBoqBodyCpp) error {
+	err := r.db.Table("po_boq_body_cpp").CreateInBatches(input, 50).Error
+
+	return err
+}
+
+func (r *repository) GetByRunNum(runNum string) ([]domain.PoBoqBodyCpp, error) {
+	result := []domain.PoBoqBodyCpp{}
+
+	err := r.db.Table("po_boq_body_cpp").Where("run_num = ?", runNum).Find(&result).Error
+
+	return result, err
+}
+
+func (r *repository) GetByRunNumBoqBody(runNum string) ([]domain.PoBoqBodyCpp, error) {
+	result := []domain.PoBoqBodyCpp{}
+
+	err := r.db.Table("po_boq_body").Where("run_num = ?", runNum).Find(&result).Error
+
+	return result, err
+}
+
+func (r *repository) InsertBatchHeader(input []domain.PoBoqHeaderCpp) error {
+	err := r.db.Table("po_boq_header_cpp").CreateInBatches(input, 50).Error
+
+	return err
+}
+
+func (r *repository) GetByRunNumHeader(pekerjaanNo string) ([]domain.PoBoqHeaderCpp, error) {
+	result := []domain.PoBoqHeaderCpp{}
+
+	err := r.db.Table("po_boq_header_cpp").Where("pekerjaan_no = ?", pekerjaanNo).Find(&result).Error
+
+	return result, err
+}
+
+func (r *repository) GetByRunNumBoqHeader(pekerjaanNo string) ([]domain.PoBoqHeaderCpp, error) {
+	result := []domain.PoBoqHeaderCpp{}
+
+	err := r.db.Table("po_boq_header").Where("pekerjaan_no = ?", pekerjaanNo).Find(&result).Error
+
+	return result, err
 }

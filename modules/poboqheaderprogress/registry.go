@@ -1,10 +1,15 @@
 package poboqheaderprogress
 
-import "gorm.io/gorm"
+import (
+	"ebapp-api-dev/modules/poboqbodyprogress"
+
+	"gorm.io/gorm"
+)
 
 func PoBoqHeaderProgressRegistry(db *gorm.DB) Service {
 	poBoqHeaderProgressRepository := NewRepository(db)
-	poBoqHeaderProgressService := NewService(poBoqHeaderProgressRepository)
+	poBoqBodyProgressService := poboqbodyprogress.PoBoqBodyProgressRegistry(db)
+	poBoqHeaderProgressService := NewService(poBoqHeaderProgressRepository, poBoqBodyProgressService)
 
 	return poBoqHeaderProgressService
 }

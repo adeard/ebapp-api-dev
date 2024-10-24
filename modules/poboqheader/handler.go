@@ -24,6 +24,9 @@ func NewPoBoqHeaderHandler(v1 *gin.RouterGroup, poBoqHeaderService Service) {
 	hHeader.GET("get/:id/:var1/:var2/:var3", handler.GetByPekerjaanNoWithBody)
 	hHeader.GET("get/:id/:var1/:var2/:var3/:var4", handler.GetByPekerjaanNoWithBodyByOrder)
 
+	hHeader.GET("getss/:id/:var1/:var2/:var3", handler.GetByPekerjaanNoWithBodyServerSide)
+	hHeader.GET("getsscount/:id/:var1/:var2/:var3", handler.GetByPekerjaanNoWithBodyServerSideCount)
+
 }
 
 func (h *poBoqHeaderHandler) GetByPekerjaanNo(c *gin.Context) {
@@ -180,6 +183,69 @@ func (h *poBoqHeaderHandler) GetByPekerjaanNoWithBody(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, headers)
+}
+
+func (h *poBoqHeaderHandler) GetByPekerjaanNoWithBodyServerSide(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3
+
+	var filter domain.PoBoqHeaderFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	headers, err := h.poBoqHeaderService.GetByPekerjaanNoWithBodyServerSide(FinalId, filter.Page, filter.PageSize, filter.Item, filter.Desc)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data Header tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data Header",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, headers)
+}
+
+func (h *poBoqHeaderHandler) GetByPekerjaanNoWithBodyServerSideCount(c *gin.Context) {
+
+	id := c.Param("id")
+	var1 := c.Param("var1")
+	var2 := c.Param("var2")
+	var3 := c.Param("var3")
+
+	FinalId := id + "/" + var1 + "/" + var2 + "/" + var3
+	var filter domain.PoBoqHeaderFilterRequestServerSide
+	c.ShouldBindQuery(&filter)
+
+	datas, err := h.poBoqHeaderService.GetByPekerjaanNoWithBodyServerSideCount(FinalId, filter.Item, filter.Desc)
+	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status":  http.StatusNotFound,
+				"message": "Data tidak ditemukan",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal mengambil data",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, datas)
 }
 
 func (h *poBoqHeaderHandler) GetByPekerjaanNoWithBodyByOrder(c *gin.Context) {

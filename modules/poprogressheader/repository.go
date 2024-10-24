@@ -15,6 +15,7 @@ type Repository interface {
 	EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error)
 	EbappUpdate2(id string, status string) (domain.PoProgressHeader, error)
 	Store(input domain.PoProgressHeader) (domain.PoProgressHeader, error)
+	SyncProgress(run_num string) error
 }
 
 type repository struct {
@@ -109,4 +110,18 @@ func (r *repository) EbappUpdate2(id string, status string) (domain.PoProgressHe
 	}
 
 	return data, nil
+}
+
+func (r *repository) SyncProgress(run_num string) error {
+	query := `SELECT (SUM(CASE 
+		WHEN (current_volume*price) is null then 0 
+		ELSE (current_volume*price)
+		END)/ SUM(price * qty))*100 as p
+  FROM po_boq_body_progress where run_num = ? and qty != 0`
+	var p float64
+	r.db.Raw(query, run_num).First(&p)
+	query2 := `UPDATE po_progress_header set new_prog = ?, last_updated = ? WHERE run_num = ?`
+	err := r.db.Exec(query2, p, time.Now().UTC(), run_num)
+
+	return err.Error
 }

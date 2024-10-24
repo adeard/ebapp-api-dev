@@ -20,6 +20,7 @@ type Service interface {
 	GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId int) []domain.PoBoqBodyResponse
 	FindLastId(runNum string, order string) (int, error)
 	Adopth(oldRunNum string, newRunNum string, newOrder string) error
+	GroupItemsByParentServerSide(items []domain.PoBoqBodyServerSideResponse, parentId int) []domain.PoBoqBodyServerSideResponse
 }
 
 type service struct {
@@ -184,6 +185,22 @@ func (s *service) GroupItemsByParent(items []domain.PoBoqBodyResponse, parentId 
 	for _, item := range items {
 		if item.ParentId == parentId {
 			children := s.GroupItemsByParent(items, item.Id)
+			item.Children = children
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
+func (s *service) GroupItemsByParentServerSide(items []domain.PoBoqBodyServerSideResponse, parentId int) []domain.PoBoqBodyServerSideResponse {
+	var result []domain.PoBoqBodyServerSideResponse
+
+	for _, item := range items {
+		if item.ParentId == parentId {
+			concatenatedOrder := item.Order + "-" + fmt.Sprint(item.Id)
+			item.Order = concatenatedOrder
+			children := s.GroupItemsByParentServerSide(items, item.Id)
 			item.Children = children
 			result = append(result, item)
 		}
