@@ -2,6 +2,7 @@ package poboqbodycpp
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoBoqBodyCppHandler(v1 *gin.RouterGroup, poBoqBodyCppService Service) {
 	handler := &poBoqBodyCppHandler{poBoqBodyCppService}
 
 	poboqbodyCpp := v1.Group("po_boq_body_cpp")
+	poboqbodyCpp.Use(middlewares.AuthService())
 
 	poboqbodyCpp.GET("/count/:id/:var1/:var2/:var3/:var4/:var5", handler.CountByRunNum)
 	poboqbodyCpp.GET("/maxorder/:id/:var1/:var2/:var3/:var4/:var5", handler.SelectMaxOrder)

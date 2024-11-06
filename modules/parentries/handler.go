@@ -3,6 +3,7 @@ package parentries
 import (
 	"ebapp-api-dev/domain"
 	"ebapp-api-dev/helper"
+	"ebapp-api-dev/middlewares"
 	"encoding/json"
 	"net/http"
 
@@ -17,6 +18,7 @@ func NewParEntriesHandler(v1 *gin.RouterGroup, parEntriesService Service) {
 	handler := &parEntriesHandler{parEntriesService}
 
 	parEntries := v1.Group("par_entries")
+	parEntries.Use(middlewares.AuthService())
 
 	parEntries.GET("", handler.GetAll)
 	parEntries.GET("/:id", handler.GetByID)

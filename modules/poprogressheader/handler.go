@@ -2,6 +2,7 @@ package poprogressheader
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoProgressHeaderHandler(v1 *gin.RouterGroup, poProgressHeaderService Ser
 	handler := &poProgressHeaderHandler{poProgressHeaderService}
 
 	header := v1.Group("progressheader")
+	header.Use(middlewares.AuthService())
 
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetProgrssByRunNum)
 	header.GET("/:id/:var1/:var2/:var3", handler.GetAllProgressByRunNum)

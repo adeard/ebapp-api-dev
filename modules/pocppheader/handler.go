@@ -2,6 +2,7 @@ package pocppheader
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoCppHeaderHandler(v1 *gin.RouterGroup, poCppHeaderService Service) {
 	handler := &poCppHeaderHandler{poCppHeaderService}
 
 	header := v1.Group("cppheader")
+	header.Use(middlewares.AuthService())
 
 	header.GET("/:id/:var1/:var2/:var3", handler.GetCppByRunNum)
 	header.GET("/by_run_num_progress/:id/:var1/:var2/:var3/:var4", handler.GetCppByRunNumProgress)

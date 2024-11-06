@@ -3,6 +3,7 @@ package boqheader
 import (
 	"ebapp-api-dev/domain"
 	"ebapp-api-dev/helper"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 	"time"
 
@@ -17,6 +18,7 @@ func NewBoqHeaderHandler(v1 *gin.RouterGroup, boqHeaderService Service) {
 	handler := &boqHeaderHandler{boqHeaderService}
 
 	boqHeader := v1.Group("boq_header")
+	boqHeader.Use(middlewares.AuthService())
 
 	boqHeader.GET("", handler.GetAll)
 	boqHeader.GET("/active", handler.GetActive)

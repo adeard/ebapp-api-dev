@@ -2,6 +2,7 @@ package poboqbodyprogress
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoBoqBodyProgressHandler(v1 *gin.RouterGroup, poBoqBodyProgressService S
 	handler := &poBoqBodyProgressHandler{poBoqBodyProgressService}
 
 	poboqbodyprogress := v1.Group("po_boq_body_progress")
+	poboqbodyprogress.Use(middlewares.AuthService())
 
 	poboqbodyprogress.GET("/count/:id/:var1/:var2/:var3/:var4", handler.CountByRunNum)
 	poboqbodyprogress.GET("/maxorder/:id/:var1/:var2/:var3/:var4", handler.SelectMaxOrder)

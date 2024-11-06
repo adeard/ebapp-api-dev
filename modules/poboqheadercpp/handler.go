@@ -2,6 +2,7 @@ package poboqheadercpp
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoBoqHeaderCppHandler(v1 *gin.RouterGroup, poBoqHeaderCppService Service
 	handler := &poBoqHeaderCppHandler{poBoqHeaderCppService}
 
 	header := v1.Group("poboq_header_cpp")
+	header.Use(middlewares.AuthService())
 
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetCpp)
 	header.POST("", handler.Store)

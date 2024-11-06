@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,6 +19,7 @@ func NewPoBoqBodyHandler(v1 *gin.RouterGroup, poBoqService Service) {
 	handler := &poBoqBodyHandler{poBoqService}
 
 	poboqbody := v1.Group("po_boq_body")
+	poboqbody.Use(middlewares.AuthService())
 
 	poboqbody.GET("/:id/:var1/:var2/:var3/:var4", handler.GetPoBoqBodyByRunNum)
 	poboqbody.POST("/getlastid", handler.GetLatestId)

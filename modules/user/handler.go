@@ -2,6 +2,7 @@ package user
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewUserHandler(v1 *gin.RouterGroup, userService Service) {
 	handler := &userHandler{userService}
 
 	user := v1.Group("user")
+	user.Use(middlewares.AuthService())
 
 	user.GET("", handler.GetAll)
 	user.GET("/:id", handler.GetById)

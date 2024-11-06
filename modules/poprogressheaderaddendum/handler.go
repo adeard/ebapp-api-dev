@@ -2,6 +2,7 @@ package poprogressheaderaddendum
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoProgressHeaderAddendumHandler(v1 *gin.RouterGroup, poProgressHeaderAdd
 	handler := &poProgressHeaderAddendumHandler{poProgressHeaderAddendumService}
 
 	header := v1.Group("progressheaderaddendum")
+	header.Use(middlewares.AuthService())
 
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetAllProgressByRunNum)
 	header.DELETE("/:id/:var1/:var2/:var3/:var4", handler.Delete)

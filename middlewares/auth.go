@@ -11,9 +11,9 @@ import (
 
 func AuthService() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		err := ValidateJWT(context)
+		_, err := validateToken(context)
 		if err != nil {
-			context.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+			context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			context.Abort()
 			return
 		}

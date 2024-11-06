@@ -2,6 +2,7 @@ package poboqheader
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 	"strconv"
 
@@ -16,6 +17,7 @@ func NewPoBoqHeaderHandler(v1 *gin.RouterGroup, poBoqHeaderService Service) {
 	handler := &poBoqHeaderHandler{poBoqHeaderService}
 
 	hHeader := v1.Group("poboq_header")
+	hHeader.Use(middlewares.AuthService())
 
 	hHeader.GET("/:id/:var1/:var2/:var3", handler.GetByPekerjaanNo)
 	hHeader.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)

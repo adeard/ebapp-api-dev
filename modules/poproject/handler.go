@@ -3,6 +3,7 @@ package poproject
 import (
 	"ebapp-api-dev/domain"
 	"ebapp-api-dev/helper"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ func NewPoProjectHandler(v1 *gin.RouterGroup, poProjectService Service) {
 	handler := &poProjectHandler{poProjectService}
 
 	poProject := v1.Group("po_project")
+	poProject.Use(middlewares.AuthService())
 
 	poProject.GET("", handler.GetAll)
 	poProject.GET("/:id/:no/:var1/:var2/:var3", handler.GetByPo)

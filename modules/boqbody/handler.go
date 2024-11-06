@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"ebapp-api-dev/middlewares"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +19,7 @@ func NewBoqBodyHandler(v1 *gin.RouterGroup, boqBodyService Service) {
 	handler := &boqBodyHandler{boqBodyService}
 
 	boqBody := v1.Group("boq_body")
+	boqBody.Use(middlewares.AuthService())
 
 	boqBody.GET("", handler.GetAll)                      // FOR TEST PURPOSE ONLY
 	boqBody.GET("/tree/:id", handler.GetChildByParentId) // FOR TEST PURPOSE ONLY

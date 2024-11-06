@@ -2,6 +2,7 @@ package poboqbody
 
 import (
 	"ebapp-api-dev/domain"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -111,26 +112,25 @@ func (r *repository) FindBoq(runNum string, order string, mainId string) ([]doma
 }
 
 func (r *repository) Delete(id string, order string, mainId string) error {
-	query := `
-	WITH temp AS 
-	(
-		SELECT main_id, parent_id, 0 AS lvl
-		FROM po_boq_body 
-		WHERE main_id = ? AND run_num = ? AND [order] = ?
+	query := fmt.Sprintf(`
+    WITH temp AS
+    (
+        SELECT main_id, parent_id, [order], 0 AS lvl
+        FROM po_boq_body
+        WHERE main_id = ? AND run_num = ? AND [order] = ?
 
-		UNION ALL 
+        UNION ALL
 
-		SELECT p.main_id, p.parent_id, C.lvl + 1 
-		FROM temp C
-		JOIN po_boq_body p ON C.main_id = p.parent_id 
-	) 
+        SELECT p.main_id, p.parent_id, p.[order], C.lvl + 1
+        FROM temp C
+        JOIN po_boq_body p
+        ON C.main_id = p.parent_id
+        WHERE p.[order] = C.[order]
+    )
 
-	DELETE FROM po_boq_body
-	WHERE main_id IN (SELECT main_id FROM temp);
-	`
-
-	err := r.db.Exec(query, mainId, id, order).Error
-
+    DELETE FROM po_boq_body
+    WHERE main_id IN (SELECT main_id FROM temp) AND [order] = ?;`)
+	err := r.db.Exec(query, mainId, id, order, order).Error
 	return err
 }
 

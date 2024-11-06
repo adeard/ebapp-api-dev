@@ -2,6 +2,7 @@ package poprojectaddendum
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoProjectAddendumHandler(v1 *gin.RouterGroup, poProjectAddendumService S
 	handler := &poProjectAddendumHandler{poProjectAddendumService}
 
 	poProjectAddendum := v1.Group("po_addendum")
+	poProjectAddendum.Use(middlewares.AuthService())
 
 	poProjectAddendum.GET("/:id/:var1/:var2/:var3", handler.GetByPo)
 	poProjectAddendum.DELETE("/:id/:var1/:var2/:var3/:var4/:var5", handler.Delete)

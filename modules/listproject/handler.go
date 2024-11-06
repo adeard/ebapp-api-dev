@@ -2,6 +2,7 @@ package listproject
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"encoding/json"
 	"net/http"
 
@@ -17,6 +18,7 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 
 	listProject := v1.Group("list_project")
 	project := v1.Group("project")
+	project.Use(middlewares.AuthService())
 
 	listProject.GET("", handler.GetAll)
 	project.GET("/:id", handler.GetByID)

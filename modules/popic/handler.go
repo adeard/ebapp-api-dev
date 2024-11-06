@@ -2,6 +2,7 @@ package popic
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 	"strconv"
 
@@ -16,6 +17,7 @@ func NewPoPicHandler(v1 *gin.RouterGroup, poPicService Service) {
 	handler := &poPicHandler{poPicService}
 
 	poPic := v1.Group("pic")
+	poPic.Use(middlewares.AuthService())
 
 	poPic.GET("/:id/:var1/:var2/:var3", handler.GetByRunNum)
 	poPic.POST("", handler.Store)

@@ -2,6 +2,7 @@ package podatasapheader
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoDataSapHeaderHandler(v1 *gin.RouterGroup, poDataSapHeaderService Servi
 	handler := &poDataSapHeaderHandler{poDataSapHeaderService}
 
 	poDataSapHeader := v1.Group("po_sap_header")
+	poDataSapHeader.Use(middlewares.AuthService())
 
 	poDataSapHeader.GET("/:id", handler.GetTitle)
 	poDataSapHeader.GET("/wbs/:id", handler.GetWbs)

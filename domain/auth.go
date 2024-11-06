@@ -17,3 +17,8 @@ type AuthRequest struct {
 type AuthResponse struct {
 	Token string `json:"token"`
 }
+
+type AuthToken struct {
+	Id    uint64 `json:"id"`
+	Token string `json:"token"`
+}

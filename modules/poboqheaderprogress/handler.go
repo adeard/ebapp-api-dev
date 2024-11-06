@@ -2,6 +2,7 @@ package poboqheaderprogress
 
 import (
 	"ebapp-api-dev/domain"
+	"ebapp-api-dev/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func NewPoBoqHeaderProgressHandler(v1 *gin.RouterGroup, poBoqHeaderProgressServi
 	handler := &poBoqHeaderProgressHandler{poBoqHeaderProgressService}
 
 	header := v1.Group("poboq_header_progress")
+	header.Use(middlewares.AuthService())
 
 	header.GET("/:id/:var1/:var2/:var3/:var4", handler.GetProgress)
 	header.POST("", handler.Store)
