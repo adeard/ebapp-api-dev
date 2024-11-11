@@ -11,6 +11,7 @@ type PoProgressHeader struct {
 	NewProg     float32   `json:"new_prog" gorm:"new_prog"`
 	Lock        int       `json:"lock" gorm:"lock"`
 	LastUpdated time.Time `json:"last_updated" gorm:"column:last_updated;default:NULL"`
+	Keterangan  string    `json:"keterangan" gorm:"column:keterangan;default:NULL"`
 }
 
 type PoProgressHeaderUpdate struct {
@@ -24,6 +25,7 @@ type PoProgressHeaderUpdate struct {
 type PoProgressHeaderUpdateEbapp struct {
 	IsEbapp     int       `json:"is_ebapp" gorm:"column:isebapp;"`
 	LastUpdated time.Time `json:"last_updated" gorm:"column:last_updated;"`
+	Keterangan  string    `json:"keterangan" gorm:"column:keterangan;"`
 }
 
 type PoProgressHeaderUpdateEbapp2 struct {

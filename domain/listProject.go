@@ -159,3 +159,16 @@ type ModelUpdateActualPlanningDate struct {
 	StartDateActual time.Time `json:"start_date_actual" gorm:"column:start_date_actual"`
 	EndDateActual   time.Time `json:"end_date_actual" gorm:"column:end_date_actual"`
 }
+
+type ListProjectPersetujuan struct {
+	PekerjaanNo string `json:"pekerjaan_no"`
+	Pihak       int    `json:"pihak"`
+	Nama        string `json:"nama"`
+	Jabatan     string `json:"jabatan"`
+}
+
+type ListProjectPersetujuanHeaderResponse struct {
+	Message string                   `json:"message"`
+	Status  int                      `json:"status"`
+	Data    []ListProjectPersetujuan `json:"data"`
+}

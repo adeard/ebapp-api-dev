@@ -19,6 +19,9 @@ type Service interface {
 	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error
 	UpdateByPekerjaanNo(pekerjaanNo string, input domain.ListProject) error
 	SyncCanProgressFalseService(pekerjaanNo string) error
+
+	StorePersetujuan(input []domain.ListProjectPersetujuan) error
+	FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectPersetujuan, error)
 }
 
 type service struct {
@@ -109,4 +112,14 @@ func (s *service) SyncCanProgressFalseService(pekerjaanNo string) error {
 	err := s.repository.SyncCanProgressFalse(pekerjaanNo)
 
 	return err
+}
+
+func (s *service) StorePersetujuan(input []domain.ListProjectPersetujuan) error {
+	_, err := s.repository.StorePersetujuan(input)
+	return err
+}
+
+func (s *service) FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectPersetujuan, error) {
+	hasil, err := s.repository.FindPersetujuan(pekerjaan_no)
+	return hasil, err
 }

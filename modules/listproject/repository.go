@@ -22,6 +22,9 @@ type Repository interface {
 	UpdatePlanningActualDate(input domain.ModelUpdateActualPlanningDate) error
 	UpdateByPekerjaanNo(pekerjaanNo string, updateData map[string]interface{}) error
 	SyncCanProgressFalse(pekerjaanNo string) error
+
+	StorePersetujuan(input []domain.ListProjectPersetujuan) ([]domain.ListProjectPersetujuan, error)
+	FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectPersetujuan, error)
 }
 
 type repository struct {
@@ -118,4 +121,31 @@ func (r *repository) SyncCanProgressFalse(pekerjaanNo string) error {
 		Where("pekerjaan_no = ?", pekerjaanNo).
 		Update("can_progress", 0).Error
 	return err
+}
+
+func (r *repository) StorePersetujuan(input []domain.ListProjectPersetujuan) ([]domain.ListProjectPersetujuan, error) {
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	if err := tx.Table("list_project_persetujuan").Where("pekerjaan_no = ?", input[0].PekerjaanNo).Delete(&domain.ListProjectPersetujuan{}).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Table("list_project_persetujuan").Create(&input).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+	return input, nil
+}
+
+func (r *repository) FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectPersetujuan, error) {
+	var listProjectsPersetujuan []domain.ListProjectPersetujuan
+	err := r.db.Table("list_project_persetujuan").Where("pekerjaan_no=?", pekerjaan_no).Find(&listProjectsPersetujuan).Error
+	return listProjectsPersetujuan, err
 }

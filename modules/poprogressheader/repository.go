@@ -72,6 +72,7 @@ func (r *repository) EbappUpdate(id string, input domain.PoProgressHeaderUpdateE
 	updateData := map[string]interface{}{
 		"isebapp":      0,
 		"last_updated": input.LastUpdated,
+		"keterangan":   input.Keterangan,
 	}
 
 	if input.IsEbapp == 1 {

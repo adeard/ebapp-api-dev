@@ -19,6 +19,7 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 	listProject := v1.Group("list_project")
 	project := v1.Group("project")
 	project.Use(middlewares.AuthService())
+	listProject.Use(middlewares.AuthService())
 
 	listProject.GET("", handler.GetAll)
 	project.GET("/:id", handler.GetByID)
@@ -31,6 +32,9 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 	project.POST("/:id", handler.UpdateSpkNRetensi)
 	project.PUT("/status", handler.UpdateStatus)
 	project.PUT("/update_planning_actual_date", handler.UpdatePlanningActualDate)
+
+	project.GET("/find_persetujuan", handler.FindPersetujuan)
+	project.POST("/post_persetujuan", handler.StorePersetujuan)
 }
 
 func (h *listProjectHandler) GetAll(c *gin.Context) {
@@ -398,4 +402,52 @@ func (h *listProjectHandler) UpdatePlanningActualDate(c *gin.Context) {
 		"status":  http.StatusOK,
 		"message": "Planning dan Actual Date proyek berhasil diperbarui",
 	})
+}
+
+func (h *listProjectHandler) StorePersetujuan(c *gin.Context) {
+	var input []domain.ListProjectPersetujuan
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "Request tidak valid",
+		})
+		return
+	}
+
+	response := domain.PoBoqHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil input persetujuan",
+	}
+
+	err := h.listProjectService.StorePersetujuan(input)
+	if err != nil {
+		response = domain.PoBoqHeaderResponse{
+			Status:  http.StatusBadRequest,
+			Message: err.Error(),
+		}
+
+	}
+
+	c.JSON(response.Status, response)
+}
+
+func (h *listProjectHandler) FindPersetujuan(c *gin.Context) {
+	pekerjaan_no := c.Query("pekerjaan_no")
+
+	response := domain.ListProjectPersetujuanHeaderResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil get persetujuan",
+	}
+
+	hasil, err := h.listProjectService.FindPersetujuan(pekerjaan_no)
+	if err != nil {
+		response = domain.ListProjectPersetujuanHeaderResponse{
+			Status:  http.StatusBadRequest,
+			Message: err.Error(),
+		}
+	}
+
+	response.Data = hasil
+	c.JSON(response.Status, response)
 }
