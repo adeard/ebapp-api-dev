@@ -115,14 +115,27 @@ func (r *repository) EbappUpdate2(id string, status string) (domain.PoProgressHe
 
 func (r *repository) SyncProgress(run_num string) error {
 	query := `SELECT (SUM(CASE 
-		WHEN (current_volume*price) is null then 0 
-		ELSE (current_volume*price)
-		END)/ SUM(price * qty))*100 as p
-  FROM po_boq_body_progress where run_num = ? and qty != 0`
+		WHEN (a.current_volume*a.price) is null then 0 
+		ELSE (a.current_volume*a.price)
+		END)/ SUM(a.price * a.qty))*100 as p
+  FROM po_boq_body_progress a left join po_boq_header b on a.[order] = b.[order]  where a.run_num = ? and a.qty != 0 and b.is_addendum = 0`
 	var p float64
 	r.db.Raw(query, run_num).First(&p)
 	query2 := `UPDATE po_progress_header set new_prog = ?, last_updated = ? WHERE run_num = ?`
 	err := r.db.Exec(query2, p, time.Now().UTC(), run_num)
 
+	// if err == nil {
+	query1 := `SELECT (SUM(CASE 
+		WHEN (a.current_volume*a.price) is null then 0 
+		ELSE (a.current_volume*a.price)
+		END)/ SUM(a.price * a.qty))*100 as p
+  FROM po_boq_body_progress a left join po_boq_header b on a.[order] = b.[order]  where a.run_num = ? and a.qty != 0 and b.is_addendum = 1`
+	var p1 float64
+	r.db.Raw(query1, run_num).First(&p1)
+	query21 := `UPDATE po_progress_header_addendum set new_prog = ?, last_updated = ? WHERE run_num = ?`
+	r.db.Exec(query21, p1, time.Now().UTC(), run_num)
+
+	// 	return err1.Error
+	// }
 	return err.Error
 }

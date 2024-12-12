@@ -103,6 +103,18 @@ func (h *authHandler) GetToken(c *gin.Context) {
 		Domain:   os.Getenv("URL_APP"),
 	}
 	http.SetCookie(c.Writer, &cookie)
+
+	vcookie := http.Cookie{
+		Name:     "valid_d",
+		Value:    url.QueryEscape(authtoken.ValidDetail),
+		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+		Secure:   false,
+		Path:     "/",
+		Domain:   os.Getenv("URL_APP"),
+	}
+	http.SetCookie(c.Writer, &vcookie)
+
 	if retrievedCookie, err := c.Cookie("session_token"); err == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"token":   true,

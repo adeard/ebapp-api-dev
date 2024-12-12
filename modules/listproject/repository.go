@@ -2,7 +2,6 @@ package listproject
 
 import (
 	"ebapp-api-dev/domain"
-	"strings"
 
 	"gorm.io/gorm"
 )
@@ -50,20 +49,23 @@ func (r *repository) FindById(id string) (domain.ListProject, error) {
 func (r *repository) FindByPlant(ids []string) ([]domain.ListProject, error) {
 	var projects []domain.ListProject
 
-	for _, id := range ids {
-		var tmpProject []domain.ListProject
-		parts := strings.Split(id, " ")
+	// for _, id := range ids {
+	// 	var tmpProject []domain.ListProject
+	// 	parts := strings.Split(id, " ")
 
-		err := r.db.Table("list_project").Where("unit_usaha LIKE ?", parts[0]+"%").Find(&tmpProject).Error
-		for _, v := range tmpProject {
-			projects = append(projects, v)
-		}
+	// 	err := r.db.Table("list_project").Where("unit_usaha LIKE ?", parts[0]+"%").Find(&tmpProject).Error
+	// 	for _, v := range tmpProject {
+	// 		projects = append(projects, v)
+	// 	}
 
-		if err != nil {
-			return nil, err
-		}
-	}
-	return projects, nil
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
+
+	query := `SELECT * FROM list_project where SUBSTRING (unit_usaha ,0 , CHARINDEX('-', unit_usaha)) in (?) ORDER BY start_date DESC`
+	err := r.db.Raw(query, ids).Find(&projects).Error
+	return projects, err
 }
 
 func (r *repository) Store(input domain.ListProject) (domain.ListProject, error) {

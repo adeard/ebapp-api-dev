@@ -8,8 +8,11 @@ import (
 
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/sha256"
 	"encoding/base64"
 	"time"
+
+	"encoding/hex"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -36,8 +39,14 @@ func ValidateJWT(context *gin.Context) error {
 }
 
 func validateToken(context *gin.Context) (jwt.MapClaims, error) {
+	//check validasi detail yang ada di frontend
+	validDetail := getValidDetailFromRequest(context)
+	hash := sha256.New()
+	hash.Write([]byte(validDetail))
+	hashedData := hash.Sum(nil)
+	hashString := hex.EncodeToString(hashedData)
+	println(hashString)
 	tokenString := getTokenFromRequest(context)
-
 	//dekrip
 	tokenDecrypt, err := Decrypt(tokenString, JWTKEY)
 	if err != nil {
@@ -77,6 +86,14 @@ func validateToken(context *gin.Context) (jwt.MapClaims, error) {
 
 func getTokenFromRequest(context *gin.Context) string {
 	if retrievedCookie, err := context.Cookie("session_token"); err == nil {
+		return retrievedCookie
+	} else {
+		return ""
+	}
+}
+
+func getValidDetailFromRequest(context *gin.Context) string {
+	if retrievedCookie, err := context.Cookie("valid_d"); err == nil {
 		return retrievedCookie
 	} else {
 		return ""

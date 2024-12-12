@@ -91,6 +91,28 @@ func (s *service) CloneProgress(previousProgress string, nextProgress string) er
 		//return errors.New("Run num " + previousProgress + " not found")
 	}
 
+	//get is_addendum
+	var getProgressAddendum, err1 = s.repository.GetByRunNumBoqHeaderProgressAddendum(previousProgress)
+	if err1 != nil {
+		return err
+	}
+
+	if len(getProgressAddendum) > 0 {
+		parts1 := strings.Split(previousProgress, "/")
+		newStr1 := strings.Join(parts1[:len(parts1)-1], "/")
+		for _, gpa := range getProgressAddendum {
+			getBoqBodyProgressAddendum, err3 := s.repository.GetByRunNumBoqBodyProgressAddendum(previousProgress, gpa.Order)
+			if err3 == nil {
+				if len(getBoqBodyProgressAddendum) == 0 {
+					getAddendumBoqBody, err2 := s.repository.GetByRunNumBoqBodyAddendum(newStr1, gpa.Order)
+					if err2 == nil {
+						getExistProgress = append(getExistProgress, getAddendumBoqBody...)
+					}
+				}
+			}
+		}
+	}
+
 	newProgress := []domain.PoBoqBodyProgress{}
 
 	for _, bodyProgressData := range getExistProgress {

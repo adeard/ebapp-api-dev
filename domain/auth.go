@@ -19,6 +19,7 @@ type AuthResponse struct {
 }
 
 type AuthToken struct {
-	Id    uint64 `json:"id"`
-	Token string `json:"token"`
+	Id          uint64 `json:"id"`
+	Token       string `json:"token"`
+	ValidDetail string `json:"valid_detail"`
 }
