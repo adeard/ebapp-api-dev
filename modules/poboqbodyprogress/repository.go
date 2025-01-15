@@ -20,6 +20,7 @@ type Repository interface {
 	GetByRunNumBoqHeaderProgressAddendum(runNum string) ([]domain.PoBoqHeader, error)
 	GetByRunNumBoqBodyAddendum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
 	GetByRunNumBoqBodyProgressAddendum(runNum string, order string) ([]domain.PoBoqBodyProgress, error)
+	GetByRunNumBoqHeaderAddendum(runNum string) ([]domain.PoBoqHeader, error)
 }
 
 type repository struct {
@@ -155,6 +156,14 @@ func (r *repository) GetByRunNumBoqBodyProgressAddendum(runNum string, order str
 	result := []domain.PoBoqBodyProgress{}
 
 	err := r.db.Table("po_boq_body_progress").Where("run_num = ? AND [order] = ?", runNum, order).Find(&result).Error
+
+	return result, err
+}
+
+func (r *repository) GetByRunNumBoqHeaderAddendum(runNum string) ([]domain.PoBoqHeader, error) {
+	result := []domain.PoBoqHeader{}
+
+	err := r.db.Table("po_boq_header").Where("pekerjaan_no = ? AND is_addendum = 1", runNum).Find(&result).Error
 
 	return result, err
 }

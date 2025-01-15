@@ -161,20 +161,22 @@ func (s *service) CheckBoqBody(id string, order string, mainId string) ([]domain
 
 func (s *service) CalculateByRunNumAndOrder(runNum string, order string) (float64, error) {
 
-	total := float64(0)
+	// total := float64(0)
 
-	poBoqBodyDatas, err := s.repository.GetByRunNumAndOrder(runNum, order)
-	if err != nil {
-		return 0, err
-	}
+	// poBoqBodyDatas, err := s.repository.GetByRunNumAndOrder(runNum, order)
+	// if err != nil {
+	// 	return 0, err
+	// }
 
-	if len(poBoqBodyDatas) == 0 {
-		return total, nil
-	}
+	// if len(poBoqBodyDatas) == 0 {
+	// 	return total, nil
+	// }
 
-	for _, poBoqBodyData := range poBoqBodyDatas {
-		total += float64(poBoqBodyData.Qty) * float64(poBoqBodyData.Price)
-	}
+	// for _, poBoqBodyData := range poBoqBodyDatas {
+	// 	total += float64(poBoqBodyData.Qty) * float64(poBoqBodyData.Price)
+	// }
+
+	total, err := s.repository.CalculateBoqBody(runNum, order)
 
 	return math.Round(total), err
 }

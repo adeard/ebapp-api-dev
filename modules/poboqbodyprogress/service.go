@@ -84,9 +84,10 @@ func (s *service) CloneProgress(previousProgress string, nextProgress string) er
 		return err
 	}
 
+	parts := strings.Split(previousProgress, "/")
+	newStr := strings.Join(parts[:len(parts)-1], "/")
+
 	if len(getExistProgress) < 1 {
-		parts := strings.Split(previousProgress, "/")
-		newStr := strings.Join(parts[:len(parts)-1], "/")
 		getExistProgress, err = s.repository.GetByRunNumBoqBody(newStr)
 		//return errors.New("Run num " + previousProgress + " not found")
 	}
@@ -98,17 +99,29 @@ func (s *service) CloneProgress(previousProgress string, nextProgress string) er
 	}
 
 	if len(getProgressAddendum) > 0 {
-		parts1 := strings.Split(previousProgress, "/")
-		newStr1 := strings.Join(parts1[:len(parts1)-1], "/")
+		// parts1 := strings.Split(previousProgress, "/")
+		// newStr1 := strings.Join(parts1[:len(parts1)-1], "/")
 		for _, gpa := range getProgressAddendum {
 			getBoqBodyProgressAddendum, err3 := s.repository.GetByRunNumBoqBodyProgressAddendum(previousProgress, gpa.Order)
 			if err3 == nil {
 				if len(getBoqBodyProgressAddendum) == 0 {
-					getAddendumBoqBody, err2 := s.repository.GetByRunNumBoqBodyAddendum(newStr1, gpa.Order)
+					getAddendumBoqBody, err2 := s.repository.GetByRunNumBoqBodyAddendum(newStr, gpa.Order)
 					if err2 == nil {
 						getExistProgress = append(getExistProgress, getAddendumBoqBody...)
 					}
 				}
+			}
+		}
+	} else {
+		//get is_addendum dari po boq header, untuk pertama kali
+		var getHeaderAddendum, err1 = s.repository.GetByRunNumBoqHeaderAddendum(newStr)
+		if err1 != nil {
+			return err
+		}
+		for _, gpa1 := range getHeaderAddendum {
+			getAddendumBoqBody, err2 := s.repository.GetByRunNumBoqBodyAddendum(newStr, gpa1.Order)
+			if err2 == nil {
+				getExistProgress = append(getExistProgress, getAddendumBoqBody...)
 			}
 		}
 	}

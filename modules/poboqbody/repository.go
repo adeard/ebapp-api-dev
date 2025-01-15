@@ -20,6 +20,7 @@ type Repository interface {
 	CheckItemNo(runNum string, order string, itemNo string) (bool, error)
 	SelectMainId(runNum string, order string, itemNo string) (int, error)
 	CopyBoqBodyToPoBoqBody(oldRunNum string, newRunNum string, newOrder string) error
+	CalculateBoqBody(runNum string, order string) (float64, error)
 }
 
 type repository struct {
@@ -238,4 +239,14 @@ func (r *repository) GenerateMainId(runNum string, order string) (int, error) {
 	`, runNum, order).Scan(&maxValue).Error
 
 	return maxValue, err
+}
+
+func (r *repository) CalculateBoqBody(runNum string, order string) (float64, error) {
+	var total float64
+
+	err := r.db.Raw(`
+		SELECT SUM(qty*price) as total FROM "po_boq_body" WHERE run_num =? AND [order] =?
+	`, runNum, order).Scan(&total).Error
+
+	return total, err
 }

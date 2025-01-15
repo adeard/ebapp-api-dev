@@ -2,6 +2,7 @@ package poprogressheader
 
 import (
 	"ebapp-api-dev/domain"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -114,13 +115,15 @@ func (r *repository) EbappUpdate2(id string, status string) (domain.PoProgressHe
 }
 
 func (r *repository) SyncProgress(run_num string) error {
+	parts := strings.Split(run_num, "/")
+	newStr := strings.Join(parts[:len(parts)-1], "/")
 	query := `SELECT (SUM(CASE 
 		WHEN (a.current_volume*a.price) is null then 0 
 		ELSE (a.current_volume*a.price)
 		END)/ SUM(a.price * a.qty))*100 as p
-  FROM po_boq_body_progress a left join po_boq_header b on a.[order] = b.[order]  where a.run_num = ? and a.qty != 0 and b.is_addendum = 0`
+  FROM po_boq_body_progress a left join po_boq_header b on a.[order] = b.[order]  where a.run_num = ? and a.qty != 0 and b.is_addendum = 0 and b.pekerjaan_no = ?`
 	var p float64
-	r.db.Raw(query, run_num).First(&p)
+	r.db.Raw(query, run_num, newStr).First(&p)
 	query2 := `UPDATE po_progress_header set new_prog = ?, last_updated = ? WHERE run_num = ?`
 	err := r.db.Exec(query2, p, time.Now().UTC(), run_num)
 
@@ -129,9 +132,9 @@ func (r *repository) SyncProgress(run_num string) error {
 		WHEN (a.current_volume*a.price) is null then 0 
 		ELSE (a.current_volume*a.price)
 		END)/ SUM(a.price * a.qty))*100 as p
-  FROM po_boq_body_progress a left join po_boq_header b on a.[order] = b.[order]  where a.run_num = ? and a.qty != 0 and b.is_addendum = 1`
+  FROM po_boq_body_progress a left join po_boq_header b on a.[order] = b.[order]  where a.run_num = ? and a.qty != 0 and b.is_addendum = 1 and b.pekerjaan_no = ?`
 	var p1 float64
-	r.db.Raw(query1, run_num).First(&p1)
+	r.db.Raw(query1, run_num, newStr).First(&p1)
 	query21 := `UPDATE po_progress_header_addendum set new_prog = ?, last_updated = ? WHERE run_num = ?`
 	r.db.Exec(query21, p1, time.Now().UTC(), run_num)
 
