@@ -9,7 +9,7 @@ import (
 
 func GetDataFromUserManagement() (string, string, string, error) {
 	// POST REQUEST UNTUK LOGIN
-	mainUrl := "http://10.126.20.217:9087"
+	mainUrl := "https://api.indoagri.co.id/am"
 	loginURL := mainUrl + "/api/user/login"
 	loginData := map[string]string{"user_name": "ebapphelper", "password": "ebapphelper"}
 	jsonData, err := json.Marshal(loginData)
