@@ -165,6 +165,7 @@ type ListProjectPersetujuan struct {
 	Pihak       int    `json:"pihak"`
 	Nama        string `json:"nama"`
 	Jabatan     string `json:"jabatan"`
+	Catatan     string `json:"catatan"`
 }
 
 type ListProjectPersetujuanHeaderResponse struct {
