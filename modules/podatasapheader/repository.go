@@ -11,7 +11,7 @@ import (
 )
 
 type Repository interface {
-	CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error)
+	CheckTitle(id string, firstToken string) ([]domain.PoDataSapHeaderTitle, error)
 	CheckArea(id string) (domain.DataMasterPlant, error)
 	CheckWbs(id string) ([]domain.ReadWbs, error)
 }
@@ -24,11 +24,11 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
 }
 
-func (r *repository) CheckTitle(id string) ([]domain.PoDataSapHeaderTitle, error) {
+func (r *repository) CheckTitle(id string, firstToken string) ([]domain.PoDataSapHeaderTitle, error) {
 	var poProject []domain.PoDataSapHeaderTitle
 
 	// Mendapatkan URL, Username, dan Password dari helper
-	urlV, usernameV, passwordV, err := helper.GetDataFromUserManagement()
+	urlV, usernameV, passwordV, err := helper.GetDataFromUserManagement(firstToken)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return nil, err

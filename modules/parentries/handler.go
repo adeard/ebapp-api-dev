@@ -82,7 +82,8 @@ func (h *parEntriesHandler) GetByHelper(c *gin.Context) {
 	id := c.Param("id")
 
 	// Memanggil GetDataParEntries untuk mendapatkan data
-	dataBytes, err := helper.GetDataParEntries(id)
+	authToken, err := c.Cookie("session_token")
+	dataBytes, err := helper.GetDataParEntries(id, authToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,

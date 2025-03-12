@@ -26,7 +26,9 @@ func NewPoDataSapHeaderHandler(v1 *gin.RouterGroup, poDataSapHeaderService Servi
 func (h *poDataSapHeaderHandler) GetTitle(c *gin.Context) {
 	id := c.Param("id")
 
-	poDataSapHeaderTitle, err := h.poDataSapHeaderService.GetTitle(id)
+	authToken, err := c.Cookie("session_token")
+
+	poDataSapHeaderTitle, err := h.poDataSapHeaderService.GetTitle(id, authToken)
 	if err != nil {
 		if err == domain.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{

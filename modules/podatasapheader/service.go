@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	GetTitle(po string) ([]domain.PoDataSapHeaderTitle, error)
+	GetTitle(po string, firstToken string) ([]domain.PoDataSapHeaderTitle, error)
 	GetWbs(po string) ([]domain.ReadWbs, error)
 	GetArea(id string) (domain.DataMasterPlant, error)
 }
@@ -18,8 +18,8 @@ func NewService(repository Repository) Service {
 	return &service{repository}
 }
 
-func (s *service) GetTitle(id string) ([]domain.PoDataSapHeaderTitle, error) {
-	poDataSapHeaderTitle, err := s.repository.CheckTitle(id)
+func (s *service) GetTitle(id string, firstToken string) ([]domain.PoDataSapHeaderTitle, error) {
+	poDataSapHeaderTitle, err := s.repository.CheckTitle(id, firstToken)
 	return poDataSapHeaderTitle, err
 }
 

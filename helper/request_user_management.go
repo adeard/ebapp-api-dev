@@ -1,55 +1,54 @@
 package helper
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-func GetDataFromUserManagement() (string, string, string, error) {
+func GetDataFromUserManagement(firstToken string) (string, string, string, error) {
 	// POST REQUEST UNTUK LOGIN
 	mainUrl := "https://api.indoagri.co.id/am"
-	loginURL := mainUrl + "/api/user/login"
-	loginData := map[string]string{"user_name": "ebapphelper", "password": "ebapphelper"}
-	jsonData, err := json.Marshal(loginData)
-	if err != nil {
-		return "", "", "", err
-	}
+	// loginURL := mainUrl + "/api/user/login"
+	// loginData := map[string]string{"user_name": "ebapphelper", "password": "ebapphelper"}
+	// jsonData, err := json.Marshal(loginData)
+	// if err != nil {
+	// 	return "", "", "", err
+	// }
 
 	client := &http.Client{}
-	loginReq, err := http.NewRequest("POST", loginURL, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return "", "", "", err
-	}
-	loginReq.Header.Set("Content-Type", "application/json")
+	// loginReq, err := http.NewRequest("POST", loginURL, bytes.NewBuffer(jsonData))
+	// if err != nil {
+	// 	return "", "", "", err
+	// }
+	// loginReq.Header.Set("Content-Type", "application/json")
 
-	loginResp, err := client.Do(loginReq)
-	if err != nil {
-		return "", "", "", err
-	}
-	defer loginResp.Body.Close()
+	// loginResp, err := client.Do(loginReq)
+	// if err != nil {
+	// 	return "", "", "", err
+	// }
+	// defer loginResp.Body.Close()
 
-	if loginResp.StatusCode != http.StatusOK {
-		return "", "", "", fmt.Errorf("login failed: %s", loginResp.Status)
-	}
+	// if loginResp.StatusCode != http.StatusOK {
+	// 	return "", "", "", fmt.Errorf("login failed: %s", loginResp.Status)
+	// }
 
-	var loginResponse struct {
-		Result  bool   `json:"result"`
-		Message string `json:"message"`
-		Datas   string `json:"datas"`
-	}
+	// var loginResponse struct {
+	// 	Result  bool   `json:"result"`
+	// 	Message string `json:"message"`
+	// 	Datas   string `json:"datas"`
+	// }
 
-	err = json.NewDecoder(loginResp.Body).Decode(&loginResponse)
-	if err != nil {
-		return "", "", "", err
-	}
+	// err = json.NewDecoder(loginResp.Body).Decode(&loginResponse)
+	// if err != nil {
+	// 	return "", "", "", err
+	// }
 
-	if !loginResponse.Result {
-		return "", "", "", fmt.Errorf("login failed: %s", loginResponse.Message)
-	}
+	// if !loginResponse.Result {
+	// 	return "", "", "", fmt.Errorf("login failed: %s", loginResponse.Message)
+	// }
 
-	firstToken := loginResponse.Datas
+	// firstToken := loginResponse.Datas
 
 	// Fungsi untuk melakukan GET request dan mengembalikan nilai dari objek->Value
 	getValue := func(url string) (string, error) {
@@ -105,48 +104,48 @@ func GetDataFromUserManagement() (string, string, string, error) {
 	return urlValue, usernameValue, passwordValue, nil
 }
 
-func GetDataParEntries(column string) ([]byte, error) {
+func GetDataParEntries(column string, firstToken string) ([]byte, error) {
 	// POST REQUEST UNTUK LOGIN
-	loginURL := "https://api.indoagri.co.id/am/api/user/login"
-	loginData := map[string]string{"user_name": "ebapphelper", "password": "ebapphelper"}
-	jsonData, err := json.Marshal(loginData)
-	if err != nil {
-		return nil, err
-	}
+	// loginURL := "https://api.indoagri.co.id/am/api/user/login"
+	// loginData := map[string]string{"user_name": "ebapphelper", "password": "ebapphelper"}
+	// jsonData, err := json.Marshal(loginData)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	client := &http.Client{}
-	loginReq, err := http.NewRequest("POST", loginURL, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, err
-	}
-	loginReq.Header.Set("Content-Type", "application/json")
+	// loginReq, err := http.NewRequest("POST", loginURL, bytes.NewBuffer(jsonData))
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// loginReq.Header.Set("Content-Type", "application/json")
 
-	loginResp, err := client.Do(loginReq)
-	if err != nil {
-		return nil, err
-	}
-	defer loginResp.Body.Close()
+	// loginResp, err := client.Do(loginReq)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// defer loginResp.Body.Close()
 
-	if loginResp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("login failed: %s", loginResp.Status)
-	}
+	// if loginResp.StatusCode != http.StatusOK {
+	// 	return nil, fmt.Errorf("login failed: %s", loginResp.Status)
+	// }
 
-	var loginResponse struct {
-		Result  bool   `json:"result"`
-		Message string `json:"message"`
-		Datas   string `json:"datas"`
-	}
+	// var loginResponse struct {
+	// 	Result  bool   `json:"result"`
+	// 	Message string `json:"message"`
+	// 	Datas   string `json:"datas"`
+	// }
 
-	err = json.NewDecoder(loginResp.Body).Decode(&loginResponse)
-	if err != nil {
-		return nil, err
-	}
+	// err = json.NewDecoder(loginResp.Body).Decode(&loginResponse)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	if !loginResponse.Result {
-		return nil, fmt.Errorf("login failed: %s", loginResponse.Message)
-	}
+	// if !loginResponse.Result {
+	// 	return nil, fmt.Errorf("login failed: %s", loginResponse.Message)
+	// }
 
-	firstToken := loginResponse.Datas
+	// firstToken := loginResponse.Datas
 
 	// Fungsi untuk melakukan GET request dan mengembalikan nilai dari objek->Value
 	getData := func(url string) ([]byte, error) {
