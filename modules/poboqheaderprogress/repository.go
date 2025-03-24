@@ -99,9 +99,10 @@ func (r *repository) FindProgressWithPagingServerSideCount(id string, item strin
 }
 
 func (r *repository) SyncProgress(run_num string) error {
-	headers, err := r.FindProgress(run_num)
-	for _, headersData := range headers {
-		query := `SELECT (SUM(CASE 
+	// headers, err := r.FindProgress(run_num)
+
+	// for _, headersData := range headers {
+	query := `SELECT (SUM(CASE 
 		WHEN (current_volume*price) is null then 0 
 		ELSE (current_volume*price)
 		END + 
@@ -109,15 +110,16 @@ func (r *repository) SyncProgress(run_num string) error {
 		WHEN (previous_volume*price) is null then 0 
 		ELSE (previous_volume*price)
 		END)/ SUM(price * qty))*100 as p
-  FROM po_boq_body_progress where run_num = ? and qty != 0 and [order] = ?`
-		var p float64
-		r.db.Raw(query, run_num, headersData.Order).First(&p)
-		query2 := `UPDATE po_boq_header_progress set actual_percentage = ? WHERE pekerjaan_no = ? and [order] = ?`
-		err2 := r.db.Exec(query2, p, run_num, headersData.Order)
-		if err2 != nil {
-			return err2.Error
-		}
+  FROM po_boq_body_progress where run_num = ? and qty != 0`
+	var p float64
+	r.db.Raw(query, run_num).First(&p)
+	query2 := `UPDATE po_boq_header_progress set actual_percentage = ? WHERE pekerjaan_no = ? and [order] = ?`
+	err2 := r.db.Exec(query2, p, run_num, 0)
+	// if err2 != nil {
+	// 	return err2.Error
+	// }
 
-	}
-	return err
+	//}
+
+	return err2.Error
 }

@@ -6,7 +6,7 @@ import (
 
 type Service interface {
 	FindProg(id string) (domain.PoProgressHeader, error)
-	FindAllProg(id string) ([]domain.PoProgressHeader, error)
+	FindAllProg(id string) ([]domain.PoProgressHeaderWithPercentage, error)
 	Delete(id string) error
 	Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error)
 	EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error)
@@ -28,7 +28,7 @@ func (s *service) FindProg(id string) (domain.PoProgressHeader, error) {
 	return data, err
 }
 
-func (s *service) FindAllProg(id string) ([]domain.PoProgressHeader, error) {
+func (s *service) FindAllProg(id string) ([]domain.PoProgressHeaderWithPercentage, error) {
 	datas, err := s.repository.FindAllProg(id)
 	return datas, err
 }

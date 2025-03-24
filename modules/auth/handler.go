@@ -53,7 +53,7 @@ func NewAuthHandler(v1 *gin.RouterGroup, authService Service) {
 	wf_helper.GET("/get_doc_by_activity_owner", handler.ApiWfGetDocByActivityOwner)
 	wf_helper.GET("/get_flag_by_id", handler.ApiWfGetFlagById)
 	wf_helper.GET("/get_next_flag", handler.ApiWfGetNextFlag)
-	wf_helper.GET("/get_doc_by_potential_owner", handler.ApiWfGetDocByPotentialOwner)
+	wf_helper.POST("/get_doc_by_potential_owner", handler.ApiWfGetDocByPotentialOwner)
 	wf_helper.GET("/download_attch", handler.ApiWfDownloadAttch)
 	wf_helper.DELETE("/delete_attch", handler.ApiWfDeleteAttch)
 
@@ -574,6 +574,12 @@ func (h *authHandler) ApiWfGetNextFlag(c *gin.Context) {
 }
 
 func (h *authHandler) ApiWfGetDocByPotentialOwner(c *gin.Context) {
+	var requestBody []interface{}
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON body"})
+		return
+	}
+
 	role := c.DefaultQuery("role", "")
 	if role == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "role is required"})
@@ -596,7 +602,13 @@ func (h *authHandler) ApiWfGetDocByPotentialOwner(c *gin.Context) {
 
 	url := fmt.Sprintf("%swf_helper/get_doc_by_potential_owner?role=%s&is_administrator=%s&doc_alias=%s", os.Getenv("SERVER_URL_WR"), role, is_administrator, doc_alias)
 
-	req, err := http.NewRequest("GET", url, nil)
+	jsonData, err := json.Marshal(requestBody)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process request body"})
+		return
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
 		return
@@ -935,6 +947,12 @@ func (h *authHandler) ApiWfDownloadAttch(c *gin.Context) {
 		return
 	}
 
+	name_file := c.DefaultQuery("name_file", "")
+	if name_file == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "name_file is required"})
+		return
+	}
+
 	authToken, err := c.Cookie("session_token")
 
 	url := fmt.Sprintf("%swf_helper/download_attch?attch_id=%s", os.Getenv("SERVER_URL_WR"), attch_id)
@@ -965,6 +983,17 @@ func (h *authHandler) ApiWfDownloadAttch(c *gin.Context) {
 	contentLength := resp.ContentLength
 	contentType := resp.Header.Get("Content-Type")
 	contentDisposition := resp.Header.Get("Content-Disposition")
+
+	// _files := strings.Split(name_file, ".")
+	ext_file := name_file
+
+	if ext_file == "xlsx" {
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	} else if ext_file == "docx" {
+		contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	} else if ext_file == "pptx" {
+		contentType = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+	}
 
 	c.Header("Content-Length", fmt.Sprintf("%d", contentLength))
 	c.Header("Content-Type", contentType)

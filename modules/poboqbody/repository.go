@@ -130,8 +130,8 @@ func (r *repository) Delete(id string, order string, mainId string) error {
     )
 
     DELETE FROM po_boq_body
-    WHERE main_id IN (SELECT main_id FROM temp) AND [order] = ?;`)
-	err := r.db.Exec(query, mainId, id, order, order).Error
+    WHERE main_id IN (SELECT main_id FROM temp) AND [order] = ? AND run_num = ?;`)
+	err := r.db.Exec(query, mainId, id, order, order, id).Error
 	return err
 }
 

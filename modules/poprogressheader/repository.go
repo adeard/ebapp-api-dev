@@ -10,7 +10,7 @@ import (
 
 type Repository interface {
 	FindProg(id string) (domain.PoProgressHeader, error)
-	FindAllProg(id string) ([]domain.PoProgressHeader, error)
+	FindAllProg(id string) ([]domain.PoProgressHeaderWithPercentage, error)
 	Delete(id string) error
 	Update(id string, input domain.PoProgressHeaderUpdate) (domain.PoProgressHeader, error)
 	EbappUpdate(id string, input domain.PoProgressHeaderUpdateEbapp) (domain.PoProgressHeader, error)
@@ -33,9 +33,16 @@ func (r *repository) FindProg(id string) (domain.PoProgressHeader, error) {
 	return progress, err
 }
 
-func (r *repository) FindAllProg(id string) ([]domain.PoProgressHeader, error) {
-	var progress []domain.PoProgressHeader
-	err := r.db.Table("po_progress_header").Where("run_num LIKE ?", id+"%").Find(&progress).Error
+func (r *repository) FindAllProg(id string) ([]domain.PoProgressHeaderWithPercentage, error) {
+	var progress []domain.PoProgressHeaderWithPercentage
+	// err := r.db.Table("po_progress_header").Where("run_num LIKE ?", id+"%").Find(&progress).Error
+
+	err := r.db.Table("po_progress_header").
+		Select("po_progress_header.*, po_boq_header_progress.actual_percentage").
+		Joins("JOIN po_boq_header_progress ON po_progress_header.run_num = po_boq_header_progress.pekerjaan_no").
+		Where("po_progress_header.run_num LIKE ? AND po_boq_header_progress.[order] = 0", id+"%").
+		Find(&progress).Error
+
 	return progress, err
 }
 
