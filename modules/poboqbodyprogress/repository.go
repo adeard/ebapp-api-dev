@@ -51,7 +51,7 @@ func (r *repository) FindByRunNum(runNum string, order string) ([]domain.PoBoqBo
 		q = q.Where("run_num = ?", runNum).Where("[order] = ?", order)
 	}
 
-	err := q.Order("main_id asc").Find(&boqBody).Error
+	err := q.Order("CAST([main_id] AS INT) ASC").Find(&boqBody).Error
 
 	return boqBody, err
 }

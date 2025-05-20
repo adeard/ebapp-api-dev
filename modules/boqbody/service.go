@@ -17,7 +17,7 @@ type Service interface {
 
 	GetByRunNumServerSide(runNum string, page int, pageSize int, item_no string, item_desc string) ([]domain.BoqBody, error)
 	GetByRunNumServerSideCount(runNum string, item_no string, item_desc string) (int64, error)
-	GetByParentIdServerSide(parentId string) ([]domain.BoqBody, error)
+	GetByParentIdServerSide(parentId string, run_num string) ([]domain.BoqBody, error)
 
 	groupItemsByParentServerSide(items []domain.BoqBodyServerSide, parentId int) []domain.BoqBodyServerSide
 }
@@ -50,8 +50,8 @@ func (s *service) GetByRunNumServerSideCount(runNum string, item_no string, item
 	return result, err
 }
 
-func (s *service) GetByParentIdServerSide(parentId string) ([]domain.BoqBody, error) {
-	boqBody, err := s.repository.FindByParentIDServerSide(parentId)
+func (s *service) GetByParentIdServerSide(parentId string, run_num string) ([]domain.BoqBody, error) {
+	boqBody, err := s.repository.FindByParentIDServerSide(parentId, run_num)
 	return boqBody, err
 }
 
@@ -124,7 +124,7 @@ func (s *service) groupItemsByParentServerSide(items []domain.BoqBodyServerSide,
 
 	for _, item := range items {
 		// if item.ParentId == parentId {
-		_boqBody, _ := s.repository.FindByParentIDServerSide(strconv.Itoa(item.Id))
+		_boqBody, _ := s.repository.FindByParentIDServerSide(strconv.Itoa(item.Id), item.RunNum)
 		//item.Children = boqBody
 		var _boqBodyServerSide []domain.BoqBodyServerSide
 		for _, body := range _boqBody {

@@ -20,7 +20,7 @@ type Repository interface {
 
 	FindByRunNumServerSide(runNum string, page int, pageSize int, item_no string, item_desc string) ([]domain.BoqBody, error)
 	FindByRunNumServerSideCount(runNum string, item_no string, item_desc string) (int64, error)
-	FindByParentIDServerSide(parentID string) ([]domain.BoqBody, error)
+	FindByParentIDServerSide(parentID string, run_num string) ([]domain.BoqBody, error)
 }
 
 type repository struct {
@@ -125,13 +125,13 @@ func (r *repository) FindByParentID(parentID string) ([]domain.BoqBody, error) {
 	return boqBody, err
 }
 
-func (r *repository) FindByParentIDServerSide(parentID string) ([]domain.BoqBody, error) {
+func (r *repository) FindByParentIDServerSide(parentID string, run_num string) ([]domain.BoqBody, error) {
 	var boqBody []domain.BoqBody
 
 	q := r.db.Table("boq_body").Debug()
 
 	if parentID != "" {
-		q = q.Where("parent_id = ?", parentID)
+		q = q.Where("parent_id = ? and run_num = ?", parentID, run_num)
 	}
 
 	err := q.Order("item_no asc").Find(&boqBody).Error

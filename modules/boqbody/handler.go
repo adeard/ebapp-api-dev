@@ -252,7 +252,7 @@ func (h *boqBodyHandler) GetBoqByParentIdServerSide(c *gin.Context) {
 	parentID := c.Param("id")
 	order := c.Param("order")
 
-	boqBody, err := h.boqBodyService.GetByParentIdServerSide(parentID)
+	boqBody, err := h.boqBodyService.GetByParentIdServerSide(parentID, "")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
@@ -419,7 +419,7 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 	}
 
 	// Memanggil service untuk melakukan update data BoQ Body.
-	_, updateErr := h.boqBodyService.Update(updateBoqBody, id)
+	boqBodies, updateErr := h.boqBodyService.Update(updateBoqBody, id)
 	if updateErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
@@ -431,7 +431,7 @@ func (h *boqBodyHandler) Update(c *gin.Context) {
 	response := domain.BoqBodyResponseFinal{
 		Status:  http.StatusOK,
 		Message: "Berhasil mengupdate data BoQ Body",
-		Data:    nil,
+		Data:    []domain.BoqBody{boqBodies},
 	}
 
 	c.JSON(http.StatusOK, response)

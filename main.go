@@ -23,6 +23,7 @@ import (
 	"ebapp-api-dev/modules/poproject"
 	"ebapp-api-dev/modules/poprojectaddendum"
 	"ebapp-api-dev/modules/progressattachment"
+	"ebapp-api-dev/modules/report"
 	"ebapp-api-dev/modules/user"
 	"log"
 	"net/http"
@@ -77,6 +78,7 @@ func main() {
 	poboqbodycpp.NewPoBoqBodyCppHandler(v1, poboqbodycpp.PoBoqBodyCppRegistry(db))
 	poboqheadercpp.NewPoBoqHeaderCppHandler(v1, poboqheadercpp.PoBoqHeaderCppRegistry(db))
 	pocppheader.NewPoCppHeaderHandler(v1, pocppheader.PoCppHeaderRegistry(db))
+	report.NewReportHandler(v1, report.ReportRegistry(db))
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)

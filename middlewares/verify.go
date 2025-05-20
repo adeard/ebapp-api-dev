@@ -12,8 +12,6 @@ import (
 	"encoding/base64"
 	"time"
 
-	"encoding/hex"
-
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
@@ -43,9 +41,9 @@ func validateToken(context *gin.Context) (jwt.MapClaims, error) {
 	validDetail := getValidDetailFromRequest(context)
 	hash := sha256.New()
 	hash.Write([]byte(validDetail))
-	hashedData := hash.Sum(nil)
-	hashString := hex.EncodeToString(hashedData)
-	println(hashString)
+	//hashedData := hash.Sum(nil)
+	//hashString := hex.EncodeToString(hashedData)
+	//println(hashString)
 	tokenString := getTokenFromRequest(context)
 	//dekrip
 	tokenDecrypt, err := Decrypt(tokenString, JWTKEY)
@@ -56,7 +54,7 @@ func validateToken(context *gin.Context) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(string(tokenDecrypt), func(token *jwt.Token) (interface{}, error) {
 		// Check the signing method
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Invalid signing method")
+			return nil, fmt.Errorf("invalid signing method")
 		}
 
 		return []byte(JWTKEY), nil
@@ -77,11 +75,11 @@ func validateToken(context *gin.Context) (jwt.MapClaims, error) {
 		}
 		if time.Now().After(expiryTime) {
 			fmt.Println("Token has expired")
-			return nil, fmt.Errorf("Token has expired")
+			return nil, fmt.Errorf("token has expired")
 		}
 		return claims, nil
 	}
-	return nil, fmt.Errorf("Invalid token")
+	return nil, fmt.Errorf("invalid token")
 }
 
 func getTokenFromRequest(context *gin.Context) string {
@@ -170,7 +168,7 @@ func DecryptAndValidate(ciphertextB64, keyB64 string) (string, error) {
 	token, err := jwt.Parse(string(plaintext), func(token *jwt.Token) (interface{}, error) {
 		// Check the signing method
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Invalid signing method")
+			return nil, fmt.Errorf("invalid signing method")
 		}
 
 		return []byte(JWTKEY), nil
@@ -191,11 +189,11 @@ func DecryptAndValidate(ciphertextB64, keyB64 string) (string, error) {
 		}
 		if time.Now().After(expiryTime) {
 			fmt.Println("Token has expired")
-			return "", fmt.Errorf("Token has expired")
+			return "", fmt.Errorf("token has expired")
 		}
 		return "Claims extracted successfully", nil
 	}
-	return "", fmt.Errorf("Invalid token")
+	return "", fmt.Errorf("invalid token")
 }
 
 func decryptAESGCM(ciphertext, key []byte) ([]byte, error) {
