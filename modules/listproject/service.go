@@ -95,13 +95,13 @@ func (s *service) UpdatePlanningActualDate(input domain.ModelUpdateActualPlannin
 func (s *service) UpdateByPekerjaanNo(pekerjaanNo string, input domain.ListProject) error {
 	updateData := map[string]interface{}{}
 
-	loc, _ := time.LoadLocation("Asia/Jakarta")
+	// loc, _ := time.LoadLocation("Asia/Jakarta")
 
 	if input.CanProgress >= 0 {
 		updateData["can_progress"] = input.CanProgress
 	}
 
-	updateData["last_updated"] = time.Now().In(loc).Format("2006-01-02 15:04:05")
+	updateData["last_updated"] = time.Now()
 
 	err := s.repository.UpdateByPekerjaanNo(pekerjaanNo, updateData)
 

@@ -35,14 +35,14 @@ import (
 
 func main() {
 	// Buka file log.txt untuk ditulis (create or append)
-	file, err := os.OpenFile("log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("Gagal membuka file log.txt: %s", err)
-	}
-	defer file.Close()
+	// file, err := os.OpenFile("log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	// if err != nil {
+	// 	log.Fatalf("Gagal membuka file log.txt: %s", err)
+	// }
+	// defer file.Close()
 
-	// Pengaturan log output ke file log.txt
-	log.SetOutput(file)
+	// // Pengaturan log output ke file log.txt
+	// log.SetOutput(file)
 	log.Println("Start App Service...")
 
 	db := config.Connect()
@@ -92,7 +92,7 @@ func main() {
 	// Menampilkan log koneksi sukses
 	log.Println("App Service run in port:", port)
 
-	err = http.ListenAndServe(":"+port, router)
+	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
 		// Menampilkan log ketika koneksi gagal
 		log.Fatal("Connection Fail -> port "+port+":", err)

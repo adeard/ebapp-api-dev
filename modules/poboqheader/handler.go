@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -131,25 +133,37 @@ func (h *poBoqHeaderHandler) Store(c *gin.Context) {
 }
 
 func (h *poBoqHeaderHandler) SyncPrice(c *gin.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			c.JSON(http.StatusInternalServerError, domain.PoBoqHeaderResponse{
+				Status:  http.StatusInternalServerError,
+				Message: fmt.Sprintf("Terjadi kesalahan internal: %v", r),
+			})
+		}
+	}()
 
 	pekerjaanNo := struct {
 		PekerjaanNo string `json:"pekerjaan_no"`
 	}{}
 
-	c.ShouldBindJSON(&pekerjaanNo)
+	if err := c.ShouldBindJSON(&pekerjaanNo); err != nil {
+		c.JSON(http.StatusBadRequest, domain.PoBoqHeaderResponse{
+			Status:  http.StatusBadRequest,
+			Message: "Format input tidak valid: " + err.Error(),
+		})
+		return
+	}
 
 	response := domain.PoBoqHeaderResponse{
 		Status:  http.StatusOK,
 		Message: "Berhasil sync data header",
 	}
 
-	err := h.poBoqHeaderService.SyncActualPrice(pekerjaanNo.PekerjaanNo)
-	if err != nil {
+	if err := h.poBoqHeaderService.SyncActualPrice(pekerjaanNo.PekerjaanNo); err != nil {
 		response = domain.PoBoqHeaderResponse{
 			Status:  http.StatusBadRequest,
 			Message: err.Error(),
 		}
-
 	}
 
 	c.JSON(response.Status, response)

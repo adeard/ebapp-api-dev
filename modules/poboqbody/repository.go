@@ -232,7 +232,7 @@ func (r *repository) GenerateMainId(runNum string, order string) (int, error) {
 				WHEN CAST(main_id AS int) > parent_id THEN CAST(main_id AS int)
 				ELSE parent_id
 			END + 1 AS max_value
-		FROM DB_eBAPP.dbo.po_boq_body
+		FROM po_boq_body
 		WHERE run_num = ? 
 		AND [order] = ?
 		ORDER BY max_value DESC
