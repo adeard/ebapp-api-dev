@@ -2,6 +2,8 @@ package domain
 
 import (
 	"encoding/xml"
+	"fmt"
+	"strconv"
 )
 
 type PoDataSapHeaderTitle struct {
@@ -15,6 +17,7 @@ type PoDataSapHeaderTitle struct {
 	PoItem    []PoItem    `xml:"link>inline>feed>entry>content>properties>PoItem"`
 	ShortText []ShortText `xml:"link>inline>feed>entry>content>properties>ShortText"`
 	NetPrice  []NetPrice  `xml:"link>inline>feed>entry>content>properties>NetPrice"`
+	PriceUnit []PriceUnit `xml:"link>inline>feed>entry>content>properties>PriceUnit"`
 	PoUnit    []PoUnit    `xml:"link>inline>feed>entry>content>properties>PoUnit"`
 	Quantity  []Quantity  `xml:"link>inline>feed>entry>content>properties>Quantity"`
 	Cera      []Cera      `xml:"link>inline>feed>entry>content>properties>VendMat"`
@@ -30,6 +33,10 @@ type ShortText struct {
 
 type NetPrice struct {
 	NetPrice string `xml:",innerxml"`
+}
+
+type PriceUnit struct {
+	PriceUnit string `xml:",innerxml"`
 }
 
 type Quantity struct {
@@ -52,7 +59,28 @@ func ParseXMLTitle(xmlData []byte) (PoDataSapHeaderTitle, error) {
 		return PoDataSapHeaderTitle{}, err
 	}
 
+	// update NetPrice = NetPrice / PriceUnit
+	for i := range parsedData.NetPrice {
+		if i >= len(parsedData.PriceUnit) {
+			break
+		}
+
+		netPrice, err1 := strconv.ParseFloat(parsedData.NetPrice[i].NetPrice, 64)
+		priceUnit, err2 := strconv.ParseFloat(parsedData.PriceUnit[i].PriceUnit, 64)
+
+		if err1 != nil || err2 != nil {
+			continue
+		}
+
+		if priceUnit == 0 {
+			continue
+		}
+
+		parsedData.NetPrice[i].NetPrice = fmt.Sprintf("%.2f", netPrice/priceUnit)
+	}
+
 	return parsedData, nil
+
 }
 
 type PoDataSapHeaderTitleResponse struct {
