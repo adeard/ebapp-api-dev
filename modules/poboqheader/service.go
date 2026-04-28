@@ -4,6 +4,7 @@ import (
 	"ebapp-api-dev/domain"
 	"ebapp-api-dev/modules/listproject"
 	"ebapp-api-dev/modules/poboqbody"
+	"math"
 	"time"
 )
 
@@ -84,7 +85,7 @@ func (s *service) SyncActualPrice(pekerjaanNo string) error {
 			return err
 		}
 
-		if float64(headersData.Qty)*float64(headersData.Price) != totalPrice {
+		if math.Round(float64(headersData.Qty)*float64(headersData.Price)) != totalPrice {
 			canProgress = 0
 		}
 	}

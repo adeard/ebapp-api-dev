@@ -76,7 +76,7 @@ func ParseXMLTitle(xmlData []byte) (PoDataSapHeaderTitle, error) {
 			continue
 		}
 
-		parsedData.NetPrice[i].NetPrice = fmt.Sprintf("%.2f", netPrice/priceUnit)
+		parsedData.NetPrice[i].NetPrice = fmt.Sprintf("%.5f", netPrice/priceUnit)
 	}
 
 	return parsedData, nil
