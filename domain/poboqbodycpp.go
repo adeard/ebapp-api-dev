@@ -9,7 +9,7 @@ type PoBoqBodyCpp struct {
 	ItemLevel         int     `json:"item_level" gorm:"column:item_level"`
 	ItemDescription   string  `json:"item_description" gorm:"column:item_description"`
 	ItemSpecification string  `json:"item_specification" gorm:"column:item_specification"`
-	Qty               float32 `json:"qty" gorm:"column:qty"`
+	Qty               float64 `json:"qty" gorm:"column:qty"`
 	Status            bool    `json:"status" gorm:"column:status"`
 	Note              string  `json:"note" gorm:"column:note"`
 }
@@ -23,7 +23,7 @@ type PoBoqBodyCppRequest struct {
 	ItemLevel         int     `json:"item_level"`
 	ItemDescription   string  `json:"item_description"`
 	ItemSpecification string  `json:"item_specification"`
-	Qty               float32 `json:"qty"`
+	Qty               float64 `json:"qty"`
 	Status            bool    `json:"status"`
 	Note              string  `json:"note"`
 }
@@ -37,7 +37,7 @@ type PoBoqBodyCppResponse struct {
 	ItemLevel         int                    `json:"item_level"`
 	ItemDescription   string                 `json:"item_description"`
 	ItemSpecification string                 `json:"item_specification"`
-	Qty               float32                `json:"qty"`
+	Qty               float64                `json:"qty"`
 	Status            bool                   `json:"status"`
 	Note              string                 `json:"note"`
 	Unit              string                 `json:"unit" gorm:"column:unit"`
@@ -70,7 +70,7 @@ type PoBoqBodyCppProgress struct {
 	ItemLevel         int     `json:"item_level" gorm:"column:item_level"`
 	ItemDescription   string  `json:"item_description" gorm:"column:item_description"`
 	ItemSpecification string  `json:"item_specification" gorm:"column:item_specification"`
-	Qty               float32 `json:"qty" gorm:"column:qty"`
+	Qty               float64 `json:"qty" gorm:"column:qty"`
 	Unit              string  `json:"unit" gorm:"column:unit"`
 	Price             float64 `json:"price" gorm:"column:price"`
 	Currency          string  `json:"currency" gorm:"column:currency"`
@@ -93,7 +93,7 @@ type PoBoqBodyCppProgressRequest struct {
 	ItemLevel         int     `json:"item_level"`
 	ItemDescription   string  `json:"item_description"`
 	ItemSpecification string  `json:"item_specification"`
-	Qty               float32 `json:"qty"`
+	Qty               float64 `json:"qty"`
 	Status            bool    `json:"status"`
 	Note              string  `json:"note"`
 }
@@ -108,7 +108,7 @@ type PoBoqBodyCppProgressResponse struct {
 	ItemLevel         int                            `json:"item_level" gorm:"column:item_level"`
 	ItemDescription   string                         `json:"item_description" gorm:"column:item_description"`
 	ItemSpecification string                         `json:"item_specification" gorm:"column:item_specification"`
-	Qty               float32                        `json:"qty" gorm:"column:qty"`
+	Qty               float64                        `json:"qty" gorm:"column:qty"`
 	Unit              string                         `json:"unit" gorm:"column:unit"`
 	Price             float64                        `json:"price" gorm:"column:price"`
 	Currency          string                         `json:"currency" gorm:"column:currency"`

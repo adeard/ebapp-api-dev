@@ -5,7 +5,7 @@ type PoBoqHeaderCpp struct {
 	Po          string  `json:"po"`
 	Item        string  `json:"item"`
 	Description string  `json:"description"`
-	Qty         float32 `json:"sum" gorm:"column:qty"`
+	Qty         float64 `json:"sum" gorm:"column:qty"`
 	Order       string  `json:"order"`
 }
 

@@ -7,8 +7,8 @@ type PoProgressHeader struct {
 	Date        time.Time `json:"date" gorm:"column:date;default:NULL"`
 	Status      string    `json:"status" gorm:"column:status"`
 	IsEbapp     int       `json:"is_ebapp" gorm:"column:isebapp"`
-	LastProg    float32   `json:"last_prog" gorm:"last_prog"`
-	NewProg     float32   `json:"new_prog" gorm:"new_prog"`
+	LastProg    float64   `json:"last_prog" gorm:"last_prog"`
+	NewProg     float64   `json:"new_prog" gorm:"new_prog"`
 	Lock        int       `json:"lock" gorm:"lock"`
 	LastUpdated time.Time `json:"last_updated" gorm:"column:last_updated;default:NULL"`
 	Keterangan  string    `json:"keterangan" gorm:"column:keterangan;default:NULL"`
@@ -17,8 +17,8 @@ type PoProgressHeader struct {
 type PoProgressHeaderUpdate struct {
 	Status      string    `json:"status" gorm:"column:status;default:NULL"`
 	IsEbapp     int       `json:"is_ebapp" gorm:"column:isebapp;default:NULL"`
-	LastProg    float32   `json:"last_prog" gorm:"last_prog;default:NULL"`
-	NewProg     float32   `json:"new_prog" gorm:"new_prog;default:NULL"`
+	LastProg    float64   `json:"last_prog" gorm:"last_prog;default:NULL"`
+	NewProg     float64   `json:"new_prog" gorm:"new_prog;default:NULL"`
 	LastUpdated time.Time `json:"last_updated" gorm:"column:last_updated;default:NULL"`
 }
 
@@ -56,8 +56,8 @@ type PoProgressHeaderWithPercentage struct {
 	Date             time.Time `json:"date" gorm:"column:date;default:NULL"`
 	Status           string    `json:"status" gorm:"column:status"`
 	IsEbapp          int       `json:"is_ebapp" gorm:"column:isebapp"`
-	LastProg         float32   `json:"last_prog" gorm:"last_prog"`
-	NewProg          float32   `json:"new_prog" gorm:"new_prog"`
+	LastProg         float64   `json:"last_prog" gorm:"last_prog"`
+	NewProg          float64   `json:"new_prog" gorm:"new_prog"`
 	Lock             int       `json:"lock" gorm:"lock"`
 	LastUpdated      time.Time `json:"last_updated" gorm:"column:last_updated;default:NULL"`
 	Keterangan       string    `json:"keterangan" gorm:"column:keterangan;default:NULL"`

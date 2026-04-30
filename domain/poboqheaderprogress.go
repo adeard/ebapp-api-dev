@@ -5,7 +5,7 @@ type PoBoqHeaderProgress struct {
 	Po               string  `json:"po"`
 	Item             string  `json:"item"`
 	Description      string  `json:"description"`
-	Qty              float32 `json:"sum" gorm:"column:qty"`
+	Qty              float64 `json:"sum" gorm:"column:qty"`
 	Unit             string  `json:"pounit" gorm:"column:unit"`
 	Price            float64 `json:"price"`
 	Currency         string  `json:"currency"`

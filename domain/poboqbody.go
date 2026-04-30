@@ -9,7 +9,7 @@ type PoBoqBody struct {
 	ItemLevel         int     `json:"item_level" gorm:"column:item_level"`
 	ItemDescription   string  `json:"item_description" gorm:"column:item_description"`
 	ItemSpecification string  `json:"item_specification" gorm:"column:item_specification"`
-	Qty               float32 `json:"qty" gorm:"column:qty"`
+	Qty               float64 `json:"qty" gorm:"column:qty"`
 	Unit              string  `json:"unit" gorm:"column:unit"`
 	Price             float64 `json:"price" gorm:"column:price"`
 	Currency          string  `json:"currency" gorm:"column:currency"`
@@ -29,7 +29,7 @@ type PoBoqBodyRequest struct {
 	ItemLevel         int     `json:"item_level"`
 	ItemDescription   string  `json:"item_description"`
 	ItemSpecification string  `json:"item_specification"`
-	Qty               float32 `json:"qty"`
+	Qty               float64 `json:"qty"`
 	Unit              string  `json:"unit"`
 	Price             float64 `json:"price"`
 	Currency          string  `json:"currency"`
@@ -49,7 +49,7 @@ type PoBoqBodyResponse struct {
 	ItemLevel         int                 `json:"item_level"`
 	ItemDescription   string              `json:"item_description"`
 	ItemSpecification string              `json:"item_specification"`
-	Qty               float32             `json:"qty"`
+	Qty               float64             `json:"qty"`
 	Unit              string              `json:"unit"`
 	Price             float64             `json:"price"`
 	Currency          string              `json:"currency"`
@@ -70,7 +70,7 @@ type PoBoqBodyServerSideResponse struct {
 	ItemLevel         int                           `json:"item_level"`
 	ItemDescription   string                        `json:"item_description"`
 	ItemSpecification string                        `json:"item_specification"`
-	Qty               float32                       `json:"qty"`
+	Qty               float64                       `json:"qty"`
 	Unit              string                        `json:"unit"`
 	Price             float64                       `json:"price"`
 	Currency          string                        `json:"currency"`
