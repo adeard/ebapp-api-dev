@@ -35,6 +35,8 @@ func NewListProjectHandler(v1 *gin.RouterGroup, listProjectService Service) {
 
 	project.GET("/find_persetujuan", handler.FindPersetujuan)
 	project.POST("/post_persetujuan", handler.StorePersetujuan)
+
+	project.DELETE("", handler.DeleteByPekerjaan)
 }
 
 func (h *listProjectHandler) GetAll(c *gin.Context) {
@@ -292,7 +294,7 @@ func (h *listProjectHandler) Store4(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Gagal meneruskan data Project",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -450,4 +452,24 @@ func (h *listProjectHandler) FindPersetujuan(c *gin.Context) {
 
 	response.Data = hasil
 	c.JSON(response.Status, response)
+}
+
+func (h *listProjectHandler) DeleteByPekerjaan(c *gin.Context) {
+	projectNo := c.Query("project_no")
+
+	err := h.listProjectService.DeleteByPekerjaanNo(projectNo)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Gagal delete data project dengan no pekerjaan " + projectNo,
+		})
+		return
+	}
+
+	response := domain.ListProjectsResponse{
+		Status:  http.StatusOK,
+		Message: "Berhasil delete data project dengan no pekerjaan " + projectNo,
+	}
+
+	c.JSON(http.StatusOK, response)
 }

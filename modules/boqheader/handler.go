@@ -129,6 +129,7 @@ func (h *boqHeaderHandler) Store(c *gin.Context) {
 		CreatedBy:         input.CreatedBy,
 		Category:          input.Category,
 		Remarks:           input.Remarks,
+		Departement:       input.Departement,
 	}
 
 	boqHeaders, err := h.boqHeaderService.Store(createdBoqHeader)
@@ -192,6 +193,7 @@ func (h *boqHeaderHandler) Clone(c *gin.Context) {
 		LastUpdatedBy:     boqHeader.LastUpdatedBy,
 		Category:          boqHeader.Category,
 		Remarks:           boqHeader.Remarks,
+		Departement:       boqHeader.Departement,
 	}
 
 	headerClone, err := h.boqHeaderService.Store(cloneBoq)
@@ -248,6 +250,7 @@ func (h *boqHeaderHandler) Update(c *gin.Context) {
 		LastUpdatedBy:     input.LastUpdatedBy,
 		Category:          input.Category,
 		Remarks:           input.Remarks,
+		Departement:       input.Departement,
 	}
 
 	// Memanggil service untuk melakukan update data BoQ Header.

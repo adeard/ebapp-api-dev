@@ -17,6 +17,7 @@ type BoqHeader struct {
 	LastUpdatedBy     string    `json:"last_updated_by" gorm:"column:lastupdatedby; default:null"`
 	Category          string    `json:"category" gorm:"column:category"`
 	Remarks           string    `json:"remarks" gorm:"column:remarks"`
+	Departement       string    `json:"departement" gorm:"column:departement"`
 }
 
 type BoqHeaderRequest struct {
@@ -30,6 +31,7 @@ type BoqHeaderRequest struct {
 	LastUpdatedBy     string    `json:"last_updated_by"`
 	Category          string    `json:"category"`
 	Remarks           string    `json:"remarks"`
+	Departement       string    `json:"departement"`
 }
 
 var (

@@ -2,6 +2,8 @@ package listproject
 
 import (
 	"ebapp-api-dev/domain"
+	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -24,6 +26,8 @@ type Repository interface {
 
 	StorePersetujuan(input []domain.ListProjectPersetujuan) ([]domain.ListProjectPersetujuan, error)
 	FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectPersetujuan, error)
+
+	DeleteByPekerjaanNo(pekerjaanNo string) error
 }
 
 type repository struct {
@@ -68,29 +72,61 @@ func (r *repository) FindByPlant(ids []string) ([]domain.ListProject, error) {
 	return projects, err
 }
 
+func (r *repository) storeProject(input interface{}, po string) error {
+	poProject, err := r.FindByPo(po)
+
+	// jika error selain data tidak ditemukan
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	// jika PO sudah ada
+	if poProject.PekerjaanNo != "" {
+		return fmt.Errorf(
+			"PO %s sudah terdaftar dengan Project %s",
+			po,
+			poProject.PekerjaanNo,
+		)
+	}
+
+	// simpan data
+	err = r.db.Table("list_project").Create(input).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *repository) Store(input domain.ListProject) (domain.ListProject, error) {
-	err := r.db.Table("list_project").Create(&input).Error
+	err := r.storeProject(&input, input.Po)
 	return input, err
 }
 
 func (r *repository) Store2(input domain.ListProject2) (domain.ListProject2, error) {
-	err := r.db.Table("list_project").Create(&input).Error
+	err := r.storeProject(&input, input.Po)
 	return input, err
 }
 
 func (r *repository) Store3(input domain.ListProject3) (domain.ListProject3, error) {
-	err := r.db.Table("list_project").Create(&input).Error
+	err := r.storeProject(&input, input.Po)
 	return input, err
 }
 
 func (r *repository) Store4(input domain.ListProject4) (domain.ListProject4, error) {
-	err := r.db.Table("list_project").Create(&input).Error
+	err := r.storeProject(&input, input.Po)
 	return input, err
 }
 
 func (r *repository) FindByPekerjaanNo(id string) (domain.UpdateStatus, error) {
 	var project domain.UpdateStatus
 	err := r.db.Table("list_project").Where("pekerjaan_no =?", id).First(&project).Error
+	return project, err
+}
+
+func (r *repository) FindByPo(po string) (domain.UpdateStatus, error) {
+	var project domain.UpdateStatus
+	err := r.db.Table("list_project").Where("po =?", po).First(&project).Error
 	return project, err
 }
 
@@ -150,4 +186,38 @@ func (r *repository) FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectP
 	var listProjectsPersetujuan []domain.ListProjectPersetujuan
 	err := r.db.Table("list_project_persetujuan").Where("pekerjaan_no=?", pekerjaan_no).Find(&listProjectsPersetujuan).Error
 	return listProjectsPersetujuan, err
+}
+
+func (r *repository) DeleteByPekerjaanNo(pekerjaanNo string) error {
+	tx := r.db.Begin()
+
+	if err := tx.Table("po_project").
+		Where("pekerjaan_no = ?", pekerjaanNo).
+		Delete(nil).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Table("po_boq_header").
+		Where("pekerjaan_no = ?", pekerjaanNo).
+		Delete(nil).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Table("po_boq_body").
+		Where("run_num = ?", pekerjaanNo).
+		Delete(nil).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Table("list_project").
+		Where("pekerjaan_no = ? AND status = ?", pekerjaanNo, "Draft").
+		Delete(nil).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }

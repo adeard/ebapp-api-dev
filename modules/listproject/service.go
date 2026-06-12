@@ -22,6 +22,8 @@ type Service interface {
 
 	StorePersetujuan(input []domain.ListProjectPersetujuan) error
 	FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectPersetujuan, error)
+
+	DeleteByPekerjaanNo(pekerjaan_no string) error
 }
 
 type service struct {
@@ -122,4 +124,9 @@ func (s *service) StorePersetujuan(input []domain.ListProjectPersetujuan) error 
 func (s *service) FindPersetujuan(pekerjaan_no string) ([]domain.ListProjectPersetujuan, error) {
 	hasil, err := s.repository.FindPersetujuan(pekerjaan_no)
 	return hasil, err
+}
+
+func (s *service) DeleteByPekerjaanNo(pekerjaan_no string) error {
+	err := s.repository.DeleteByPekerjaanNo(pekerjaan_no)
+	return err
 }
