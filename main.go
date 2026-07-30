@@ -2,6 +2,7 @@ package main
 
 import (
 	"ebapp-api-dev/config"
+	"ebapp-api-dev/job"
 	"ebapp-api-dev/middlewares"
 	"ebapp-api-dev/modules/auth"
 	"ebapp-api-dev/modules/boqbody"
@@ -82,6 +83,9 @@ func main() {
 
 	// Mengatur mode GIN menjadi release
 	gin.SetMode(gin.ReleaseMode)
+
+	//cron job
+	job.MainJob()
 
 	//Penyesuaian Port ke IIS
 	port := "88"
