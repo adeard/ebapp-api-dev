@@ -12,6 +12,7 @@ type DocItem struct {
 	PotensialActivityOwner string `json:"PotensialActivityOwner"`
 	Activity               string `json:"Activity"`
 	Status                 string `json:"Status"`
+	ActivityOwner          string `json:"ActivityOwner"`
 }
 
 type UserEmailResponse struct {
@@ -28,4 +29,10 @@ type LoginResponse struct {
 	Result  bool   `json:"result"`
 	Message string `json:"message"`
 	Datas   string `json:"datas"`
+}
+
+type UserEmailByUsernameResponse struct {
+	Result  bool   `json:"result"`
+	Objek   string `json:"objek"`
+	Message string `json:"message"`
 }

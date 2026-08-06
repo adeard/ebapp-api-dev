@@ -53,12 +53,15 @@ func ProsesSendEmail() error {
 
 	client := &http.Client{}
 
+	listStatus := []string{"Waiting", "OnProgress"}
+	bodyListStatus, _ := json.Marshal(listStatus)
+
 	urlDoc := fmt.Sprintf(
-		"%swf_helper/get_doc_by_status?status=Waiting&doc_alias=eBAPP",
+		"%swf_helper/get_doc_by_status?doc_alias=eBAPP",
 		os.Getenv("SERVER_URL_WR"),
 	)
 
-	req, err := http.NewRequest(http.MethodGet, urlDoc, nil)
+	req, err := http.NewRequest(http.MethodPost, urlDoc, bytes.NewBuffer(bodyListStatus))
 	if err != nil {
 		return err
 	}
@@ -94,54 +97,105 @@ func ProsesSendEmail() error {
 
 		body, _ := json.Marshal(listMasterValueID)
 
-		urlUser := fmt.Sprintf(
-			"%suser/list_email_by_role_master_value_id?application_role=%s",
-			os.Getenv("SERVER_URL_UM"),
-			url.QueryEscape(doc.PotensialActivityOwner),
-		)
+		emails := []string{}
 
-		reqUser, err := http.NewRequest(
-			http.MethodPost,
-			urlUser,
-			bytes.NewBuffer(body),
-		)
-
-		if err != nil {
-			log.Println(err)
+		if strings.TrimSpace(doc.PotensialActivityOwner) == "bapp.kontraktorvendor" {
 			continue
 		}
 
-		reqUser.Header.Set("Content-Type", "application/json")
-		reqUser.Header.Set("authenticationToken", authToken)
+		if strings.TrimSpace(doc.ActivityOwner) != "" {
 
-		respUser, err := client.Do(reqUser)
-		if err != nil {
-			log.Println(err)
+			urlUser := fmt.Sprintf(
+				"%suser/email_by_username?username=%s",
+				os.Getenv("SERVER_URL_UM"),
+				url.QueryEscape(doc.ActivityOwner),
+			)
+
+			reqUser, err := http.NewRequest(http.MethodGet, urlUser, nil)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			reqUser.Header.Set("Accept", "application/json")
+			reqUser.Header.Set("authenticationToken", authToken)
+
+			respUser, err := client.Do(reqUser)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			defer respUser.Body.Close()
+
+			var userResp UserEmailByUsernameResponse
+			if err := json.NewDecoder(respUser.Body).Decode(&userResp); err != nil {
+				log.Println(err)
+				continue
+			}
+
+			if !userResp.Result || strings.TrimSpace(userResp.Objek) == "" {
+				continue
+			}
+
+			emails = append(emails, userResp.Objek)
+
+		} else {
+
+			urlUser := fmt.Sprintf(
+				"%suser/list_email_by_role_master_value_id?application_role=%s",
+				os.Getenv("SERVER_URL_UM"),
+				url.QueryEscape(doc.PotensialActivityOwner),
+			)
+
+			reqUser, err := http.NewRequest(
+				http.MethodPost,
+				urlUser,
+				bytes.NewBuffer(body),
+			)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			reqUser.Header.Set("Content-Type", "application/json")
+			reqUser.Header.Set("authenticationToken", authToken)
+
+			respUser, err := client.Do(reqUser)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			defer respUser.Body.Close()
+
+			var users UserEmailResponse
+			if err := json.NewDecoder(respUser.Body).Decode(&users); err != nil {
+				log.Println(err)
+				continue
+			}
+
+			if !users.Result {
+				continue
+			}
+
+			for _, user := range users.Objek {
+				if strings.TrimSpace(user.Email) != "" {
+					emails = append(emails, user.Email)
+				}
+			}
+		}
+
+		if len(emails) == 0 {
 			continue
 		}
 
-		var users UserEmailResponse
+		for _, user := range emails {
 
-		if err := json.NewDecoder(respUser.Body).Decode(&users); err != nil {
-			respUser.Body.Close()
-			log.Println(err)
-			continue
-		}
-
-		respUser.Body.Close()
-
-		if !users.Result {
-			continue
-		}
-
-		for _, user := range users.Objek {
-
-			if user.Email == "" {
+			if user == "" {
 				continue
 			}
 
 			// Default kirim ke email user
-			sendTo := user.Email
+			sendTo := user
 			projectID := ""
 			estate := ""
 			projectName := ""
